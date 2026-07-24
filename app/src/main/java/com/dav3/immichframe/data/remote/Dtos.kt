@@ -23,15 +23,28 @@ data class AlbumDto(
 )
 
 @Serializable
-data class AlbumInfoDto(
-    val id: String,
-    val albumName: String,
-    val assetCount: Int = 0,
-    val assets: List<AssetDto> = emptyList(),
-)
-
-@Serializable
 data class AssetDto(
     val id: String,
     val type: String = "IMAGE",
+)
+
+// --- Search endpoint (POST /search/metadata) ---
+
+@Serializable
+data class SearchMetadataRequest(
+    val albumIds: List<String>,
+    val type: String = "IMAGE",
+    val size: Int = 1000,
+)
+
+@Serializable
+data class SearchMetadataResponse(
+    val assets: SearchAssetsDto,
+)
+
+@Serializable
+data class SearchAssetsDto(
+    val total: Int = 0,
+    val count: Int = 0,
+    val items: List<AssetDto> = emptyList(),
 )

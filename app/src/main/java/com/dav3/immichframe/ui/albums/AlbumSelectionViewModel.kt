@@ -67,6 +67,8 @@ constructor(
 
     fun retry() = loadAlbums()
 
+    fun thumbnailUrl(assetId: String?): String? = assetId?.let { immichRepo.thumbnailUrl(it) }
+
     fun startSlideshow() {
         viewModelScope.launch {
             settingsRepo.setSelectedAlbumIds(_uiState.value.selectedIds.toList())

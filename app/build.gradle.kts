@@ -15,7 +15,7 @@ android {
         applicationId = "com.dav3.immichframe"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = (System.currentTimeMillis() / 1000).toInt()
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

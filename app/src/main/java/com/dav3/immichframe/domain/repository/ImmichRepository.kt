@@ -14,5 +14,5 @@ interface ImmichRepository {
 
     fun imageUrl(assetId: String): String
 
-    fun thumbnailUrl(albumId: String): String
+    fun thumbnailUrl(assetId: String): String
 }

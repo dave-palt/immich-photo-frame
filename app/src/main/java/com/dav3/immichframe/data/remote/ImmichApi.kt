@@ -1,8 +1,8 @@
 package com.dav3.immichframe.data.remote
 
+import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.POST
 
 interface ImmichApi {
     @GET("server/ping")
@@ -14,9 +14,8 @@ interface ImmichApi {
     @GET("albums")
     suspend fun getAlbums(): List<AlbumDto>
 
-    @GET("albums/{id}")
-    suspend fun getAlbumInfo(
-        @Path("id") id: String,
-        @Query("withoutAssets") withoutAssets: Boolean = false,
-    ): AlbumInfoDto
+    @POST("search/metadata")
+    suspend fun searchAssets(
+        @Body request: SearchMetadataRequest,
+    ): SearchMetadataResponse
 }

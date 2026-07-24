@@ -93,20 +93,22 @@ constructor(
 
     override suspend fun getAlbumAssets(albumId: String): Result<List<Asset>> = runCatching {
         getApi()
-            .getAlbumInfo(albumId)
+            .searchAssets(SearchMetadataRequest(albumIds = listOf(albumId)))
             .assets
+            .items
             .filter { it.type.equals("IMAGE", ignoreCase = true) }
             .map { Asset(it.id, AssetType.IMAGE) }
     }
 
     override fun imageUrl(assetId: String): String {
         val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }
-        return "${base.trimEnd('/')}/api/assets/$assetId/original"
+        val apiKey = runBlocking { settings.apiKey.first() }
+        return "${base.trimEnd('/')}/api/assets/$assetId/thumbnail?size=preview&apiKey=$apiKey"
     }
 
-    override fun thumbnailUrl(albumId: String): String {
+    override fun thumbnailUrl(assetId: String): String {
         val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }
-        // Album list returns albumThumbnailAssetId; the caller should pass the assetId
-        return base.trimEnd('/')
+        val apiKey = runBlocking { settings.apiKey.first() }
+        return "${base.trimEnd('/')}/api/assets/$assetId/thumbnail?size=thumbnail&apiKey=$apiKey"
     }
 }

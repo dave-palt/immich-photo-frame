@@ -2,7 +2,7 @@
 #
 # generate-api-key.sh
 #
-# Creates a least-privilege Immich API key for ImmichPhotoFrame.
+# Creates or updates a least-privilege Immich API key for ImmichPhotoFrame.
 # The key is scoped to only the 4 permissions the app needs:
 #
 #   album.read   — list and get albums
@@ -16,10 +16,12 @@
 #   ./generate-api-key.sh https://photos.example.com:2283 user@example.com
 #
 # If password is omitted, you'll be prompted securely.
-# The script never stores credentials — the login token is used in-memory
-# to create the key, then discarded.
+# If an existing "ImmichPhotoFrame" key is found, you'll be asked to update
+# or recreate it. Otherwise a new key is created.
 #
 set -euo pipefail
+
+KEY_NAME="ImmichPhotoFrame"
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 <server-url> <email> [password]"
@@ -60,20 +62,66 @@ fi
 
 echo "Login successful."
 
-# --- Step 2: Create scoped API key ---
+# --- Step 2: Check for existing ImmichPhotoFrame key ---
+
+EXISTING_KEYS=$(curl -sf "${SERVER_URL}/api/api-keys" \
+    -H "Authorization: Bearer ${ACCESS_TOKEN}" 2>&1) || EXISTING_KEYS="[]"
+
+# Find key ID(s) matching our name
+EXISTING_ID=$(echo "$EXISTING_KEYS" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
+
+# Check if any key has our name
+KEY_NAMES=$(echo "$EXISTING_KEYS" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//;s/"$//')
+
+if echo "$KEY_NAMES" | grep -q "$KEY_NAME"; then
+    echo "Found existing '$KEY_NAME' key."
+
+    # Extract the ID of the matching key (find the name, then grab the nearest id)
+    MATCHING_ID=$(echo "$EXISTING_KEYS" | tr ',' '\n' | grep -A1 "\"name\".*\"$KEY_NAME\"" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
+    # Fallback: try a looser match
+    if [ -z "$MATCHING_ID" ]; then
+        MATCHING_ID=$(echo "$EXISTING_KEYS" | python3 -c "
+import sys, json
+for k in json.load(sys.stdin):
+    if k.get('name') == '$KEY_NAME':
+        print(k['id'])
+        break
+" 2>/dev/null || true)
+    fi
+
+    echo "  Existing key ID: $MATCHING_ID"
+    echo ""
+    read -p "Delete and recreate it with fresh permissions? [y/N] " CONFIRM
+    if [[ "$CONFIRM" =~ ^[Yy] ]]; then
+        echo "Deleting old key..."
+        curl -sf -X DELETE "${SERVER_URL}/api/api-keys/${MATCHING_ID}" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" || {
+            echo "Error: Could not delete old key."
+            exit 1
+        }
+        echo "Old key deleted."
+    else
+        echo "Keeping existing key. Done."
+        exit 0
+    fi
+fi
+
+# --- Step 3: Create scoped API key ---
+
+echo "Creating scoped key..."
 
 KEY_RESPONSE=$(curl -sf -X POST "${SERVER_URL}/api/api-keys" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-    -d '{
-        "name": "ImmichPhotoFrame",
-        "permissions": [
-            "album.read",
-            "asset.read",
-            "asset.view",
-            "user.read"
+    -d "{
+        \"name\": \"${KEY_NAME}\",
+        \"permissions\": [
+            \"album.read\",
+            \"asset.read\",
+            \"asset.view\",
+            \"user.read\"
         ]
-    }') || {
+    }") || {
     echo "Error: API key creation failed. Your Immich server may not support scoped keys (requires v1.135+)."
     exit 1
 }
@@ -90,7 +138,7 @@ fi
 
 echo ""
 echo "================================================"
-echo "  ImmichPhotoFrame API Key (save this now)"
+echo "  ${KEY_NAME} API Key (save this now)"
 echo "================================================"
 echo ""
 echo "$API_KEY"

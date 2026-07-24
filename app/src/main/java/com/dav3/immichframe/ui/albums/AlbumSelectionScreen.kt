@@ -88,6 +88,7 @@ fun AlbumSelectionScreen(
                 items(state.albums, key = { it.id }) { album ->
                     AlbumCard(
                         album = album,
+                        thumbnailUrl = viewModel.thumbnailUrl(album.thumbnailAssetId),
                         isSelected = album.id in state.selectedIds,
                         onClick = { viewModel.toggleAlbum(album.id) },
                     )
@@ -100,6 +101,7 @@ fun AlbumSelectionScreen(
 @Composable
 private fun AlbumCard(
     album: Album,
+    thumbnailUrl: String?,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
@@ -111,9 +113,9 @@ private fun AlbumCard(
         shape = RoundedCornerShape(12.dp),
     ) {
         Box {
-            if (album.thumbnailAssetId != null) {
+            if (thumbnailUrl != null) {
                 AsyncImage(
-                    model = album.id, // placeholder; full URL built by Coil interceptor
+                    model = thumbnailUrl,
                     contentDescription = album.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
