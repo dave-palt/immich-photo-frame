@@ -70,7 +70,16 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml') }}
           restore-keys: gradle-${{ runner.os }}-
 
+      - name: Decode debug keystore
+        run: |
+          echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 -d > debug.keystore
+          echo "DEBUG_KEYSTORE_PATH=$(pwd)/debug.keystore" >> $GITHUB_ENV
+
       - name: Build debug APK
+        env:
+          DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+          DEBUG_KEY_ALIAS: ${{ secrets.DEBUG_KEY_ALIAS }}
+          DEBUG_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact

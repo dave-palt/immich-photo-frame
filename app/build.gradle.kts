@@ -34,6 +34,23 @@ android {
                 keyPassword = providers.environmentVariable("SIGNING_KEY_PASSWORD").get()
             }
         }
+        create("sharedDebug") {
+            // Use a shared debug keystore (base64 in CI secret DEBUG_KEYSTORE)
+            // so all dev builds share the same signature for clean upgrades.
+            // Falls back to the default debug keystore (~/.android/debug.keystore) locally.
+            val debugStorePath = providers.environmentVariable("DEBUG_KEYSTORE_PATH").orNull
+            if (debugStorePath != null) {
+                storeFile = file(debugStorePath)
+                storePassword = providers.environmentVariable("DEBUG_KEYSTORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("DEBUG_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("DEBUG_KEY_PASSWORD").get()
+            } else {
+                storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
     }
 
     buildTypes {
@@ -41,6 +58,7 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-dev"
+            signingConfig = signingConfigs.findByName("sharedDebug")
         }
         release {
             isMinifyEnabled = true

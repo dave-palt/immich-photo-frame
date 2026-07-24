@@ -18,3 +18,4 @@ local.env
 /app/build
 /app/release.jks
 app/local signing.properties
+debug.keystore
