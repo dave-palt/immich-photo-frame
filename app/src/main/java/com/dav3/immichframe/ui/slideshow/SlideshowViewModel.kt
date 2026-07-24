@@ -50,16 +50,25 @@ constructor(
             }
 
             val allAssets = mutableListOf<Asset>()
+            val errors = mutableListOf<String>()
             for (id in albumIds) {
-                immichRepo.getAlbumAssets(id).onSuccess { allAssets.addAll(it) }
+                immichRepo.getAlbumAssets(id).fold(
+                    onSuccess = { allAssets.addAll(it) },
+                    onFailure = { errors.add("${id.take(8)}: ${it.message ?: "unknown"}") },
+                )
             }
 
-            _uiState.value =
-                if (allAssets.isEmpty()) {
-                    SlideshowUiState(isLoading = false, error = "No images found")
-                } else {
+            _uiState.value = when {
+                allAssets.isNotEmpty() -> {
                     SlideshowUiState(assets = allAssets.shuffled(), currentIndex = 0, isLoading = false)
                 }
+                errors.isNotEmpty() -> {
+                    SlideshowUiState(isLoading = false, error = "Asset load failed:\n${errors.joinToString("\n")}")
+                }
+                else -> {
+                    SlideshowUiState(isLoading = false, error = "No images found")
+                }
+            }
         }
     }
 

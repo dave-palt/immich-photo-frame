@@ -1,5 +1,6 @@
 package com.dav3.immichframe.data.remote
 
+import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.domain.model.Album
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
@@ -52,7 +53,11 @@ constructor(
 
         val logging =
             HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.NONE // don't log API key
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BASIC
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
             }
 
         val client =
