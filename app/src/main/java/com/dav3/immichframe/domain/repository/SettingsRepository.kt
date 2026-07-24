@@ -10,7 +10,10 @@ interface SettingsRepository {
     val slideshowSettings: Flow<SlideshowSettings>
 
     suspend fun setServerUrl(url: String)
+
     suspend fun setApiKey(key: String)
+
     suspend fun setSelectedAlbumIds(ids: List<String>)
+
     suspend fun setSlideshowSettings(settings: SlideshowSettings)
 }

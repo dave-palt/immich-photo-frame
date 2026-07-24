@@ -21,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun SetupScreen(
     onSuccess: () -> Unit,
-    viewModel: SetupViewModel = hiltViewModel()
+    viewModel: SetupViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -42,17 +42,17 @@ fun SetupScreen(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 "ImmichFrame",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 "Connect to your Immich server",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             )
             Spacer(Modifier.height(32.dp))
 
@@ -62,7 +62,7 @@ fun SetupScreen(
                 label = { Text("Immich Server URL") },
                 placeholder = { Text("https://photos.example.com") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(16.dp))
 
@@ -77,24 +77,24 @@ fun SetupScreen(
                     IconButton(onClick = { showKey = !showKey }) {
                         Icon(
                             if (showKey) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (showKey) "Hide key" else "Show key"
+                            contentDescription = if (showKey) "Hide key" else "Show key",
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(24.dp))
 
             Button(
                 onClick = viewModel::testConnection,
                 enabled = state.connectionState != ConnectionState.CONNECTING,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 if (state.connectionState == ConnectionState.CONNECTING) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                     Spacer(Modifier.width(8.dp))
                 }
@@ -106,7 +106,7 @@ fun SetupScreen(
                     "Connected as ${state.connectedEmail}",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = 12.dp),
                 )
             }
             AnimatedVisibility(state.connectionState == ConnectionState.ERROR) {
@@ -114,7 +114,7 @@ fun SetupScreen(
                     state.errorMessage ?: "Connection failed",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = 12.dp),
                 )
             }
         }

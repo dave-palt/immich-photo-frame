@@ -16,7 +16,7 @@ import com.dav3.immichframe.domain.model.FillMode
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val s by viewModel.settings.collectAsState()
 
@@ -28,9 +28,9 @@ fun SettingsScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -38,7 +38,7 @@ fun SettingsScreen(
                 .padding(padding)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Slideshow interval
             Text("Slideshow Interval: ${s.intervalSeconds}s", style = MaterialTheme.typography.titleSmall)
@@ -46,7 +46,7 @@ fun SettingsScreen(
                 value = s.intervalSeconds.toFloat(),
                 onValueChange = { viewModel.updateInterval(it.toInt()) },
                 valueRange = 5f..120f,
-                steps = 22
+                steps = 22,
             )
 
             HorizontalDivider()
@@ -57,12 +57,12 @@ fun SettingsScreen(
                 FilterChip(
                     selected = s.fillMode == FillMode.CONTAIN,
                     onClick = { viewModel.updateFillMode(FillMode.CONTAIN) },
-                    label = { Text("Contain") }
+                    label = { Text("Contain") },
                 )
                 FilterChip(
                     selected = s.fillMode == FillMode.COVER,
                     onClick = { viewModel.updateFillMode(FillMode.COVER) },
-                    label = { Text("Cover") }
+                    label = { Text("Cover") },
                 )
             }
 
@@ -71,15 +71,15 @@ fun SettingsScreen(
             // Toggles
             ListItem(
                 headlineContent = { Text("Ken Burns Effect") },
-                trailingContent = { Switch(checked = s.kenBurns, onCheckedChange = { viewModel.toggleKenBurns() }) }
+                trailingContent = { Switch(checked = s.kenBurns, onCheckedChange = { viewModel.toggleKenBurns() }) },
             )
             ListItem(
                 headlineContent = { Text("Show Clock") },
-                trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) }
+                trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
             )
             ListItem(
                 headlineContent = { Text("Keep Screen On") },
-                trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) }
+                trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) },
             )
         }
     }

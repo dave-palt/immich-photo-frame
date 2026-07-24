@@ -4,12 +4,12 @@ data class Album(
     val id: String,
     val name: String,
     val assetCount: Int,
-    val thumbnailAssetId: String?
+    val thumbnailAssetId: String?,
 )
 
 data class Asset(
     val id: String,
-    val type: AssetType
+    val type: AssetType,
 )
 
 enum class AssetType { IMAGE, VIDEO }
@@ -20,7 +20,7 @@ data class SlideshowSettings(
     val fillMode: FillMode = FillMode.CONTAIN,
     val kenBurns: Boolean = false,
     val showClock: Boolean = false,
-    val keepScreenOn: Boolean = true
+    val keepScreenOn: Boolean = true,
 )
 
 enum class FillMode { CONTAIN, COVER }

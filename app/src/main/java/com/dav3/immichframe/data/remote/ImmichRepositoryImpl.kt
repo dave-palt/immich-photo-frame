@@ -5,23 +5,24 @@ import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ImmichRepositoryImpl @Inject constructor(
-    private val settings: SettingsRepository
+class ImmichRepositoryImpl
+@Inject
+constructor(
+    private val settings: SettingsRepository,
 ) : ImmichRepository {
-
     private val json = Json { ignoreUnknownKeys = true }
 
     private var cachedApi: ImmichApi? = null
@@ -38,30 +39,39 @@ class ImmichRepositoryImpl @Inject constructor(
 
         val apiKey = runBlocking { settings.apiKey.first() }
 
-        val authInterceptor = Interceptor { chain ->
-            val req = chain.request().newBuilder()
-                .addHeader("x-api-key", apiKey)
+        val authInterceptor =
+            Interceptor { chain ->
+                val req =
+                    chain
+                        .request()
+                        .newBuilder()
+                        .addHeader("x-api-key", apiKey)
+                        .build()
+                chain.proceed(req)
+            }
+
+        val logging =
+            HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.NONE // don't log API key
+            }
+
+        val client =
+            OkHttpClient
+                .Builder()
+                .addInterceptor(authInterceptor)
+                .addInterceptor(logging)
                 .build()
-            chain.proceed(req)
-        }
-
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.NONE // don't log API key
-        }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .addInterceptor(logging)
-            .build()
 
         val url = if (baseUrl.endsWith("/")) "${baseUrl}api/" else "$baseUrl/api/"
 
-        cachedApi = Retrofit.Builder()
-            .baseUrl(url)
-            .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
-            .create(ImmichApi::class.java)
+        cachedApi =
+            Retrofit
+                .Builder()
+                .baseUrl(url)
+                .client(client)
+                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                .build()
+                .create(ImmichApi::class.java)
 
         cachedBaseUrl = baseUrl
         return cachedApi!!
@@ -82,7 +92,9 @@ class ImmichRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAlbumAssets(albumId: String): Result<List<Asset>> = runCatching {
-        getApi().getAlbumInfo(albumId).assets
+        getApi()
+            .getAlbumInfo(albumId)
+            .assets
             .filter { it.type.equals("IMAGE", ignoreCase = true) }
             .map { Asset(it.id, AssetType.IMAGE) }
     }

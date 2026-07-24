@@ -27,7 +27,7 @@ import com.dav3.immichframe.domain.model.Album
 fun AlbumSelectionScreen(
     onStartSlideshow: () -> Unit,
     onSettings: () -> Unit,
-    viewModel: AlbumSelectionViewModel = hiltViewModel()
+    viewModel: AlbumSelectionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -39,17 +39,17 @@ fun AlbumSelectionScreen(
                     IconButton(onClick = onSettings) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
-                }
+                },
             )
         },
         bottomBar = {
             if (state.selectedIds.isNotEmpty()) {
                 BottomAppBar(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ) {
                     Text(
                         "${state.selectedIds.size} selected",
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 16.dp),
                     )
                     Spacer(Modifier.weight(1f))
                     Button(
@@ -57,11 +57,11 @@ fun AlbumSelectionScreen(
                             viewModel.startSlideshow()
                             onStartSlideshow()
                         },
-                        modifier = Modifier.padding(end = 16.dp)
+                        modifier = Modifier.padding(end = 16.dp),
                     ) { Text("Start Slideshow") }
                 }
             }
-        }
+        },
     ) { padding ->
         when {
             state.isLoading -> {
@@ -83,13 +83,13 @@ fun AlbumSelectionScreen(
                 contentPadding = PaddingValues(16.dp, padding.calculateTopPadding().value.toInt().dp, 16.dp, 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
             ) {
                 items(state.albums, key = { it.id }) { album ->
                     AlbumCard(
                         album = album,
                         isSelected = album.id in state.selectedIds,
-                        onClick = { viewModel.toggleAlbum(album.id) }
+                        onClick = { viewModel.toggleAlbum(album.id) },
                     )
                 }
             }
@@ -101,14 +101,14 @@ fun AlbumSelectionScreen(
 private fun AlbumCard(
     album: Album,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
     ) {
         Box {
             if (album.thumbnailAssetId != null) {
@@ -118,26 +118,26 @@ private fun AlbumCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(140.dp),
                 )
             } else {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Outlined.Circle, contentDescription = null, tint = Color.Gray) }
             }
 
             // Selection indicator
             IconButton(
                 onClick = onClick,
-                modifier = Modifier.align(Alignment.TopEnd)
+                modifier = Modifier.align(Alignment.TopEnd),
             ) {
                 Icon(
                     if (isSelected) Icons.Default.CheckCircle else Icons.Outlined.Circle,
                     contentDescription = if (isSelected) "Selected" else "Not selected",
-                    tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f),
                 )
             }
 
@@ -146,17 +146,17 @@ private fun AlbumCard(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(12.dp),
             ) {
                 Text(
                     album.name,
                     style = MaterialTheme.typography.labelLarge,
-                    color = Color.White
+                    color = Color.White,
                 )
                 Text(
                     "${album.assetCount} photos",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = Color.White.copy(alpha = 0.7f),
                 )
             }
         }

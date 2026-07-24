@@ -48,7 +48,7 @@ import kotlinx.coroutines.delay
 fun SlideshowScreen(
     onClose: () -> Unit,
     onSettings: () -> Unit,
-    viewModel: SlideshowViewModel = hiltViewModel()
+    viewModel: SlideshowViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val settings by viewModel.settings.collectAsState(initial = com.dav3.immichframe.domain.model.SlideshowSettings())
@@ -87,7 +87,7 @@ fun SlideshowScreen(
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { controlsVisible = !controlsVisible })
                 },
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             when {
                 state.isLoading -> CircularProgressIndicator()
@@ -96,20 +96,23 @@ fun SlideshowScreen(
 
                 state.assets.isNotEmpty() -> {
                     val asset = state.assets[state.currentIndex]
-                    val scale = if (s.fillMode == com.dav3.immichframe.domain.model.FillMode.COVER)
-                        ContentScale.Crop else ContentScale.Fit
+                    val scale = if (s.fillMode == com.dav3.immichframe.domain.model.FillMode.COVER) {
+                        ContentScale.Crop
+                    } else {
+                        ContentScale.Fit
+                    }
 
                     AnimatedContent(
                         targetState = asset.id,
                         transitionSpec = { fadeIn(tween(1000)) togetherWith fadeOut(tween(1000)) },
-                        label = "slideshow"
+                        label = "slideshow",
                     ) { assetId ->
                         val url = viewModel.imageUrl(assetId)
                         AsyncImage(
                             model = url,
                             contentDescription = null,
                             contentScale = scale,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 }
@@ -120,14 +123,14 @@ fun SlideshowScreen(
                 visible = controlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color(0x80000000))
                         .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text("${state.assets.size} photos", color = Color.White)
                     androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
@@ -145,7 +148,7 @@ fun SlideshowScreen(
                 visible = controlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
-                modifier = Modifier.align(Alignment.CenterStart)
+                modifier = Modifier.align(Alignment.CenterStart),
             ) {
                 IconButton(onClick = { viewModel.previous() }) {
                     Icon(Icons.Default.NavigateBefore, "Previous", tint = Color.White, modifier = Modifier.size(48.dp))
@@ -155,7 +158,7 @@ fun SlideshowScreen(
                 visible = controlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
-                modifier = Modifier.align(Alignment.CenterEnd)
+                modifier = Modifier.align(Alignment.CenterEnd),
             ) {
                 IconButton(onClick = { viewModel.next() }) {
                     Icon(Icons.Default.NavigateNext, "Next", tint = Color.White, modifier = Modifier.size(48.dp))
@@ -167,14 +170,14 @@ fun SlideshowScreen(
                 visible = controlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter),
             ) {
                 IconButton(onClick = { isPaused = !isPaused }) {
                     Icon(
                         if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                         if (isPaused) "Play" else "Pause",
                         tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp),
                     )
                 }
             }

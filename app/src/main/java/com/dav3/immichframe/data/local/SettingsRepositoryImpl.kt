@@ -23,10 +23,11 @@ import javax.inject.Singleton
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 
 @Singleton
-class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+class SettingsRepositoryImpl
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
 ) : SettingsRepository {
-
     private object Keys {
         val SERVER_URL = stringPreferencesKey("server_url")
         val SELECTED_ALBUMS = stringSetPreferencesKey("selected_album_ids")
@@ -40,7 +41,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     // Encrypted storage for API key
     private val masterKey by lazy {
-        MasterKey.Builder(context)
+        MasterKey
+            .Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
     }
@@ -51,16 +53,17 @@ class SettingsRepositoryImpl @Inject constructor(
             "secure_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
     }
 
     override val serverUrl: Flow<String> =
         context.dataStore.data.map { it[Keys.SERVER_URL] ?: "" }
 
-    override val apiKey: Flow<String> = kotlinx.coroutines.flow.flow {
-        emit(encPrefs.getString("api_key", "") ?: "")
-    }
+    override val apiKey: Flow<String> =
+        kotlinx.coroutines.flow.flow {
+            emit(encPrefs.getString("api_key", "") ?: "")
+        }
 
     override val selectedAlbumIds: Flow<List<String>> =
         context.dataStore.data.map {
@@ -75,7 +78,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 fillMode = FillMode.valueOf(prefs[Keys.FILL_MODE] ?: FillMode.CONTAIN.name),
                 kenBurns = prefs[Keys.KEN_BURNS]?.toBoolean() ?: false,
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
-                keepScreenOn = prefs[Keys.KEEP_SCREEN_ON]?.toBoolean() ?: true
+                keepScreenOn = prefs[Keys.KEEP_SCREEN_ON]?.toBoolean() ?: true,
             )
         }
 

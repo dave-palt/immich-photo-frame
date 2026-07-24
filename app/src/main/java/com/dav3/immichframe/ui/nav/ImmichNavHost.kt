@@ -35,24 +35,24 @@ fun ImmichNavHost() {
     ) {
         composable(Routes.SETUP) {
             SetupScreen(
-                onSuccess = { navController.navigate(Routes.ALBUMS) { popUpTo(Routes.SETUP) { inclusive = true } } }
+                onSuccess = { navController.navigate(Routes.ALBUMS) { popUpTo(Routes.SETUP) { inclusive = true } } },
             )
         }
         composable(Routes.ALBUMS) {
             AlbumSelectionScreen(
                 onStartSlideshow = { navController.navigate(Routes.SLIDESHOW) },
-                onSettings = { navController.navigate(Routes.SETTINGS) }
+                onSettings = { navController.navigate(Routes.SETTINGS) },
             )
         }
         composable(Routes.SLIDESHOW) {
             SlideshowScreen(
                 onClose = { navController.popBackStack() },
-                onSettings = { navController.navigate(Routes.SETTINGS) }
+                onSettings = { navController.navigate(Routes.SETTINGS) },
             )
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
             )
         }
     }

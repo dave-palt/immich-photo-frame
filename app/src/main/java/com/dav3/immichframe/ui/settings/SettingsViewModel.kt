@@ -13,12 +13,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val settingsRepo: SettingsRepository
+class SettingsViewModel
+@Inject
+constructor(
+    private val settingsRepo: SettingsRepository,
 ) : ViewModel() {
-
-    val settings: StateFlow<SlideshowSettings> = settingsRepo.slideshowSettings
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SlideshowSettings())
+    val settings: StateFlow<SlideshowSettings> =
+        settingsRepo.slideshowSettings
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SlideshowSettings())
 
     fun updateInterval(seconds: Int) = viewModelScope.launch {
         settingsRepo.setSlideshowSettings(settings.value.copy(intervalSeconds = seconds))

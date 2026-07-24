@@ -18,20 +18,27 @@ data class SlideshowUiState(
     val assets: List<Asset> = emptyList(),
     val currentIndex: Int = 0,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
 )
 
 @HiltViewModel
-class SlideshowViewModel @Inject constructor(
+class SlideshowViewModel
+@Inject
+constructor(
     private val immichRepo: ImmichRepository,
-    private val settingsRepo: SettingsRepository
+    private val settingsRepo: SettingsRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SlideshowUiState())
     val uiState: StateFlow<SlideshowUiState> = _uiState
 
-    val settings = settingsRepo.slideshowSettings
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.dav3.immichframe.domain.model.SlideshowSettings())
+    val settings =
+        settingsRepo.slideshowSettings
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                com.dav3.immichframe.domain.model
+                    .SlideshowSettings(),
+            )
 
     fun load() {
         viewModelScope.launch {
@@ -47,11 +54,12 @@ class SlideshowViewModel @Inject constructor(
                 immichRepo.getAlbumAssets(id).onSuccess { allAssets.addAll(it) }
             }
 
-            _uiState.value = if (allAssets.isEmpty()) {
-                SlideshowUiState(isLoading = false, error = "No images found")
-            } else {
-                SlideshowUiState(assets = allAssets.shuffled(), currentIndex = 0, isLoading = false)
-            }
+            _uiState.value =
+                if (allAssets.isEmpty()) {
+                    SlideshowUiState(isLoading = false, error = "No images found")
+                } else {
+                    SlideshowUiState(assets = allAssets.shuffled(), currentIndex = 0, isLoading = false)
+                }
         }
     }
 

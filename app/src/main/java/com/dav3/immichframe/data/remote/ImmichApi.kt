@@ -5,7 +5,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ImmichApi {
-
     @GET("server/ping")
     suspend fun ping(): PingResponse
 
@@ -18,6 +17,6 @@ interface ImmichApi {
     @GET("albums/{id}")
     suspend fun getAlbumInfo(
         @Path("id") id: String,
-        @Query("withoutAssets") withoutAssets: Boolean = false
+        @Query("withoutAssets") withoutAssets: Boolean = false,
     ): AlbumInfoDto
 }
