@@ -62,6 +62,7 @@ fun SetupScreen(
                 label = { Text("Immich Server URL") },
                 placeholder = { Text("https://photos.example.com") },
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(16.dp))

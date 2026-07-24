@@ -16,4 +16,6 @@ interface SettingsRepository {
     suspend fun setSelectedAlbumIds(ids: List<String>)
 
     suspend fun setSlideshowSettings(settings: SlideshowSettings)
+
+    suspend fun clearAll()
 }

@@ -21,6 +21,7 @@ data class SlideshowSettings(
     val kenBurns: Boolean = false,
     val showClock: Boolean = false,
     val keepScreenOn: Boolean = true,
+    val fullscreen: Boolean = true,
 )
 
 enum class FillMode { CONTAIN, COVER }

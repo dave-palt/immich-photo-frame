@@ -37,6 +37,7 @@ constructor(
         val KEN_BURNS = stringPreferencesKey("ken_burns")
         val SHOW_CLOCK = stringPreferencesKey("show_clock")
         val KEEP_SCREEN_ON = stringPreferencesKey("keep_screen_on")
+        val FULLSCREEN = stringPreferencesKey("fullscreen")
     }
 
     // Encrypted storage for API key
@@ -79,6 +80,7 @@ constructor(
                 kenBurns = prefs[Keys.KEN_BURNS]?.toBoolean() ?: false,
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
                 keepScreenOn = prefs[Keys.KEEP_SCREEN_ON]?.toBoolean() ?: true,
+                fullscreen = prefs[Keys.FULLSCREEN]?.toBoolean() ?: true,
             )
         }
 
@@ -102,6 +104,12 @@ constructor(
             it[Keys.KEN_BURNS] = settings.kenBurns.toString()
             it[Keys.SHOW_CLOCK] = settings.showClock.toString()
             it[Keys.KEEP_SCREEN_ON] = settings.keepScreenOn.toString()
+            it[Keys.FULLSCREEN] = settings.fullscreen.toString()
         }
+    }
+
+    override suspend fun clearAll() {
+        context.dataStore.edit { it.clear() }
+        encPrefs.edit().clear().apply()
     }
 }

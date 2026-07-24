@@ -2,43 +2,72 @@ package com.dav3.immichframe.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
+import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SettingsUiState(
+    val settings: SlideshowSettings = SlideshowSettings(),
+    val serverUrl: String = "",
+    val apiKey: String = "",
+)
 
 @HiltViewModel
 class SettingsViewModel
 @Inject
 constructor(
     private val settingsRepo: SettingsRepository,
+    private val immichRepo: ImmichRepository,
 ) : ViewModel() {
+    val uiState: StateFlow<SettingsUiState> =
+        combine(
+            settingsRepo.slideshowSettings,
+            settingsRepo.serverUrl,
+            settingsRepo.apiKey,
+        ) { slideshow, url, key ->
+            SettingsUiState(slideshow, url, key)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
+
     val settings: StateFlow<SlideshowSettings> =
         settingsRepo.slideshowSettings
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SlideshowSettings())
 
-    fun updateInterval(seconds: Int) = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(settings.value.copy(intervalSeconds = seconds))
+    private fun update(block: (SlideshowSettings) -> SlideshowSettings) = viewModelScope.launch {
+        settingsRepo.setSlideshowSettings(block(settings.value))
     }
 
-    fun updateFillMode(mode: FillMode) = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(settings.value.copy(fillMode = mode))
+    fun updateInterval(seconds: Int) = update { it.copy(intervalSeconds = seconds) }
+
+    fun updateFillMode(mode: FillMode) = update { it.copy(fillMode = mode) }
+
+    fun toggleKenBurns() = update { it.copy(kenBurns = !it.kenBurns) }
+
+    fun toggleClock() = update { it.copy(showClock = !it.showClock) }
+
+    fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
+
+    fun toggleFullscreen() = update { it.copy(fullscreen = !it.fullscreen) }
+
+    fun updateServerUrl(url: String) = viewModelScope.launch {
+        settingsRepo.setServerUrl(url.trim().trimEnd('/'))
+        (immichRepo as ImmichRepositoryImpl).invalidateCache()
     }
 
-    fun toggleKenBurns() = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(settings.value.copy(kenBurns = !settings.value.kenBurns))
+    fun updateApiKey(key: String) = viewModelScope.launch {
+        settingsRepo.setApiKey(key.trim())
+        (immichRepo as ImmichRepositoryImpl).invalidateCache()
     }
 
-    fun toggleClock() = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(settings.value.copy(showClock = !settings.value.showClock))
-    }
-
-    fun toggleKeepScreenOn() = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(settings.value.copy(keepScreenOn = !settings.value.keepScreenOn))
+    fun resetAll() = viewModelScope.launch {
+        settingsRepo.clearAll()
     }
 }
