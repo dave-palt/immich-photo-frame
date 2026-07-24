@@ -3,13 +3,26 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#B69CFF"
-        android:pathData="M54,30 m-18,0 a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M38,52 L70,52 A4,4 0 0,1 74,56 L74,72 A4,4 0 0,1 70,76 L38,76 A4,4 0 0,1 34,72 L34,56 A4,4 0 0,1 38,52 Z" />
-    <path
-        android:fillColor="#B69CFF"
-        android:pathData="M44,60 L52,52 L60,60 L68,52 L68,72 L44,72 Z" />
+
+    <!-- Colored frame segments, scaled from 512 viewBox (×0.211) -->
+    <!-- Red: top-center → top-right → right -->
+    <path android:strokeColor="#FA2921" android:strokeWidth="8.4"
+        android:fillColor="#00000000"
+        android:pathData="M 53.97,24.48 L 94.61,24.48 A 1.69,1.69 0 0,1 96.30,26.17 L 96.30,39.88"/>
+    <!-- Orange: right → bottom-right → bottom -->
+    <path android:strokeColor="#FFB400" android:strokeWidth="8.4"
+        android:fillColor="#00000000"
+        android:pathData="M 96.30,39.88 L 96.30,81.87 A 1.69,1.69 0 0,1 94.61,83.56 L 82.54,83.56"/>
+    <!-- Green: bottom -->
+    <path android:strokeColor="#18C249" android:strokeWidth="8.4"
+        android:fillColor="#00000000"
+        android:pathData="M 82.54,83.56 L 25.53,83.56"/>
+    <!-- Blue: bottom-left → left -->
+    <path android:strokeColor="#1E83F7" android:strokeWidth="8.4"
+        android:fillColor="#00000000"
+        android:pathData="M 25.53,83.56 L 13.50,83.56 A 1.69,1.69 0 0,1 11.81,81.87 L 11.81,39.88"/>
+    <!-- Purple: left → top-left → top-center -->
+    <path android:strokeColor="#ED79B5" android:strokeWidth="8.4"
+        android:fillColor="#00000000"
+        android:pathData="M 11.81,39.88 L 11.81,26.17 A 1.69,1.69 0 0,1 13.50,24.48 L 53.97,24.48"/>
 </vector>
