@@ -50,7 +50,7 @@ PING=$(curl -sf -w "\n%{http_code}" "${BASE}/server/ping" -H "x-api-key: ${API_K
     exit 1
 }
 PING_CODE=$(echo "$PING" | tail -1)
-PING_BODY=$(echo "$PING" | head -n -1)
+PING_BODY=$(echo "$PING" | sed '$d')
 if [ "$PING_CODE" = "200" ]; then
     pass "Ping OK (HTTP 200) — $PING_BODY"
 else
@@ -63,7 +63,7 @@ echo ""
 info "Testing GET /users/me ..."
 USER=$(curl -sf -w "\n%{http_code}" "${BASE}/users/me" -H "x-api-key: ${API_KEY}" 2>&1) || true
 USER_CODE=$(echo "$USER" | tail -1)
-USER_BODY=$(echo "$USER" | head -n -1)
+USER_BODY=$(echo "$USER" | sed '$d')
 if [ "$USER_CODE" = "200" ]; then
     EMAIL=$(echo "$USER_BODY" | grep -o '"email"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"email"[[:space:]]*:[[:space:]]*"//;s/"$//')
     pass "User authenticated as: $EMAIL"
@@ -81,7 +81,7 @@ echo ""
 info "Testing GET /albums ..."
 ALBUMS=$(curl -sf -w "\n%{http_code}" "${BASE}/albums" -H "x-api-key: ${API_KEY}" 2>&1) || true
 ALBUMS_CODE=$(echo "$ALBUMS" | tail -1)
-ALBUMS_BODY=$(echo "$ALBUMS" | head -n -1)
+ALBUMS_BODY=$(echo "$ALBUMS" | sed '$d')
 if [ "$ALBUMS_CODE" = "200" ]; then
     ALBUM_COUNT=$(echo "$ALBUMS_BODY" | grep -o '"id"' | wc -l | tr -d ' ')
     pass "Found $ALBUM_COUNT album(s)"
@@ -106,7 +106,7 @@ info "Testing GET /albums/$FIRST_ALBUM_ID ..."
 
 ALBUM_DETAIL=$(curl -sf -w "\n%{http_code}" "${BASE}/albums/${FIRST_ALBUM_ID}" -H "x-api-key: ${API_KEY}" 2>&1) || true
 ALBUM_CODE=$(echo "$ALBUM_DETAIL" | tail -1)
-ALBUM_BODY=$(echo "$ALBUM_DETAIL" | head -n -1)
+ALBUM_BODY=$(echo "$ALBUM_DETAIL" | sed '$d')
 if [ "$ALBUM_CODE" = "200" ]; then
     ASSET_COUNT=$(echo "$ALBUM_BODY" | grep -o '"id"' | wc -l | tr -d ' ')
     # Subtract the album's own id from the count
