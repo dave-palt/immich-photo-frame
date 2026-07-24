@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,11 +36,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dav3.immichframe.domain.model.FillMode
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -100,18 +109,75 @@ fun SettingsScreen(
             HorizontalDivider()
 
             ListItem(
+                headlineContent = { Text("Shuffle") },
+                supportingContent = { Text("Randomize image order") },
+                trailingContent = { Switch(checked = s.shuffle, onCheckedChange = { viewModel.toggleShuffle() }) },
+            )
+            ListItem(
+                headlineContent = { Text("Skip Videos") },
+                supportingContent = { Text("Only show photos") },
+                trailingContent = { Switch(checked = s.skipVideos, onCheckedChange = { viewModel.toggleSkipVideos() }) },
+            )
+            ListItem(
+                headlineContent = { Text("Muted") },
+                supportingContent = { Text("Silence video audio") },
+                trailingContent = { Switch(checked = s.muted, onCheckedChange = { viewModel.toggleMuted() }) },
+            )
+
+            HorizontalDivider()
+
+            ListItem(
                 headlineContent = { Text("Fullscreen") },
                 supportingContent = { Text("Hide system bars") },
                 trailingContent = { Switch(checked = s.fullscreen, onCheckedChange = { viewModel.toggleFullscreen() }) },
             )
             ListItem(
-                headlineContent = { Text("Show Clock") },
-                trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
-            )
-            ListItem(
                 headlineContent = { Text("Keep Screen On") },
                 trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) },
             )
+
+            HorizontalDivider()
+
+            // --- Clock ---
+            Text("Clock", style = MaterialTheme.typography.titleSmall)
+            ListItem(
+                headlineContent = { Text("Show Clock") },
+                trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
+            )
+            if (s.showClock) {
+                // Clock size slider with live preview
+                Text("Clock Size: ${s.clockSize.toInt()}sp")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Slider(
+                        value = s.clockSize,
+                        onValueChange = { viewModel.updateClockSize(it) },
+                        valueRange = 24f..96f,
+                        modifier = Modifier.weight(1f),
+                    )
+                    // Live preview of clock at current size
+                    Surface(
+                        color = Color(0x80000000),
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Text(
+                            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                            color = Color.White,
+                            fontSize = (s.clockSize * 0.35f).sp,
+                            fontWeight = FontWeight.Light,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
+                    }
+                }
+                Text(
+                    "Drag the clock on the slideshow screen to reposition",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
 
             HorizontalDivider()
 

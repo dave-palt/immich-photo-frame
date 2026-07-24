@@ -136,4 +136,8 @@ dependencies {
 
     // Encrypted preferences
     implementation(libs.androidx.security.crypto)
+
+    // Media3 (ExoPlayer) for video playback
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
 }

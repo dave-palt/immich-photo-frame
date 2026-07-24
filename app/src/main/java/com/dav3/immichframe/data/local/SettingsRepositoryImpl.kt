@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.SettingsRepository
@@ -36,11 +37,16 @@ constructor(
         val FILL_MODE = stringPreferencesKey("fill_mode")
         val KEN_BURNS = stringPreferencesKey("ken_burns")
         val SHOW_CLOCK = stringPreferencesKey("show_clock")
+        val CLOCK_SIZE = floatPreferencesKey("clock_size")
+        val CLOCK_X = floatPreferencesKey("clock_x")
+        val CLOCK_Y = floatPreferencesKey("clock_y")
         val KEEP_SCREEN_ON = stringPreferencesKey("keep_screen_on")
         val FULLSCREEN = stringPreferencesKey("fullscreen")
+        val SHUFFLE = stringPreferencesKey("shuffle")
+        val SKIP_VIDEOS = stringPreferencesKey("skip_videos")
+        val MUTED = stringPreferencesKey("muted")
     }
 
-    // Encrypted storage for API key
     private val masterKey by lazy {
         MasterKey
             .Builder(context)
@@ -79,8 +85,16 @@ constructor(
                 fillMode = FillMode.valueOf(prefs[Keys.FILL_MODE] ?: FillMode.CONTAIN.name),
                 kenBurns = prefs[Keys.KEN_BURNS]?.toBoolean() ?: false,
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
+                clockSize = prefs[Keys.CLOCK_SIZE] ?: 48f,
+                clockPosition = ClockPosition(
+                    x = prefs[Keys.CLOCK_X] ?: -1f,
+                    y = prefs[Keys.CLOCK_Y] ?: -1f,
+                ),
                 keepScreenOn = prefs[Keys.KEEP_SCREEN_ON]?.toBoolean() ?: true,
                 fullscreen = prefs[Keys.FULLSCREEN]?.toBoolean() ?: true,
+                shuffle = prefs[Keys.SHUFFLE]?.toBoolean() ?: true,
+                skipVideos = prefs[Keys.SKIP_VIDEOS]?.toBoolean() ?: true,
+                muted = prefs[Keys.MUTED]?.toBoolean() ?: true,
             )
         }
 
@@ -103,8 +117,14 @@ constructor(
             it[Keys.FILL_MODE] = settings.fillMode.name
             it[Keys.KEN_BURNS] = settings.kenBurns.toString()
             it[Keys.SHOW_CLOCK] = settings.showClock.toString()
+            it[Keys.CLOCK_SIZE] = settings.clockSize
+            it[Keys.CLOCK_X] = settings.clockPosition.x
+            it[Keys.CLOCK_Y] = settings.clockPosition.y
             it[Keys.KEEP_SCREEN_ON] = settings.keepScreenOn.toString()
             it[Keys.FULLSCREEN] = settings.fullscreen.toString()
+            it[Keys.SHUFFLE] = settings.shuffle.toString()
+            it[Keys.SKIP_VIDEOS] = settings.skipVideos.toString()
+            it[Keys.MUTED] = settings.muted.toString()
         }
     }
 

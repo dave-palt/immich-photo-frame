@@ -4,25 +4,52 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Colored frame segments, scaled from 512 viewBox (×0.211) -->
-    <!-- Red: top-center → top-right → right -->
-    <path android:strokeColor="#FA2921" android:strokeWidth="8.4"
+    <!-- Background -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z" />
+
+    <!-- Frame segments (clockwise from top), scaled from 512→108 viewBox -->
+    <!-- stroke-width ~8.5 (40/512*108), rounded corners at 96/512*108 ≈ 20 -->
+
+    <!-- Red: top edge + top-right corner -->
+    <path
+        android:strokeColor="#FA2921"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
         android:fillColor="#00000000"
-        android:pathData="M 53.97,24.48 L 94.61,24.48 A 1.69,1.69 0 0,1 96.30,26.17 L 96.30,39.88"/>
-    <!-- Orange: right → bottom-right → bottom -->
-    <path android:strokeColor="#FFB400" android:strokeWidth="8.4"
+        android:pathData="M 54,20 L 88,20 A 1.7,1.7 0 0,1 89.5,21.7 L 89.5,42" />
+
+    <!-- Orange: right edge + bottom-right corner -->
+    <path
+        android:strokeColor="#FFB400"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
         android:fillColor="#00000000"
-        android:pathData="M 96.30,39.88 L 96.30,81.87 A 1.69,1.69 0 0,1 94.61,83.56 L 82.54,83.56"/>
-    <!-- Green: bottom -->
-    <path android:strokeColor="#18C249" android:strokeWidth="8.4"
+        android:pathData="M 89.5,42 L 89.5,86 A 1.7,1.7 0 0,1 88,87.7 L 67.5,87.7" />
+
+    <!-- Green: bottom edge (left half) -->
+    <path
+        android:strokeColor="#18C249"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
         android:fillColor="#00000000"
-        android:pathData="M 82.54,83.56 L 25.53,83.56"/>
-    <!-- Blue: bottom-left → left -->
-    <path android:strokeColor="#1E83F7" android:strokeWidth="8.4"
+        android:pathData="M 67.5,87.7 L 40.5,87.7" />
+
+    <!-- Blue: bottom-left corner + left edge -->
+    <path
+        android:strokeColor="#1E83F7"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
         android:fillColor="#00000000"
-        android:pathData="M 25.53,83.56 L 13.50,83.56 A 1.69,1.69 0 0,1 11.81,81.87 L 11.81,39.88"/>
-    <!-- Purple: left → top-left → top-center -->
-    <path android:strokeColor="#ED79B5" android:strokeWidth="8.4"
+        android:pathData="M 40.5,87.7 L 20,87.7 A 1.7,1.7 0 0,1 18.5,86 L 18.5,42" />
+
+    <!-- Purple: left edge + top-left corner -->
+    <path
+        android:strokeColor="#ED79B5"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
         android:fillColor="#00000000"
-        android:pathData="M 11.81,39.88 L 11.81,26.17 A 1.69,1.69 0 0,1 13.50,24.48 L 53.97,24.48"/>
+        android:pathData="M 18.5,42 L 18.5,21.7 A 1.7,1.7 0 0,1 20,20 L 54,20" />
+
 </vector>

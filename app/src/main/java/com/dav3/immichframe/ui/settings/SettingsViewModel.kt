@@ -53,9 +53,17 @@ constructor(
 
     fun toggleClock() = update { it.copy(showClock = !it.showClock) }
 
+    fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
+
     fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
 
     fun toggleFullscreen() = update { it.copy(fullscreen = !it.fullscreen) }
+
+    fun toggleShuffle() = update { it.copy(shuffle = !it.shuffle) }
+
+    fun toggleSkipVideos() = update { it.copy(skipVideos = !it.skipVideos) }
+
+    fun toggleMuted() = update { it.copy(muted = !it.muted) }
 
     fun updateServerUrl(url: String) = viewModelScope.launch {
         settingsRepo.setServerUrl(url.trim().trimEnd('/'))

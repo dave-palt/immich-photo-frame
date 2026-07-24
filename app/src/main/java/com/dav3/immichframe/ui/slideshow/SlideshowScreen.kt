@@ -1,6 +1,7 @@
 package com.dav3.immichframe.ui.slideshow
 
 import android.app.Activity
+import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -8,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,18 +18,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,15 +46,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil3.compose.AsyncImage
+import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.ClockPosition
+import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.SlideshowSettings
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -62,7 +81,7 @@ fun SlideshowScreen(
     viewModel: SlideshowViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    val settings by viewModel.settings.collectAsState(initial = com.dav3.immichframe.domain.model.SlideshowSettings())
+    val settings by viewModel.settings.collectAsState(initial = SlideshowSettings())
     val s = settings
 
     LaunchedEffect(Unit) { viewModel.load() }
@@ -89,9 +108,23 @@ fun SlideshowScreen(
     }
 
     var isPaused by remember { mutableStateOf(false) }
+
+    // Track container size for clock position normalization
+    var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
+
+    // Auto-advance with progress tracking
+    var progress by remember { mutableStateOf(0f) }
     LaunchedEffect(state.currentIndex, isPaused, s.intervalSeconds) {
+        progress = 0f
         if (!isPaused && state.assets.isNotEmpty()) {
-            delay(s.intervalSeconds * 1000L)
+            val total = s.intervalSeconds * 1000L
+            val tick = 50L
+            var elapsed = 0L
+            while (elapsed < total) {
+                delay(tick)
+                elapsed += tick
+                progress = elapsed.toFloat() / total
+            }
             viewModel.next()
         }
     }
@@ -109,7 +142,7 @@ fun SlideshowScreen(
         view.keepScreenOn = s.keepScreenOn
     }
 
-    // Clock state
+    // Clock
     var currentTime by remember { mutableStateOf("") }
     if (s.showClock) {
         LaunchedEffect(Unit) {
@@ -120,11 +153,26 @@ fun SlideshowScreen(
         }
     }
 
+    // Clock drag position (pixels), synced from persisted normalized position
+    var clockOffsetPx by remember(s.clockPosition) {
+        mutableStateOf(
+            if (s.clockPosition.x >= 0 && containerSize.width > 0) {
+                Offset(
+                    s.clockPosition.x * containerSize.width,
+                    s.clockPosition.y * containerSize.height,
+                )
+            } else {
+                Offset.Zero
+            },
+        )
+    }
+
     Surface(color = Color.Black) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
+                .onSizeChanged { containerSize = it }
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { controlsVisible = !controlsVisible })
                 },
@@ -137,7 +185,7 @@ fun SlideshowScreen(
 
                 state.assets.isNotEmpty() -> {
                     val asset = state.assets[state.currentIndex]
-                    val scale = if (s.fillMode == com.dav3.immichframe.domain.model.FillMode.COVER) {
+                    val scale = if (s.fillMode == FillMode.COVER) {
                         ContentScale.Crop
                     } else {
                         ContentScale.Fit
@@ -148,37 +196,84 @@ fun SlideshowScreen(
                         transitionSpec = { fadeIn(tween(1000)) togetherWith fadeOut(tween(1000)) },
                         label = "slideshow",
                     ) { assetId ->
-                        val url = viewModel.imageUrl(assetId)
-                        AsyncImage(
-                            model = url,
-                            contentDescription = null,
-                            contentScale = scale,
-                            modifier = Modifier.fillMaxSize(),
-                        )
+                        val currentAsset = state.assets.find { it.id == assetId }
+                        if (currentAsset?.type == AssetType.VIDEO) {
+                            VideoPlayer(
+                                asset = currentAsset,
+                                viewModel = viewModel,
+                                muted = s.muted,
+                            )
+                        } else {
+                            AsyncImage(
+                                model = viewModel.imageUrl(assetId),
+                                contentDescription = null,
+                                contentScale = scale,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
                     }
                 }
             }
 
-            // Clock overlay (bottom-left)
+            // Draggable clock overlay
             if (s.showClock && currentTime.isNotEmpty()) {
-                Surface(
-                    color = Color(0x80000000),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(24.dp),
-                ) {
-                    Text(
-                        currentTime,
-                        color = Color.White,
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Light,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+                val defaultPos = s.clockPosition.x < 0
+                if (defaultPos) {
+                    // Default: bottom-start corner
+                    Box(modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)) {
+                        DraggableClock(
+                            time = currentTime,
+                            fontSize = s.clockSize,
+                            offset = clockOffsetPx,
+                            onPositionChanged = { offset ->
+                                clockOffsetPx = offset
+                                if (containerSize.width > 0 && containerSize.height > 0) {
+                                    viewModel.setClockPosition(
+                                        ClockPosition(
+                                            x = offset.x / containerSize.width,
+                                            y = offset.y / containerSize.height,
+                                        ),
+                                    )
+                                }
+                            },
+                        )
+                    }
+                } else {
+                    DraggableClock(
+                        time = currentTime,
+                        fontSize = s.clockSize,
+                        offset = clockOffsetPx,
+                        onPositionChanged = { offset ->
+                            clockOffsetPx = offset
+                            if (containerSize.width > 0 && containerSize.height > 0) {
+                                viewModel.setClockPosition(
+                                    ClockPosition(
+                                        x = offset.x / containerSize.width,
+                                        y = offset.y / containerSize.height,
+                                    ),
+                                )
+                            }
+                        },
                     )
                 }
             }
 
-            // Top bar: photo count + albums + settings + close
+            // Progress bar (bottom, thin line) — shows when controls visible
+            AnimatedVisibility(
+                visible = controlsVisible && !isPaused,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.BottomCenter),
+            ) {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.White,
+                    trackColor = Color(0x33FFFFFF),
+                )
+            }
+
+            // Top bar: photo count + mute + albums + settings + close
             AnimatedVisibility(
                 visible = controlsVisible,
                 enter = fadeIn(),
@@ -214,7 +309,7 @@ fun SlideshowScreen(
                 modifier = Modifier.align(Alignment.CenterStart),
             ) {
                 IconButton(onClick = { viewModel.previous() }) {
-                    Icon(Icons.Default.NavigateBefore, "Previous", tint = Color.White, modifier = Modifier.size(48.dp))
+                    Icon(Icons.AutoMirrored.Filled.NavigateBefore, "Previous", tint = Color.White, modifier = Modifier.size(48.dp))
                 }
             }
             AnimatedVisibility(
@@ -224,26 +319,105 @@ fun SlideshowScreen(
                 modifier = Modifier.align(Alignment.CenterEnd),
             ) {
                 IconButton(onClick = { viewModel.next() }) {
-                    Icon(Icons.Default.NavigateNext, "Next", tint = Color.White, modifier = Modifier.size(48.dp))
+                    Icon(Icons.AutoMirrored.Filled.NavigateNext, "Next", tint = Color.White, modifier = Modifier.size(48.dp))
                 }
             }
 
-            // Pause/play (bottom-center)
+            // Pause/play + mute (bottom-center)
             AnimatedVisibility(
                 visible = controlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.align(Alignment.BottomCenter),
             ) {
-                IconButton(onClick = { isPaused = !isPaused }) {
-                    Icon(
-                        if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                        if (isPaused) "Play" else "Pause",
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp),
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { isPaused = !isPaused }) {
+                        Icon(
+                            if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
+                            if (isPaused) "Play" else "Pause",
+                            tint = Color.White,
+                            modifier = Modifier.size(36.dp),
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    IconButton(onClick = { /* mute handled via settings */ }) {
+                        Icon(
+                            if (s.muted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
+                            "Mute",
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp),
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun DraggableClock(
+    time: String,
+    fontSize: Float,
+    offset: Offset,
+    onPositionChanged: (Offset) -> Unit,
+) {
+    Surface(
+        color = Color(0x80000000),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    onPositionChanged(Offset(offset.x + dragAmount.x, offset.y + dragAmount.y))
+                }
+            },
+    ) {
+        Text(
+            time,
+            color = Color.White,
+            fontSize = fontSize.sp,
+            fontWeight = FontWeight.Light,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+        )
+    }
+}
+
+@Composable
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+private fun VideoPlayer(
+    asset: Asset,
+    viewModel: SlideshowViewModel,
+    muted: Boolean,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            repeatMode = Player.REPEAT_MODE_ONE
+        }
+    }
+
+    DisposableEffect(asset.id) {
+        exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(viewModel.videoUrl(asset.id))))
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+
+    DisposableEffect(muted) {
+        exoPlayer.volume = if (muted) 0f else 1f
+        onDispose { }
+    }
+
+    AndroidView(
+        factory = { ctx ->
+            PlayerView(ctx).apply {
+                player = exoPlayer
+                useController = false
+                resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            }
+        },
+        modifier = Modifier.fillMaxSize(),
+    )
 }

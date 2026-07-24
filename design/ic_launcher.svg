@@ -1,18 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <rect width="512" height="512" rx="96" fill="#1a1a2e"/>
   <g fill="none" stroke-width="40" stroke-linecap="butt">
-    <!-- Segments start at top-center, go clockwise. Each crosses exactly one corner.
-         Breaks calculated to fall on straight edges, not corners. -->
-    <!-- Red: top-center → top-right corner → right -->
-    <path stroke="#FA2921" d="M 256,116 L 448,116 A 8,8 0 0,1 456,124 L 456,189"/>
-    <!-- Orange: right → bottom-right corner → bottom -->
-    <path stroke="#FFB400" d="M 456,189 L 456,388 A 8,8 0 0,1 448,396 L 391,396"/>
-    <!-- Green: bottom (straight, no corners) -->
-    <path stroke="#18C249" d="M 391,396 L 121,396"/>
-    <!-- Blue: bottom → bottom-left corner → left -->
-    <path stroke="#1E83F7" d="M 121,396 L 64,396 A 8,8 0 0,1 56,388 L 56,189"/>
-    <!-- Purple: left → top-left corner → top-center -->
-    <path stroke="#ED79B5" d="M 56,189 L 56,124 A 8,8 0 0,1 64,116 L 256,116"/>
+    <path stroke="#FA2921" d="M 256,96 L 416,96 A 8,8 0 0,1 424,104 L 424,200"/>
+    <path stroke="#FFB400" d="M 424,200 L 424,408 A 8,8 0 0,1 416,416 L 320,416"/>
+    <path stroke="#18C249" d="M 320,416 L 192,416"/>
+    <path stroke="#1E83F7" d="M 192,416 L 96,416 A 8,8 0 0,1 88,408 L 88,200"/>
+    <path stroke="#ED79B5" d="M 88,200 L 88,104 A 8,8 0 0,1 96,96 L 256,96"/>
   </g>
   <text x="256" y="261" text-anchor="middle" dominant-baseline="central"
         font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif"

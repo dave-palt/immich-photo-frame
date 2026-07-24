@@ -33,7 +33,6 @@ data class AssetDto(
 @Serializable
 data class SearchMetadataRequest(
     val albumIds: List<String>,
-    val type: String = "IMAGE",
     val size: Int = 1000,
 )
 

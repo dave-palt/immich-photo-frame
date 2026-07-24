@@ -14,14 +14,24 @@ data class Asset(
 
 enum class AssetType { IMAGE, VIDEO }
 
+data class ClockPosition(
+    val x: Float = -1f, // -1 = unset (default bottom-start)
+    val y: Float = -1f, // normalized 0..1 of screen
+)
+
 data class SlideshowSettings(
     val intervalSeconds: Int = 30,
     val transitionSeconds: Float = 1f,
     val fillMode: FillMode = FillMode.CONTAIN,
     val kenBurns: Boolean = false,
     val showClock: Boolean = false,
+    val clockSize: Float = 48f, // sp
+    val clockPosition: ClockPosition = ClockPosition(),
     val keepScreenOn: Boolean = true,
     val fullscreen: Boolean = true,
+    val shuffle: Boolean = true,
+    val skipVideos: Boolean = true,
+    val muted: Boolean = true,
 )
 
 enum class FillMode { CONTAIN, COVER }

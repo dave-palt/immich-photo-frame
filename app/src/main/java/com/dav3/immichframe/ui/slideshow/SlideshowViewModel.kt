@@ -3,6 +3,8 @@ package com.dav3.immichframe.ui.slideshow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +45,7 @@ constructor(
     fun load() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            val s = settings.value
             val albumIds = settingsRepo.selectedAlbumIds.first()
             if (albumIds.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = "No albums selected")
@@ -58,9 +61,15 @@ constructor(
                 )
             }
 
+            // Filter videos if skipVideos is enabled
+            val assets = if (s.skipVideos) allAssets.filter { it.type == AssetType.IMAGE } else allAssets
+
+            // Shuffle if enabled
+            val ordered = if (s.shuffle) assets.shuffled() else assets
+
             _uiState.value = when {
-                allAssets.isNotEmpty() -> {
-                    SlideshowUiState(assets = allAssets.shuffled(), currentIndex = 0, isLoading = false)
+                ordered.isNotEmpty() -> {
+                    SlideshowUiState(assets = ordered, currentIndex = 0, isLoading = false)
                 }
                 errors.isNotEmpty() -> {
                     SlideshowUiState(isLoading = false, error = "Asset load failed:\n${errors.joinToString("\n")}")
@@ -86,5 +95,13 @@ constructor(
         }
     }
 
+    fun setClockPosition(pos: ClockPosition) {
+        viewModelScope.launch {
+            settingsRepo.setSlideshowSettings(settings.value.copy(clockPosition = pos))
+        }
+    }
+
     fun imageUrl(assetId: String): String = immichRepo.imageUrl(assetId)
+
+    fun videoUrl(assetId: String): String = immichRepo.videoUrl(assetId)
 }

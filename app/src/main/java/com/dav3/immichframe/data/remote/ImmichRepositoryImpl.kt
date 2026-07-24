@@ -101,8 +101,12 @@ constructor(
             .searchAssets(SearchMetadataRequest(albumIds = listOf(albumId)))
             .assets
             .items
-            .filter { it.type.equals("IMAGE", ignoreCase = true) }
-            .map { Asset(it.id, AssetType.IMAGE) }
+            .map { dto ->
+                Asset(
+                    dto.id,
+                    if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
+                )
+            }
     }
 
     override fun imageUrl(assetId: String): String {
@@ -115,5 +119,11 @@ constructor(
         val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }
         val apiKey = runBlocking { settings.apiKey.first() }
         return "${base.trimEnd('/')}/api/assets/$assetId/thumbnail?size=thumbnail&apiKey=$apiKey"
+    }
+
+    override fun videoUrl(assetId: String): String {
+        val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }
+        val apiKey = runBlocking { settings.apiKey.first() }
+        return "${base.trimEnd('/')}/api/assets/$assetId/original?apiKey=$apiKey"
     }
 }
