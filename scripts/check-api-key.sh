@@ -3,18 +3,16 @@
 # check-api-key.sh — Diagnose an Immich API key's permissions
 #
 # Tests the exact endpoints ImmichPhotoFrame uses, in order:
-#   1. GET /server/ping
-#   2. GET /users/me
-#   3. GET /albums
-#   4. GET /albums/{id} (picks first album, checks assets)
-#   5. GET /assets/{id}/thumbnail (if album has assets)
+#   1. GET  /server/ping
+#   2. GET  /users/me
+#   3. GET  /albums
+#   4. POST /search/metadata (album assets — same as the app)
+#   5. GET  /assets/{id}/thumbnail?size=preview
 #
 # Usage:
 #   ./scripts/check-api-key.sh <server-url> <api-key>
 #
-#   ./scripts/check-api-key.sh https://photos.example.com:2283 myApiKey123
-#
-set -euo pipefail
+set -uo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -69,7 +67,6 @@ if [ "$USER_CODE" = "200" ]; then
     pass "User authenticated as: $EMAIL"
 else
     fail "GET /users/me failed (HTTP $USER_CODE)"
-    echo "  Response: $USER_BODY"
     if [ "$USER_CODE" = "403" ]; then
         echo "  → Key is missing 'user.read' permission"
     fi
@@ -87,7 +84,6 @@ if [ "$ALBUMS_CODE" = "200" ]; then
     pass "Found $ALBUM_COUNT album(s)"
 else
     fail "GET /albums failed (HTTP $ALBUMS_CODE)"
-    echo "  Response: $ALBUMS_BODY"
     if [ "$ALBUMS_CODE" = "403" ]; then
         echo "  → Key is missing 'album.read' permission"
     fi
@@ -95,40 +91,41 @@ else
 fi
 echo ""
 
-# --- 4. First album assets ---
+# --- 4. Album assets via POST /search/metadata ---
 if [ "$ALBUM_COUNT" = "0" ]; then
     fail "No albums found — cannot test album assets"
     exit 0
 fi
 
 FIRST_ALBUM_ID=$(echo "$ALBUMS_BODY" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
-info "Testing GET /albums/$FIRST_ALBUM_ID ..."
+info "Testing POST /search/metadata (album: $FIRST_ALBUM_ID) ..."
 
-ALBUM_DETAIL=$(curl -sf -w "\n%{http_code}" "${BASE}/albums/${FIRST_ALBUM_ID}" -H "x-api-key: ${API_KEY}" 2>&1) || true
-ALBUM_CODE=$(echo "$ALBUM_DETAIL" | tail -1)
-ALBUM_BODY=$(echo "$ALBUM_DETAIL" | sed '$d')
-if [ "$ALBUM_CODE" = "200" ]; then
-    ASSET_COUNT=$(echo "$ALBUM_BODY" | grep -o '"id"' | wc -l | tr -d ' ')
-    # Subtract the album's own id from the count
-    ASSET_COUNT=$((ASSET_COUNT > 0 ? ASSET_COUNT - 1 : 0))
-    pass "Album has $ASSET_COUNT asset(s)"
-    if [ "$ASSET_COUNT" -gt 0 ]; then
-        # Show types
-        TYPES=$(echo "$ALBUM_BODY" | grep -o '"type"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"type"[[:space:]]*:[[:space:]]*"//;s/"$//' | sort | uniq -c | tr '\n' ' ')
-        info "Asset types: $TYPES"
+SEARCH_RESULT=$(curl -sf -w "\n%{http_code}" -X POST "${BASE}/search/metadata" \
+    -H "x-api-key: ${API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d "{\"albumIds\":[\"${FIRST_ALBUM_ID}\"],\"type\":\"IMAGE\",\"size\":100}" 2>&1) || true
+SEARCH_CODE=$(echo "$SEARCH_RESULT" | tail -1)
+SEARCH_BODY=$(echo "$SEARCH_RESULT" | sed '$d')
+if [ "$SEARCH_CODE" = "200" ]; then
+    ASSET_COUNT=$(echo "$SEARCH_BODY" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['assets']['items']))" 2>/dev/null || echo "0")
+    pass "Album has $ASSET_COUNT image asset(s)"
+    if [ "$ASSET_COUNT" = "0" ]; then
+        info "No assets to test thumbnails with."
     fi
 else
-    fail "GET /albums/$FIRST_ALBUM_ID failed (HTTP $ALBUM_CODE)"
-    echo "  Response: $ALBUM_BODY"
+    fail "POST /search/metadata failed (HTTP $SEARCH_CODE)"
+    if [ "$SEARCH_CODE" = "403" ]; then
+        echo "  → Key is missing 'asset.read' permission"
+    fi
     exit 1
 fi
 echo ""
 
-# --- 5. Thumbnail (if assets exist) ---
-if [ "$ASSET_COUNT" -gt 0 ]; then
-    FIRST_ASSET_ID=$(echo "$ALBUM_BODY" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | sed -n '2p' | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
+# --- 5. Thumbnail ---
+if [ "${ASSET_COUNT:-0}" -gt 0 ]; then
+    FIRST_ASSET_ID=$(echo "$SEARCH_BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['assets']['items'][0]['id'])" 2>/dev/null || echo "")
     if [ -n "$FIRST_ASSET_ID" ]; then
-        info "Testing thumbnail: GET /assets/$FIRST_ASSET_ID/thumbnail ..."
+        info "Testing thumbnail: GET /assets/$FIRST_ASSET_ID/thumbnail?size=preview ..."
         THUMB_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/thumbnail?size=preview" -H "x-api-key: ${API_KEY}" 2>&1) || true
         if [ "$THUMB_CODE" = "200" ]; then
             pass "Thumbnail loaded (HTTP 200)"
