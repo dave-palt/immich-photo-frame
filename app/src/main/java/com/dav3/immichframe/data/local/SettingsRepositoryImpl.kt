@@ -1,14 +1,11 @@
 package com.dav3.immichframe.data.local
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.dav3.immichframe.domain.model.ClockPosition
@@ -20,8 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 
 @Singleton
 class SettingsRepositoryImpl
@@ -69,7 +64,7 @@ constructor(
     }
 
     override val serverUrl: Flow<String> =
-        context.dataStore.data.map { it[Keys.SERVER_URL] ?: "" }
+        context.appDataStore.data.map { it[Keys.SERVER_URL] ?: "" }
 
     override val apiKey: Flow<String> =
         kotlinx.coroutines.flow.flow {
@@ -77,12 +72,12 @@ constructor(
         }
 
     override val selectedAlbumIds: Flow<List<String>> =
-        context.dataStore.data.map {
+        context.appDataStore.data.map {
             (it[Keys.SELECTED_ALBUMS] ?: emptySet()).toList()
         }
 
     override val slideshowSettings: Flow<SlideshowSettings> =
-        context.dataStore.data.map { prefs ->
+        context.appDataStore.data.map { prefs ->
             SlideshowSettings(
                 intervalSeconds = prefs[Keys.INTERVAL] ?: 30,
                 transitionSeconds = prefs[Keys.TRANSITION] ?: 1f,
@@ -107,7 +102,7 @@ constructor(
         }
 
     override suspend fun setServerUrl(url: String) {
-        context.dataStore.edit { it[Keys.SERVER_URL] = url }
+        context.appDataStore.edit { it[Keys.SERVER_URL] = url }
     }
 
     override suspend fun setApiKey(key: String) {
@@ -115,11 +110,11 @@ constructor(
     }
 
     override suspend fun setSelectedAlbumIds(ids: List<String>) {
-        context.dataStore.edit { it[Keys.SELECTED_ALBUMS] = ids.toSet() }
+        context.appDataStore.edit { it[Keys.SELECTED_ALBUMS] = ids.toSet() }
     }
 
     override suspend fun setSlideshowSettings(settings: SlideshowSettings) {
-        context.dataStore.edit {
+        context.appDataStore.edit {
             it[Keys.INTERVAL] = settings.intervalSeconds
             it[Keys.TRANSITION] = settings.transitionSeconds
             it[Keys.FILL_MODE] = settings.fillMode.name
@@ -141,7 +136,7 @@ constructor(
     }
 
     override suspend fun clearAll() {
-        context.dataStore.edit { it.clear() }
+        context.appDataStore.edit { it.clear() }
         encPrefs.edit().clear().apply()
     }
 }
