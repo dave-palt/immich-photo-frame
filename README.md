@@ -40,11 +40,56 @@ lets you pick which album(s) to display, and remembers your choice.
 
 ## Setup
 
-1. Create an API key in Immich: User Settings > API Keys
-   (requires `album.read`, `asset.read`, `asset.view`, `user.read`)
+1. Create an API key in Immich (see below)
 2. Enter server URL + API key in the app
 3. Select album(s)
 4. Slideshow starts
+
+### Creating the API key
+
+The app needs a **scoped API key** with exactly 4 permissions:
+
+| Permission | Used for |
+|---|---|
+| `album.read` | List albums, get album info |
+| `asset.read` | Search/list assets in albums |
+| `asset.view` | Download/view photos and videos |
+| `user.read` | Validate the key during setup |
+
+> Requires Immich **v1.135+** for scoped keys. On older versions, any API key
+> will work but will have full access — update your server if possible.
+
+**Option A — Automatic (recommended).** Helper scripts create and scope the
+key for you:
+
+```bash
+# macOS / Linux
+./scripts/generate-api-key.sh https://photos.example.com:2283 user@example.com
+
+# Windows PowerShell
+.\scripts\generate-api-key.ps1 https://photos.example.com:2283 user@example.com
+```
+
+You'll be prompted for your password. The script creates a key named
+`ImmichPhotoFrame` with exactly the 4 permissions above.
+
+To verify an existing key's permissions against the app's endpoints:
+
+```bash
+./scripts/check-api-key.sh https://photos.example.com:2283 <your-api-key>
+```
+
+**Option B — Manual.** Create the key in the Immich web UI:
+
+1. Log in to your Immich server.
+2. Go to **User Settings → API Keys → New API Key**.
+3. Name it `ImmichPhotoFrame` (or any name you like).
+4. Under **Permissions**, select exactly these four:
+   - `album.read`
+   - `asset.read`
+   - `asset.view`
+   - `user.read`
+5. Copy the generated key — it won't be shown again.
 
 ## Tech Stack
 
