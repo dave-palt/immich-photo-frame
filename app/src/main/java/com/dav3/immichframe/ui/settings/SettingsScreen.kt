@@ -473,6 +473,10 @@ private fun openBootPermissionSettings(context: Context) {
             "com.asus.mobilemanager",
             "com.asus.mobilemanager.entry.FunctionActivity",
         ).also { intent.putExtra("showFragment", "com.asus.mobilemanager.autostart.AutoStartActivity") }
+        "oneplus" -> ComponentName(
+            "com.oneplus.security",
+            "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity",
+        )
         "samsung" -> null // Samsung doesn't typically block, but try general settings
         else -> null
     }
@@ -488,15 +492,18 @@ private fun openBootPermissionSettings(context: Context) {
     }
 
     // Fallback: app details settings (where user can find permissions)
-    intent.action = AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS
-    intent.data = Uri.fromParts("package", context.packageName, null)
+    val fallback = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
     try {
-        context.startActivity(intent)
+        context.startActivity(fallback)
     } catch (_: Exception) {
         // Last resort: general settings
-        intent.action = AndroidSettings.ACTION_SETTINGS
-        intent.data = null
-        context.startActivity(intent)
+        val general = Intent(AndroidSettings.ACTION_SETTINGS).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(general)
     }
 }
 

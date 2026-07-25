@@ -406,136 +406,123 @@ private fun DraggableClock(
     snapToGrid: Boolean,
     onPositionChanged: (Float, Float) -> Unit,
 ) {
-    // Default position: center of screen
+    if (containerSize.width == 0) return
+
     val isDefault = position.x < 0f
     val normX = if (isDefault) 0.5f else position.x
     val normY = if (isDefault) 0.5f else position.y
 
-    // Snap-to-grid: grid cell size based on clock font size
-    // Clock is roughly fontSize wide per character, ~5 chars in "HH:MM"
-    val clockApproxWidth = fontSize * 3.5f + 80f // padding
-    val clockApproxHeight = fontSize * 1.5f + 32f
-    val gridStepX = (clockApproxWidth * 0.5f).coerceAtLeast(20f) // half clock width
-    val gridStepY = (clockApproxHeight * 0.5f).coerceAtLeast(20f) // half clock height
+    val clockW = fontSize * 3.5f + 80f
+    val clockH = fontSize * 1.5f + 32f
+    val halfW = clockW / 2f
+    val halfH = clockH / 2f
+    val gridStep = (clockW * 0.5f).coerceAtLeast(20f)
 
-    // Max position keeping clock inside viewport
-    val maxX = (containerSize.width - clockApproxWidth).coerceAtLeast(0f)
-    val maxY = (containerSize.height - clockApproxHeight).coerceAtLeast(0f)
+    // Bounds for clock CENTER (keeps full clock visible)
+    val minCX = halfW
+    val maxCX = (containerSize.width - halfW).coerceAtLeast(halfW)
+    val minCY = halfH
+    val maxCY = (containerSize.height - halfH).coerceAtLeast(halfH)
 
-    // Current pixel position from normalized coords, clamped to viewport
-    var pxX by remember(position) { mutableFloatStateOf((normX * containerSize.width).coerceIn(0f, maxX)) }
-    var pxY by remember(position) { mutableFloatStateOf((normY * containerSize.height).coerceIn(0f, maxY)) }
+    // Clock CENTER in screen px
+    var cx by remember(position) { mutableFloatStateOf((normX * containerSize.width).coerceIn(minCX, maxCX)) }
+    var cy by remember(position) { mutableFloatStateOf((normY * containerSize.height).coerceIn(minCY, maxCY)) }
     var isDragging by remember { mutableStateOf(false) }
 
-    // Snap a raw pixel position to the nearest centered grid point
-    fun snapToGrid(x: Float, y: Float): Pair<Float, Float> {
+    fun snap(x: Float, y: Float): Pair<Float, Float> {
         if (!snapToGrid) return x to y
-        // Grid is centered: points at screenCenter ± n * gridStep
-        val centerX = containerSize.width / 2f
-        val centerY = containerSize.height / 2f
-        val sx = centerX + round((x - centerX) / gridStepX) * gridStepX
-        val sy = centerY + round((y - centerY) / gridStepY) * gridStepY
-        return sx.coerceIn(0f, maxX) to sy.coerceIn(0f, maxY)
+        val scx = containerSize.width / 2f
+        val scy = containerSize.height / 2f
+        val sx = scx + round((x - scx) / gridStep) * gridStep
+        val sy = scy + round((y - scy) / gridStep) * gridStep
+        return sx.coerceIn(minCX, maxCX) to sy.coerceIn(minCY, maxCY)
     }
 
-    // Recompute on orientation / container size change — keeps clock in viewport
     LaunchedEffect(containerSize) {
-        pxX = (normX * containerSize.width).coerceIn(0f, maxX)
-        pxY = (normY * containerSize.height).coerceIn(0f, maxY)
+        cx = (normX * containerSize.width).coerceIn(minCX, maxCX)
+        cy = (normY * containerSize.height).coerceIn(minCY, maxCY)
     }
 
-    // Burn-in drift: slow oscillation centered on the clock's position
+    // Burn-in drift
     val driftX = if (burnInProtection) {
-        val t = rememberInfiniteTransition(label = "clockDriftX")
-        t.animateFloat(
-            initialValue = -4f,
-            targetValue = 4f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(30_000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
+        rememberInfiniteTransition(label = "clockDriftX").animateFloat(
+            -4f,
+            4f,
+            infiniteRepeatable(tween(30_000, easing = LinearEasing), RepeatMode.Reverse),
             label = "driftX",
         ).value
     } else {
         0f
     }
     val driftY = if (burnInProtection) {
-        val t = rememberInfiniteTransition(label = "clockDriftY")
-        t.animateFloat(
-            initialValue = -3f,
-            targetValue = 3f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(45_000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
+        rememberInfiniteTransition(label = "clockDriftY").animateFloat(
+            -3f,
+            3f,
+            infiniteRepeatable(tween(45_000, easing = LinearEasing), RepeatMode.Reverse),
             label = "driftY",
         ).value
     } else {
         0f
     }
 
-    // Grid dots — visible only while dragging and snap enabled
     val density = LocalDensity.current
     val dotRadiusPx = with(density) { 3.dp.toPx() }
     val dotColor = Color(0x88FFFFFF)
 
-    Box(
-        modifier = Modifier
-            .offset { IntOffset(pxX.toInt(), pxY.toInt()) }
-            .graphicsLayer {
-                translationX = driftX
-                translationY = driftY
-            }
-            .pointerInput(snapToGrid) {
-                detectDragGestures(
-                    onDragStart = { isDragging = true },
-                    onDragEnd = {
-                        isDragging = false
-                        val (sx, sy) = snapToGrid(pxX, pxY)
-                        pxX = sx
-                        pxY = sy
-                        if (containerSize.width > 0 && containerSize.height > 0) {
-                            onPositionChanged(pxX / containerSize.width, pxY / containerSize.height)
-                        }
-                    },
-                    onDragCancel = { isDragging = false },
-                ) { change, dragAmount ->
-                    change.consume()
-                    val rawX = (pxX + dragAmount.x).coerceIn(0f, maxX)
-                    val rawY = (pxY + dragAmount.y).coerceIn(0f, maxY)
-                    // Live snap: show where it will land as finger moves
-                    val (sx, sy) = snapToGrid(rawX, rawY)
-                    pxX = if (snapToGrid) sx else rawX
-                    pxY = if (snapToGrid) sy else rawY
-                }
-            },
-    ) {
-        // Grid dots overlay — centered on screen, visible while dragging
-        if (isDragging && snapToGrid && containerSize.width > 0) {
+    // Full-screen overlay: grid canvas + clock
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Grid dots — full screen, centered, uniform spacing
+        if (isDragging && snapToGrid) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Screen center in canvas-local coords (clock is at origin via offset)
-                val centerScreenX = containerSize.width / 2f - pxX
-                val centerScreenY = containerSize.height / 2f - pxY
-                // Grid extends from center outward, ensuring a point at screen center
-                val cols = (containerSize.width / gridStepX / 2).toInt() + 2
-                val rows = (containerSize.height / gridStepY / 2).toInt() + 2
+                val scx = size.width / 2f
+                val scy = size.height / 2f
+                val cols = (size.width / gridStep / 2).toInt() + 2
+                val rows = (size.height / gridStep / 2).toInt() + 2
                 for (i in -cols..cols) {
                     for (j in -rows..rows) {
                         drawCircle(
                             color = dotColor,
                             radius = dotRadiusPx,
-                            center = androidx.compose.ui.geometry.Offset(
-                                centerScreenX + i * gridStepX,
-                                centerScreenY + j * gridStepY,
-                            ),
+                            center = androidx.compose.ui.geometry.Offset(scx + i * gridStep, scy + j * gridStep),
                         )
                     }
                 }
             }
         }
+
+        // Clock — positioned so CENTER is at (cx, cy)
         Surface(
             color = Color(0x80000000),
             shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .offset { IntOffset((cx - halfW).toInt(), (cy - halfH).toInt()) }
+                .graphicsLayer {
+                    translationX = driftX
+                    translationY = driftY
+                }
+                .pointerInput(snapToGrid) {
+                    detectDragGestures(
+                        onDragStart = { isDragging = true },
+                        onDragEnd = {
+                            isDragging = false
+                            val (sx, sy) = snap(cx, cy)
+                            cx = sx
+                            cy = sy
+                            if (containerSize.width > 0) {
+                                onPositionChanged(cx / containerSize.width, cy / containerSize.height)
+                            }
+                        },
+                        onDragCancel = { isDragging = false },
+                    ) { change, dragAmount ->
+                        change.consume()
+                        // Track finger freely, snap center live
+                        val rawCX = (cx + dragAmount.x).coerceIn(minCX, maxCX)
+                        val rawCY = (cy + dragAmount.y).coerceIn(minCY, maxCY)
+                        val (sx, sy) = snap(rawCX, rawCY)
+                        cx = sx
+                        cy = sy
+                    }
+                },
         ) {
             Text(
                 time,
