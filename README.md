@@ -33,6 +33,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Progress bar showing time remaining per image
 - Start on boot (with OEM autostart permission detection)
 - Self-update via GitHub releases (sideloaded installs only)
+- Offline media cache with background sync (Room + WorkManager)
 - Auto-resumes last album on launch
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
 - Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)

@@ -12,6 +12,8 @@ interface ImmichRepository {
 
     suspend fun getAlbumAssets(albumId: String): Result<List<Asset>>
 
+    suspend fun getAlbumAssets(albumId: String, cursor: String?): Result<List<Asset>>
+
     fun imageUrl(assetId: String): String
 
     fun thumbnailUrl(assetId: String): String

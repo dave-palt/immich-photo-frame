@@ -10,6 +10,7 @@ data class Album(
 data class Asset(
     val id: String,
     val type: AssetType,
+    val lastModified: Long = 0,
 )
 
 enum class AssetType { IMAGE, VIDEO }
@@ -44,6 +45,9 @@ data class SlideshowSettings(
     val animPanRight: Boolean = true,
     val animPanUp: Boolean = true,
     val animPanDown: Boolean = true,
+    // Media Cache
+    val autoSync: Boolean = true,
+    val syncIntervalMinutes: Int = 30,
 ) {
     /** Non-random enabled animations. Empty = no animation. */
     val enabledAnimations: List<PhotoAnimation>
@@ -69,3 +73,59 @@ enum class PhotoAnimation {
 }
 
 enum class FillMode { CONTAIN, COVER }
+
+// Media Cache Models
+
+data class CachedAsset(
+    val id: String,
+    val albumId: String,
+    val type: AssetType,
+    val filePath: String,
+    val thumbnailPath: String?,
+    val fileSize: Long,
+    val checksum: String?,
+    val lastModified: Long,
+    val cachedAt: Long,
+)
+
+data class AlbumSyncState(
+    val albumId: String,
+    val lastSyncedAt: Long = 0,
+    val lastCursor: String? = null,
+    val assetCount: Int = 0,
+)
+
+// Sync Progress Models
+
+data class SyncProgress(
+    val albumIds: List<String> = emptyList(),
+    val currentAlbum: String = "",
+    val phase: Phase = Phase.IDLE,
+    val totalAssets: Int = 0,
+    val processedAssets: Int = 0,
+    val currentAsset: String = "",
+) {
+    enum class Phase {
+        IDLE,
+        FETCHING_METADATA,
+        DOWNLOADING,
+        PROCESSING,
+        COMPLETE,
+        ERROR,
+    }
+
+    val progressPercent: Float
+        get() = if (totalAssets > 0) processedAssets.toFloat() / totalAssets else 0f
+}
+
+sealed class SyncResult {
+    data class Success(
+        val added: Int,
+        val updated: Int,
+        val removed: Int,
+        val failed: Int,
+        val errors: List<String>,
+    ) : SyncResult()
+
+    data class Failure(val error: String) : SyncResult()
+}

@@ -131,6 +131,20 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-25** — Added Media Cache feature (Room + WorkManager). New
+  packages: `data/local/` (Room DB, DAOs, entities, cache repo impl,
+  converters) and `data/sync/` (MediaCacheWorker, SyncScheduler). New
+  settings: `autoSync` (bool, default true) + `syncIntervalMinutes` (int,
+  default 30, clamped to 15 min by WorkManager). SlideshowViewModel now
+  loads cache-first, falls back to network on cold start, and delegates
+  background sync to SyncScheduler.syncNow() (which enqueues
+  MediaCacheWorker). New deps: Room 2.7.1, WorkManager 2.9.1, Hilt-Work
+  1.2.0. AndroidManifest removes default WorkManagerInitializer.
+  ImmichFrameApp implements Configuration.Provider for HiltWorkerFactory.
+  Updated: functional-spec (F3, F6), technical-spec (tech stack, package
+  layout, state persistence, media cache section), ui-spec (settings
+  mockup), overview (goals), README.
+
 - **2026-07-25** — Burn-in Protection setting removed. Photo animations now
   serve double duty as burn-in protection (the slow pan/zoom is what prevents
   OLED burn-in for always-on displays). Removed: `burnInProtection` field from
