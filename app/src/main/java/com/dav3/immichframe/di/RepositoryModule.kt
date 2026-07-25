@@ -1,8 +1,10 @@
 package com.dav3.immichframe.di
 
+import com.dav3.immichframe.data.local.MediaCacheRepositoryImpl
 import com.dav3.immichframe.data.local.SettingsRepositoryImpl
 import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
 import com.dav3.immichframe.domain.repository.ImmichRepository
+import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -20,4 +22,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMediaCacheRepository(impl: MediaCacheRepositoryImpl): MediaCacheRepository
 }

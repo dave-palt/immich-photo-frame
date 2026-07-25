@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ImmichFrame</string>
+    <string name="app_name">Immich Media Frame</string>
 
     <!-- Sections -->
     <string name="section_playback">Riproduzione</string>
@@ -112,5 +112,5 @@
     <string name="later">Più tardi</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d foto</string>
+    <string name="photos_count">%1$d / %2$d foto</string>
 </resources>

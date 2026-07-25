@@ -2,12 +2,13 @@
 #
 # check-api-key.sh — Diagnose an Immich API key's permissions
 #
-# Tests the exact endpoints ImmichPhotoFrame uses, in order:
+# Tests the exact endpoints Immich Media Frame uses, in order:
 #   1. GET  /server/ping
 #   2. GET  /users/me
 #   3. GET  /albums
 #   4. POST /search/metadata (album assets — same as the app)
 #   5. GET  /assets/{id}/thumbnail?size=preview
+#   6. GET  /assets/{id}/original
 #
 # Usage:
 #   ./scripts/check-api-key.sh <server-url> <api-key>
@@ -133,6 +134,18 @@ if [ "${ASSET_COUNT:-0}" -gt 0 ]; then
             fail "Thumbnail failed (HTTP $THUMB_CODE)"
             if [ "$THUMB_CODE" = "403" ]; then
                 echo "  → Key is missing 'asset.view' permission"
+            fi
+        fi
+
+        # --- 6. Download original (video playback) ---
+        info "Testing download: GET /assets/$FIRST_ASSET_ID/original ..."
+        DL_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/original" -H "x-api-key: ***" 2>&1) || true
+        if [ "$DL_CODE" = "200" ]; then
+            pass "Original download OK (HTTP 200)"
+        else
+            fail "Download failed (HTTP $DL_CODE)"
+            if [ "$DL_CODE" = "403" ]; then
+                echo "  → Key is missing 'asset.download' permission (required for video playback)"
             fi
         fi
     fi

@@ -2,6 +2,7 @@ package com.dav3.immichframe.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dav3.immichframe.data.sync.SyncScheduler
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
@@ -31,6 +32,7 @@ class SettingsViewModel
 constructor(
     private val settingsRepo: SettingsRepository,
     private val immichRepo: ImmichRepository,
+    private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -47,7 +49,17 @@ constructor(
     private fun update(block: (SlideshowSettings) -> SlideshowSettings) = viewModelScope.launch {
         updateMutex.withLock {
             val current = settingsRepo.slideshowSettings.first()
-            settingsRepo.setSlideshowSettings(block(current))
+            val newSettings = block(current)
+            settingsRepo.setSlideshowSettings(newSettings)
+
+            // Update sync schedule when autoSync or interval changes
+            if (newSettings.autoSync != current.autoSync || newSettings.syncIntervalMinutes != current.syncIntervalMinutes) {
+                if (newSettings.autoSync) {
+                    syncScheduler.schedulePeriodicSync()
+                } else {
+                    syncScheduler.cancelPeriodicSync()
+                }
+            }
         }
     }
 
@@ -82,6 +94,10 @@ constructor(
 
     fun toggleAutoUpdate() = update { it.copy(autoUpdate = !it.autoUpdate) }
 
+    fun toggleAutoSync() = update { it.copy(autoSync = !it.autoSync) }
+
+    fun updateSyncInterval(minutes: Int) = update { it.copy(syncIntervalMinutes = minutes) }
+
     fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
 
     fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }
@@ -111,5 +127,11 @@ constructor(
 
     fun resetAll() = viewModelScope.launch {
         settingsRepo.clearAll()
+    }
+
+    fun syncNow() = viewModelScope.launch {
+        val settings = settingsRepo.slideshowSettings.first()
+        val albumIds = settingsRepo.selectedAlbumIds.first()
+        syncScheduler.syncNow(albumIds)
     }
 }

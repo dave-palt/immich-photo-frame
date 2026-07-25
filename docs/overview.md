@@ -28,6 +28,7 @@ The app stores the server URL and API key on-device, lets the user pick which al
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Start-on-boot for dedicated frame devices
 - Self-update via GitHub releases (bypasses Play Store for sideloaded installs)
+- Offline-capable media cache (Room + WorkManager background sync)
 - Minimal setup: enter URL + API key, pick album, done
 - Sensible defaults, configurable later
 

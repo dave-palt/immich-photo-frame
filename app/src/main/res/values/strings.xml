@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ImmichFrame</string>
+    <string name="app_name">Immich Media Frame</string>
+    <string name="app_name_dev">Immich Media Frame - Dev</string>
 
     <!-- Sections -->
     <string name="section_playback">Playback</string>
@@ -48,14 +49,29 @@
     <string name="snap_to_grid_desc">Align clock to grid based on its size when released</string>
 
     <!-- System -->
-    <string name="start_on_boot">Start on Boot</string>
-    <string name="start_on_boot_desc">Launch the app automatically after device reboot</string>
-    <string name="boot_not_verified_desc">Autostart permission may not be granted — reboot to verify. If it doesn\'t launch, use the button below to open your device\'s autostart settings.</string>
-    <string name="open_autostart">Open Autostart Settings</string>
-    <string name="auto_update">Auto-Update</string>
-    <string name="auto_update_desc">Check GitHub for new builds and download them automatically</string>
+        <string name="start_on_boot">Start on Boot</string>
+        <string name="start_on_boot_desc">Launch the app automatically after device reboot</string>
+        <string name="boot_not_verified_desc">Autostart permission may not be granted \u2014 reboot to verify. If it doesn\u2019t launch, use the button below to open your device\u2019s autostart settings.</string>
+        <string name="open_autostart">Open Autostart Settings</string>
+        <string name="auto_update">Auto-Update</string>
+        <string name="auto_update_desc">Check GitHub for new builds and download them automatically</string>
 
-    <!-- Albums -->
+        <!-- Media Cache -->
+        <string name="section_media_cache">Media Cache</string>
+        <string name="auto_sync">Auto Sync</string>
+        <string name="auto_sync_desc">Automatically download new photos and remove deleted ones in the background</string>
+        <string name="sync_interval">Sync Interval</string>
+        <string name="sync_interval_desc">How often to check for album changes (1 min - 24 hours)</string>
+        <string name="sync_now">Sync Now</string>
+        <string name="sync_status_idle">Idle</string>
+        <string name="sync_status_syncing">Syncing…</string>
+        <string name="sync_status_complete">Last sync: %1$s</string>
+        <string name="sync_status_error">Sync failed: %1$s</string>
+        <string name="cache_size">Cache Size</string>
+        <string name="clear_cache">Clear Cache</string>
+        <string name="clear_cache_confirm">This will delete all cached photos. They will be re-downloaded on next sync.</string>
+
+        <!-- Albums -->
     <string name="change_albums">Change Album Selection</string>
 
     <!-- Connection -->
@@ -112,5 +128,5 @@
     <string name="later">Later</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d photos</string>
+    <string name="photos_count">%1$d / %2$d photos</string>
 </resources>

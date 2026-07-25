@@ -125,11 +125,26 @@ Format:
   match implementation state as of commit d06759e. Added AGENTS.md (this file)
   with the sync rules. Key corrections: (1) API endpoint for album assets is
   `POST /search/metadata`, not `GET /albums/{id}` (Immich v3 compatibility);
-  (2) API key needs 4 scoped permissions (was 2): `album.read`, `asset.read`,
-  `asset.view`, `user.read`; (3) Immich v3 uses `key` query param, not
+  (2) API key needs 5 scoped permissions: `album.read`, `asset.read`,
+  `asset.view`, `asset.download` (for video playback), `user.read`;
+  (3) Immich v3 uses `key` query param, not
   `apiKey` — documented as a known caveat in api-reference.md and technical-spec.md.
 
 <!-- Append new clarifications below this line. -->
+
+- **2026-07-25** — Added Media Cache feature (Room + WorkManager). New
+  packages: `data/local/` (Room DB, DAOs, entities, cache repo impl,
+  converters) and `data/sync/` (MediaCacheWorker, SyncScheduler). New
+  settings: `autoSync` (bool, default true) + `syncIntervalMinutes` (int,
+  default 30, clamped to 15 min by WorkManager). SlideshowViewModel now
+  loads cache-first, falls back to network on cold start, and delegates
+  background sync to SyncScheduler.syncNow() (which enqueues
+  MediaCacheWorker). New deps: Room 2.7.1, WorkManager 2.9.1, Hilt-Work
+  1.2.0. AndroidManifest removes default WorkManagerInitializer.
+  ImmichFrameApp implements Configuration.Provider for HiltWorkerFactory.
+  Updated: functional-spec (F3, F6), technical-spec (tech stack, package
+  layout, state persistence, media cache section), ui-spec (settings
+  mockup), overview (goals), README.
 
 - **2026-07-25** — Burn-in Protection setting removed. Photo animations now
   serve double duty as burn-in protection (the slow pan/zoom is what prevents

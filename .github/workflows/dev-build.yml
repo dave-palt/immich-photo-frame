@@ -37,7 +37,7 @@ jobs:
         run: ./gradlew spotlessCheck --no-daemon
 
       - name: Android Lint
-        run: ./gradlew lintDebug --no-daemon
+        run: ./gradlew lintDebug --no-daemon --no-configuration-cache
 
       - name: Upload lint reports
         if: always()

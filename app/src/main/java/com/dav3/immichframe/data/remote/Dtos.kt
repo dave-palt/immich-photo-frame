@@ -26,6 +26,7 @@ data class AlbumDto(
 data class AssetDto(
     val id: String,
     val type: String = "IMAGE",
+    val updatedAt: String? = null,
 )
 
 // --- Search endpoint (POST /search/metadata) ---
