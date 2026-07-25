@@ -20,18 +20,24 @@ The app stores the server URL and API key on-device, lets the user pick which al
 
 - Direct Immich API access (no middleman server)
 - Native Android UI (Jetpack Compose, no WebView)
-- Album picker with persistent selection
+- Album picker with persistent multi-select selection
 - Fullscreen slideshow with crossfade transitions
+- Video playback (optional, with mute/skip controls)
+- Draggable clock overlay with configurable size and position
+- Burn-in protection (slow pan/zoom) for always-on displays
+- Adaptive background (fills letterbox bars with each photo's dominant color)
+- Start-on-boot for dedicated frame devices
+- Self-update via GitHub releases (bypasses Play Store for sideloaded installs)
 - Minimal setup: enter URL + API key, pick album, done
 - Sensible defaults, configurable later
 
-## Non-Goals (v1)
+## Non-Goals
 
 - Multi-user / multi-server support
 - Weather, calendar, or metadata overlays
-- Video playback
 - Screensaver / DreamService integration
 - Android TV / Leanback support
 - Server-side image caching (all caching is local on-device)
+- Play Store publishing (deferred — AAB is built and ready, but not auto-published)
 
 These may be revisited in later versions.

@@ -9,22 +9,38 @@ All endpoints are under `/api` prefix.
 Send the API key as an HTTP header:
 
 ```
-x-api-key: <apiKey>
+x-api-key: ***
 ```
 
-Alternatively as a query parameter: `?apiKey=<apiKey>` (not used by this app).
+The app uses this header for all Retrofit API calls (injected via an OkHttp
+interceptor in `ImmichRepositoryImpl.kt`).
+
+For image/video URLs fetched by Coil and ExoPlayer (which do not use the
+Retrofit client), the API key is appended as a query parameter:
+
+```
+?apiKey=<key>
+```
+
+> **Immich v3 note**: Immich v3 renamed the query parameter from `apiKey` to
+> `key`. The app currently uses `apiKey` for image/video URLs. If your Immich
+> server is on v3 and images fail to load (404/401), this is the likely cause.
+> The `x-api-key` header used by Retrofit calls is unaffected and works on
+> both v1 and v3.
 
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
 
 ### Required Permissions
 
-For v1 (album browsing + image display), the API key needs:
+The API key needs 4 scoped permissions:
 
 | Permission | Used for |
 |---|---|
 | `album.read` | List albums, get album info |
-| `asset.read` | Download/view assets (images) |
+| `asset.read` | Search/list assets in albums |
+| `asset.view` | Download/view assets (images, videos, thumbnails) |
+| `user.read` | Validate API key (GET /users/me) |
 
 ## Endpoints Used
 
@@ -76,98 +92,95 @@ GET /api/albums
 
 Auth: `x-api-key`
 
-Optional query params:
-- `assetId` — (none) list albums containing a specific asset
-
 Returns array of albums:
 
 ```json
 [
   {
     "id": "album-uuid",
-    "ownerId": "user-uuid",
     "albumName": "Vacation 2024",
-    "description": "",
     "assetCount": 142,
-    "lastModifiedAssetTimestamp": "2024-12-01T...",
-    "startDate": "2024-06-01T...",
-    "endDate": "2024-06-15T...",
-    "hasSharedLink": false,
-    "order": "default",
     "albumThumbnailAssetId": "asset-uuid"
   }
 ]
 ```
 
+The app extracts `id`, `albumName`, `assetCount`, and `albumThumbnailAssetId`.
+
 ---
 
-### 4. Get Album Details (with assets)
+### 4. Search Assets by Album (Metadata Search)
 
 ```
-GET /api/albums/{id}
+POST /api/search/metadata
 ```
 
 Auth: `x-api-key`
 
-Optional query params:
-- `withoutAssets` — if `true`, returns album info without the asset list
+> **Note**: The app previously used `GET /api/albums/{id}` to fetch album
+> assets, but switched to the search endpoint for reliability with Immich v3.
+> The album details endpoint returns assets inconsistently across versions.
 
-Returns album with full asset list:
+Request body:
 
 ```json
 {
-  "id": "album-uuid",
-  "albumName": "Vacation 2024",
-  "assetCount": 142,
-  "assets": [
-    {
-      "id": "asset-uuid",
-      "deviceAssetId": "1",
-      "ownerId": "user-uuid",
-      "deviceId": "device",
-      "originalPath": "/upload/...",
-      "type": "IMAGE",
-      "originalFileName": "IMG_0001",
-      "originalMimeType": "image/jpeg",
-      "exifInfo": { ... },
-      "isFavorite": false,
-      "isArchived": false,
-      "localDateTime": "2024-06-01T...",
-      "thumbhash": "base64string"
-      // many more fields available
-    }
-  ]
+  "albumIds": ["album-uuid"],
+  "size": 1000
 }
 ```
 
-For the slideshow, we extract `id` and `type` from each asset. We filter
-to `type == "IMAGE"` (skip videos in v1).
+Response:
+
+```json
+{
+  "albums": { "total": 1, "count": 1, "items": [...] },
+  "assets": {
+    "total": 142,
+    "count": 142,
+    "items": [
+      { "id": "asset-uuid", "type": "IMAGE" }
+    ]
+  }
+}
+```
+
+The app extracts `id` and `type` from each asset in `assets.items`. Assets
+with `type == "VIDEO"` are handled by ExoPlayer (when Skip Videos is off).
+
+DTOs are in `Dtos.kt` (`SearchMetadataRequest`, `SearchMetadataResponse`,
+`SearchAssetsDto`, `AssetDto`).
 
 ---
 
 ### 5. Download / View Asset
 
 ```
-GET /api/assets/{id}/original
-```
-
-Auth: `x-api-key`
-
-Returns the binary image data (JPEG, PNG, etc.).
-
-For slideshow display, we use the preview endpoint instead (smaller, faster):
-
-```
 GET /api/assets/{id}/thumbnail?size=preview
 ```
 
+Auth: `x-api-key` header **or** `?apiKey=<key>` query param.
+
 Returns a web-friendly preview image. The `size` parameter accepts:
-- `thumbnail` — small (~100px)
-- `preview` — medium/large (~1440p), good for slideshow display
-- `full` — original resolution
+- `thumbnail` — small (~100px), used for album picker thumbnails
+- `preview` — medium/large (~1440p), used for slideshow display
 
 The app requests `size=preview` for all slideshow images to optimize
 bandwidth and disk cache usage.
+
+For video playback:
+
+```
+GET /api/assets/{id}/original
+```
+
+Returns the original binary data (video file). Used by ExoPlayer when
+Skip Videos is off.
+
+URL construction is in `ImmichRepositoryImpl.kt`:
+- `imageUrl(assetId)` → `{base}/api/assets/{id}/thumbnail?size=preview&apiKey={key}`
+- `thumbnailUrl(assetId)` → `{base}/api/assets/{id}/thumbnail?size=thumbnail&apiKey={key}`
+- `videoUrl(assetId)` → `{base}/api/assets/{id}/original?apiKey={key}`
 
 ## Rate Limiting
 
@@ -184,3 +197,16 @@ across minor version updates.
 If Immich changes their API, the app will surface HTTP errors (404, 400)
 rather than crash. Version compatibility can be checked via
 `GET /api/server-info/version` if needed in the future.
+
+## GitHub API (Self-Update)
+
+The self-update feature uses the GitHub API (not Immich):
+
+```
+GET https://api.github.com/repos/dave-palt/immich-photo-frame/releases/latest
+```
+
+No authentication required (public repo). Returns the latest release with
+tag name (`dev-{sha}` format), assets (APK download URL), and release notes.
+
+Implemented in `GitHubApi.kt` / `GitHubDtos.kt` / `UpdateManager.kt`.

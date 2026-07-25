@@ -3,36 +3,63 @@
 ## Branching Strategy
 
 - `develop` — active development branch. Push/PR triggers a debug APK build.
-- `main` — production branch. Merges trigger a signed release AAB build.
+- `main` — production branch. Merges trigger a signed release AAB + APK build.
 - Feature branches off `develop`: `feat/<description>`, `fix/<description>`.
 
 ## Dev Build (develop branch)
 
-Triggers on push/PR to `develop`. Builds a debug APK with `.debug` application ID suffix
-and `-dev` version name suffix. No signing required.
+Triggers on push/PR to `develop` (workflow: `.github/workflows/dev-build.yml`).
 
-Artifact: `immichframe-debug.apk` (14-day retention).
+Two parallel jobs:
 
-## Production Build (main branch)
+### Lint job
+- Spotless code style check (`spotlessCheck`)
+- Android Lint (`lintDebug`)
+- Lint reports uploaded as artifacts (7-day retention)
 
-Triggers on push to `main`. Builds a signed release AAB with R8 minification and
-resource shrinking.
+### Build job
+- Decodes shared debug keystore from `DEBUG_KEYSTORE` secret
+- Builds debug APK with `.debug` application ID suffix and `-dev` version name suffix
+- APK signed with shared debug keystore (all dev builds share the same signature
+  for clean upgrades over each other)
+- Artifact: `immichframe-debug` (14-day retention)
+- **On push to develop** (not PR): publishes a GitHub pre-release:
+  - Tag: `dev-{full sha}` (explicitly pinned via `--target ${{ github.sha }}`)
+  - Title: "Dev Build (unstable)"
+  - Prerelease flag set
+- **Auto-cleanup**: keeps only the 3 most recent dev releases, deletes older ones
+  with `gh release delete --cleanup-tag`
 
-### Required GitHub Secrets / Variables
-
-The production workflow uses **repository variables** (non-secret) and **repository secrets**
-(sensitive). Configure these in GitHub Settings → Secrets and variables → Actions.
-
-#### Variables (Settings → Secrets and variables → Actions → Variables tab)
-
-| Variable | Description |
-|---|---|
-| `SIGNING_KEYSTORE_BASE64` | The `.jks` keystore file, base64-encoded |
-
-#### Secrets (Settings → Secrets and variables → Actions → Secrets tab)
+### Required GitHub Secrets (dev)
 
 | Secret | Description |
 |---|---|
+| `DEBUG_KEYSTORE` | Shared debug keystore file, base64-encoded |
+| `DEBUG_KEYSTORE_PASSWORD` | Debug keystore password |
+| `DEBUG_KEY_ALIAS` | Debug key alias |
+| `DEBUG_KEY_PASSWORD` | Debug key password |
+
+The release is created via `gh release create` (not `softprops/action-gh-release`)
+for full control over tag dates and target commit. The `--target ${{ github.sha }}`
+flag is critical — without it, GitHub Actions' detached HEAD checkout causes
+the tag to be created on the wrong commit.
+
+## Production Build (main branch)
+
+Triggers on push to `main` or manual `workflow_dispatch`
+(workflow: `.github/workflows/prod-build.yml`).
+
+- Decodes signing keystore from `SIGNING_KEYSTORE_BASE64` secret
+- Builds signed release **AAB** (`bundleRelease`) with R8 minification + resource shrinking
+- Builds signed release **APK** (`assembleRelease`)
+- Uploads both as artifacts (90-day retention)
+- Creates a GitHub Release with `softprops/action-gh-release@v2`
+
+### Required GitHub Secrets (prod)
+
+| Secret | Description |
+|---|---|
+| `SIGNING_KEYSTORE_BASE64` | The `.jks` keystore file, base64-encoded |
 | `SIGNING_STORE_PASSWORD` | Keystore file password |
 | `SIGNING_KEY_ALIAS` | Key alias name within the keystore |
 | `SIGNING_KEY_PASSWORD` | Password for the specific key |
@@ -41,10 +68,10 @@ The production workflow uses **repository variables** (non-secret) and **reposit
 
 ```bash
 keytool -genkeypair \
-  -alias immichframe \
+  -alias release \
   -keyalg RSA -keysize 4096 \
-  -validity 10000 \
-  -keystore immichframe.jks \
+  -validity 36500 \
+  -keystore release.jks \
   -storepass <STORE_PASSWORD> \
   -keypass <KEY_PASSWORD> \
   -dname "CN=ImmichFrame, OU=Mobile, O=dav3, L=City, ST=State, C=US"
@@ -53,15 +80,15 @@ keytool -genkeypair \
 ### Uploading to GitHub
 
 ```bash
-# Base64-encode the keystore for storage as a variable
-base64 -i immichframe.jks -o keystore.b64
+# Base64-encode the keystore
+base64 -i release.jks -o keystore.b64
 
-# Copy the content and add it as a repository variable:
-# Settings → Secrets and variables → Actions → Variables → New variable
+# Add as repository secret:
+# Settings → Secrets and variables → Actions → Secrets → New secret
 # Name: SIGNING_KEYSTORE_BASE64
 # Value: (paste contents of keystore.b64)
 
-# Then add the secrets:
+# Then add the remaining secrets:
 # SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD
 ```
 
@@ -70,13 +97,31 @@ base64 -i immichframe.jks -o keystore.b64
 For local signed builds, set the environment variables before running Gradle:
 
 ```bash
-export SIGNING_STORE_FILE=/path/to/immichframe.jks
+export SIGNING_STORE_FILE=/path/to/release.jks
 export SIGNING_STORE_PASSWORD=<password>
-export SIGNING_KEY_ALIAS=immichframe
+export SIGNING_KEY_ALIAS=release
 export SIGNING_KEY_PASSWORD=<password>
 
 ./gradlew bundleRelease
 ```
+
+## Local Debug Build
+
+```bash
+./gradlew clean spotlessApply spotlessCheck lintDebug assembleDebug
+```
+
+If no `DEBUG_KEYSTORE_PATH` env var is set, the build falls back to the
+default debug keystore at `~/.android/debug.keystore` (storepass: `android`,
+alias: `androiddebugkey`).
+
+## Self-Update (GitHub Releases)
+
+Dev builds published to the `develop` branch are consumed by the app's
+self-update feature (see [functional-spec.md](functional-spec.md#F5c)).
+The app compares `BuildConfig.GIT_SHA` against the release tag SHA
+(`dev-{sha}`). If they differ, it downloads the APK and invokes the
+system installer. This only works for non-Play-Store installs.
 
 ## Play Store Publishing (Future)
 
