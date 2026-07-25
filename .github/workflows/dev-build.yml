@@ -96,11 +96,12 @@ jobs:
         run: |
           gh release create "dev-${{ github.sha }}" \
             --repo ${{ github.repository }} \
+            --target ${{ github.sha }} \
             --title "Dev Build (unstable)" \
-            --notes "⚠️ **Unstable development build** — auto-generated from latest develop branch.
+            --notes "⚠️ Unstable development build — auto-generated from latest develop branch.
 
-          **Commit:** ${{ github.event.head_commit.message }}
-          **SHA:** ${{ github.sha }}
+          Commit: ${{ github.event.head_commit.message }}
+          SHA: ${{ github.sha }}
 
           Install at your own risk. Not a stable release." \
             --prerelease \
