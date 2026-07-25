@@ -1,0 +1,533 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "hermes-agent",
+  "elements": [
+    {
+      "type": "text",
+      "id": "title",
+      "x": 230,
+      "y": 12,
+      "text": "ImmichFrame \u2014 Architecture Comparison",
+      "fontSize": 28,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "originalText": "ImmichFrame \u2014 Architecture Comparison",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "x": 250,
+      "y": 48,
+      "text": "Native direct-API  vs.  Docker + WebView middleman",
+      "fontSize": 16,
+      "fontFamily": 1,
+      "strokeColor": "#757575",
+      "originalText": "Native direct-API  vs.  Docker + WebView middleman",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "zone_top",
+      "x": 20,
+      "y": 85,
+      "width": 920,
+      "height": 255,
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#22c55e",
+      "strokeWidth": 1,
+      "opacity": 30
+    },
+    {
+      "type": "text",
+      "id": "zone_top_label",
+      "x": 40,
+      "y": 93,
+      "text": "ImmichFrame \u2014 This App (Native Android)",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "strokeColor": "#15803d",
+      "originalText": "ImmichFrame \u2014 This App (Native Android)",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "dev_top",
+      "x": 80,
+      "y": 145,
+      "width": 220,
+      "height": 100,
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#4a9eed",
+      "boundElements": [
+        {
+          "id": "t_dev_top",
+          "type": "text"
+        },
+        {
+          "id": "arr_top",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_dev_top",
+      "x": 85,
+      "y": 165,
+      "width": 210,
+      "height": 45,
+      "text": "Android Device\nNative Compose UI",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dev_top",
+      "originalText": "Android Device\nNative Compose UI",
+      "autoResize": true
+    },
+    {
+      "type": "arrow",
+      "id": "arr_top",
+      "x": 300,
+      "y": 195,
+      "width": 200,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "dev_top",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "immich_top",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      },
+      "boundElements": [
+        {
+          "id": "t_arr_top",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_arr_top",
+      "x": 320,
+      "y": 168,
+      "width": 160,
+      "height": 40,
+      "text": "x-api-key header\n(direct Retrofit call)",
+      "fontSize": 16,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "arr_top",
+      "originalText": "x-api-key header\n(direct Retrofit call)",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "immich_top",
+      "x": 500,
+      "y": 145,
+      "width": 220,
+      "height": 100,
+      "backgroundColor": "#c3fae8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#22c55e",
+      "boundElements": [
+        {
+          "id": "t_immich_top",
+          "type": "text"
+        },
+        {
+          "id": "arr_top",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_immich_top",
+      "x": 505,
+      "y": 165,
+      "width": 210,
+      "height": 45,
+      "text": "Immich Server\n(your photos)",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "immich_top",
+      "originalText": "Immich Server\n(your photos)",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "feats_top_h",
+      "x": 760,
+      "y": 140,
+      "text": "Key traits:",
+      "fontSize": 16,
+      "fontFamily": 1,
+      "strokeColor": "#15803d",
+      "originalText": "Key traits:",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "feats_top",
+      "x": 760,
+      "y": 168,
+      "text": "- Scoped key (4 perms)\n- AES-256 on-device\n- Album multi-select\n- No Docker needed\n- No WebView layer",
+      "fontSize": 14,
+      "fontFamily": 1,
+      "strokeColor": "#495057",
+      "originalText": "- Scoped key (4 perms)\n- AES-256 on-device\n- Album multi-select\n- No Docker needed\n- No WebView layer",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "zone_bot",
+      "x": 20,
+      "y": 370,
+      "width": 920,
+      "height": 280,
+      "backgroundColor": "#ffd8a8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#f59e0b",
+      "strokeWidth": 1,
+      "opacity": 30
+    },
+    {
+      "type": "text",
+      "id": "zone_bot_label",
+      "x": 40,
+      "y": 378,
+      "text": "ImmichFrame_Android (the other one)",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "strokeColor": "#b86d00",
+      "originalText": "ImmichFrame_Android (the other one)",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "dev_bot",
+      "x": 80,
+      "y": 430,
+      "width": 170,
+      "height": 100,
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#4a9eed",
+      "boundElements": [
+        {
+          "id": "t_dev_bot",
+          "type": "text"
+        },
+        {
+          "id": "arr_bot1",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_dev_bot",
+      "x": 85,
+      "y": 450,
+      "width": 160,
+      "height": 45,
+      "text": "Android Device\n(WebView)",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dev_bot",
+      "originalText": "Android Device\n(WebView)",
+      "autoResize": true
+    },
+    {
+      "type": "arrow",
+      "id": "arr_bot1",
+      "x": 250,
+      "y": 480,
+      "width": 120,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          120,
+          0
+        ]
+      ],
+      "strokeColor": "#1e1e1e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "dev_bot",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "frame_srv",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      },
+      "boundElements": [
+        {
+          "id": "t_arr_bot1",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_arr_bot1",
+      "x": 260,
+      "y": 460,
+      "width": 100,
+      "height": 20,
+      "text": "loads web UI",
+      "fontSize": 14,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "arr_bot1",
+      "originalText": "loads web UI",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "frame_srv",
+      "x": 370,
+      "y": 430,
+      "width": 190,
+      "height": 100,
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#f59e0b",
+      "boundElements": [
+        {
+          "id": "t_frame_srv",
+          "type": "text"
+        },
+        {
+          "id": "arr_bot1",
+          "type": "arrow"
+        },
+        {
+          "id": "arr_bot2",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_frame_srv",
+      "x": 375,
+      "y": 450,
+      "width": 180,
+      "height": 45,
+      "text": "ImmichFrame Server\n(Docker container)",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "frame_srv",
+      "originalText": "ImmichFrame Server\n(Docker container)",
+      "autoResize": true
+    },
+    {
+      "type": "arrow",
+      "id": "arr_bot2",
+      "x": 560,
+      "y": 480,
+      "width": 160,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          160,
+          0
+        ]
+      ],
+      "strokeColor": "#f59e0b",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "frame_srv",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "immich_bot",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      },
+      "boundElements": [
+        {
+          "id": "t_arr_bot2",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_arr_bot2",
+      "x": 575,
+      "y": 460,
+      "width": 130,
+      "height": 40,
+      "text": "holds API key,\nfetches + serves",
+      "fontSize": 14,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "arr_bot2",
+      "originalText": "holds API key,\nfetches + serves",
+      "autoResize": true
+    },
+    {
+      "type": "rectangle",
+      "id": "immich_bot",
+      "x": 720,
+      "y": 430,
+      "width": 190,
+      "height": 100,
+      "backgroundColor": "#c3fae8",
+      "fillStyle": "solid",
+      "roundness": {
+        "type": 3
+      },
+      "strokeColor": "#22c55e",
+      "boundElements": [
+        {
+          "id": "t_immich_bot",
+          "type": "text"
+        },
+        {
+          "id": "arr_bot2",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "t_immich_bot",
+      "x": 725,
+      "y": 450,
+      "width": 180,
+      "height": 45,
+      "text": "Immich Server\n(your photos)",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "strokeColor": "#1e1e1e",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "immich_bot",
+      "originalText": "Immich Server\n(your photos)",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "feats_bot_h",
+      "x": 80,
+      "y": 550,
+      "text": "Drawbacks:",
+      "fontSize": 16,
+      "fontFamily": 1,
+      "strokeColor": "#b86d00",
+      "originalText": "Drawbacks:",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "feats_bot",
+      "x": 80,
+      "y": 578,
+      "text": "- Extra Docker container to run/maintain        - Server holds your full API key        - WebView = heavier, less native        - Same content on every screen unless you run multiple containers",
+      "fontSize": 14,
+      "fontFamily": 1,
+      "strokeColor": "#495057",
+      "originalText": "- Extra Docker container to run/maintain        - Server holds your full API key        - WebView = heavier, less native        - Same content on every screen unless you run multiple containers",
+      "autoResize": true
+    },
+    {
+      "type": "text",
+      "id": "footer",
+      "x": 230,
+      "y": 665,
+      "text": "One hop vs. two \u2014 the app cuts out the middleman entirely.",
+      "fontSize": 16,
+      "fontFamily": 1,
+      "strokeColor": "#757575",
+      "originalText": "One hop vs. two \u2014 the app cuts out the middleman entirely.",
+      "autoResize": true
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  }
+}

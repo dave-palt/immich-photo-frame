@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">播放</string>
+    <string name="section_display">显示</string>
+    <string name="section_clock">时钟</string>
+    <string name="section_system">系统</string>
+    <string name="section_albums">相册</string>
+    <string name="section_connection">连接</string>
+
+    <!-- Playback -->
+    <string name="interval">间隔</string>
+    <string name="shuffle">随机播放</string>
+    <string name="shuffle_desc">随机排列图片顺序</string>
+    <string name="skip_videos">跳过视频</string>
+    <string name="skip_videos_desc">仅显示照片</string>
+    <string name="muted">静音</string>
+    <string name="muted_desc">静音视频音频</string>
+    <string name="photo_animations">照片动画</string>
+    <string name="photo_animations_desc">对照片应用细微的缩放和平移效果</string>
+    <string name="photo_animations_hint">每张照片会从已启用的类型中随机选择一种效果</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">放大</string>
+    <string name="anim_zoom_out">缩小</string>
+    <string name="anim_pan_left">向左平移</string>
+    <string name="anim_pan_right">向右平移</string>
+    <string name="anim_pan_up">向上平移</string>
+    <string name="anim_pan_down">向下平移</string>
+
+    <!-- Display -->
+    <string name="image_fit">图片适应</string>
+    <string name="contain">包含</string>
+    <string name="cover">填充</string>
+    <string name="adaptive_background">自适应背景</string>
+    <string name="adaptive_background_desc">用每张照片的平均色填充黑边</string>
+    <string name="fullscreen">全屏</string>
+    <string name="fullscreen_desc">隐藏系统栏</string>
+    <string name="keep_screen_on">保持屏幕常亮</string>
+
+    <!-- Clock -->
+    <string name="show_clock">显示时钟</string>
+    <string name="clock_size">时钟大小</string>
+    <string name="drag_clock_hint">在幻灯片放映屏幕上拖动时钟以重新定位</string>
+    <string name="snap_to_grid">对齐到网格</string>
+    <string name="snap_to_grid_desc">释放时根据时钟大小对齐到网格</string>
+
+    <!-- System -->
+    <string name="start_on_boot">开机启动</string>
+    <string name="start_on_boot_desc">设备开机时自动启动应用</string>
+    <string name="boot_not_verified_desc">可能未授予自动启动权限 — 请重启设备以验证。如果未启动，请使用下方按钮打开设备的自动启动设置。</string>
+    <string name="open_autostart">打开自动启动设置</string>
+    <string name="auto_update">自动更新</string>
+    <string name="auto_update_desc">检查GitHub上的新版本并自动下载</string>
+
+    <!-- Albums -->
+    <string name="change_albums">更改相册选择</string>
+
+    <!-- Connection -->
+    <string name="server">服务器</string>
+    <string name="server_url">服务器URL</string>
+    <string name="api_key">API密钥</string>
+    <string name="not_set">未设置</string>
+    <string name="edit">编辑</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+
+    <!-- Settings UI -->
+    <string name="settings">设置</string>
+    <string name="back">返回</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">自动启动权限</string>
+    <string name="autostart_perm_message">某些设备会阻止应用自动启动。为确保应用在开机时启动，您可能需要在设备设置中授予自动启动权限。</string>
+    <string name="open_settings">打开设置</string>
+    <string name="skip">跳过</string>
+    <string name="reset_title">重置全部？</string>
+    <string name="reset_message">这将清除服务器URL、API密钥、所选相册和所有幻灯片放映设置。您将返回到设置界面。</string>
+    <string name="reset">重置</string>
+    <string name="reset_all">重置所有设置</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">ImmichFrame设置</string>
+    <string name="setup_subtitle">连接到您的Immich服务器</string>
+    <string name="protocol">协议</string>
+    <string name="domain">域名</string>
+    <string name="domain_placeholder">photos.example.com</string>
+    <string name="full_url_preview">完整URL</string>
+    <string name="test_connection">测试连接</string>
+    <string name="connecting">连接中…</string>
+    <string name="next">下一步</string>
+    <string name="select_albums">选择相册</string>
+    <string name="done">完成</string>
+    <string name="no_albums">未找到相册</string>
+    <string name="loading_albums">正在加载相册…</string>
+    <string name="hide_key">隐藏密钥</string>
+    <string name="show_key">显示密钥</string>
+    <string name="connected_as">已连接为 %1$s</string>
+    <string name="connection_failed">连接失败</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">已选择 %1$d 个</string>
+    <string name="start_slideshow">开始幻灯片放映</string>
+    <string name="retry">重试</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">有可用更新</string>
+    <string name="update_message">新版本已下载，可以安装。\n\n版本：%1$s…</string>
+    <string name="install">安装</string>
+    <string name="later">稍后</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d张照片</string>
+</resources>

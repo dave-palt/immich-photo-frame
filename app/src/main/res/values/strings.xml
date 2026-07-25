@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">Playback</string>
+    <string name="section_display">Display</string>
+    <string name="section_clock">Clock</string>
+    <string name="section_system">System</string>
+    <string name="section_albums">Albums</string>
+    <string name="section_connection">Connection</string>
+
+    <!-- Playback -->
+    <string name="interval">Interval</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="shuffle_desc">Randomize image order</string>
+    <string name="skip_videos">Skip Videos</string>
+    <string name="skip_videos_desc">Only show photos</string>
+    <string name="muted">Muted</string>
+    <string name="muted_desc">Silence video audio</string>
+    <string name="photo_animations">Photo Animations</string>
+    <string name="photo_animations_desc">Subtle zoom and pan effects on photos (also reduces OLED burn-in)</string>
+    <string name="photo_animations_hint">A random effect is picked from the enabled types for each photo</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">Zoom In</string>
+    <string name="anim_zoom_out">Zoom Out</string>
+    <string name="anim_pan_left">Pan Left</string>
+    <string name="anim_pan_right">Pan Right</string>
+    <string name="anim_pan_up">Pan Up</string>
+    <string name="anim_pan_down">Pan Down</string>
+
+    <!-- Display -->
+    <string name="image_fit">Image Fit</string>
+    <string name="contain">Contain</string>
+    <string name="cover">Cover</string>
+    <string name="adaptive_background">Adaptive Background</string>
+    <string name="adaptive_background_desc">Fill letterbox bars with average color from each photo</string>
+    <string name="fullscreen">Fullscreen</string>
+    <string name="fullscreen_desc">Hide system bars</string>
+    <string name="keep_screen_on">Keep Screen On</string>
+
+    <!-- Clock -->
+    <string name="show_clock">Show Clock</string>
+    <string name="clock_size">Clock Size</string>
+    <string name="drag_clock_hint">Drag the clock on the slideshow screen to reposition</string>
+    <string name="snap_to_grid">Snap to Grid</string>
+    <string name="snap_to_grid_desc">Align clock to grid based on its size when released</string>
+
+    <!-- System -->
+    <string name="start_on_boot">Start on Boot</string>
+    <string name="start_on_boot_desc">Launch the app automatically after device reboot</string>
+    <string name="boot_not_verified_desc">Autostart permission may not be granted — reboot to verify. If it doesn\'t launch, use the button below to open your device\'s autostart settings.</string>
+    <string name="open_autostart">Open Autostart Settings</string>
+    <string name="auto_update">Auto-Update</string>
+    <string name="auto_update_desc">Check GitHub for new builds and download them automatically</string>
+
+    <!-- Albums -->
+    <string name="change_albums">Change Album Selection</string>
+
+    <!-- Connection -->
+    <string name="server">Server</string>
+    <string name="server_url">Server URL</string>
+    <string name="api_key">API Key</string>
+    <string name="not_set">Not set</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Settings UI -->
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">Autostart Permission</string>
+    <string name="autostart_perm_message">Some devices block apps from starting automatically. To ensure the app launches on boot, you may need to grant autostart permission in your device settings.</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="skip">Skip</string>
+    <string name="reset_title">Reset Everything?</string>
+    <string name="reset_message">This clears server URL, API key, selected albums, and all slideshow settings. You\'ll be sent back to the setup screen.</string>
+    <string name="reset">Reset</string>
+    <string name="reset_all">Reset All Settings</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">ImmichFrame Setup</string>
+    <string name="setup_subtitle">Connect to your Immich server</string>
+    <string name="protocol">Protocol</string>
+    <string name="domain">Domain</string>
+    <string name="domain_placeholder">photos.example.com</string>
+    <string name="full_url_preview">Full URL</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="connecting">Connecting…</string>
+    <string name="next">Next</string>
+    <string name="select_albums">Select Albums</string>
+    <string name="done">Done</string>
+    <string name="no_albums">No albums found</string>
+    <string name="loading_albums">Loading albums…</string>
+    <string name="hide_key">Hide key</string>
+    <string name="show_key">Show key</string>
+    <string name="connected_as">Connected as %1$s</string>
+    <string name="connection_failed">Connection failed</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">%1$d selected</string>
+    <string name="start_slideshow">Start Slideshow</string>
+    <string name="retry">Retry</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">Update Available</string>
+    <string name="update_message">A new build has been downloaded and is ready to install.\n\nVersion: %1$s…</string>
+    <string name="install">Install</string>
+    <string name="later">Later</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d photos</string>
+</resources>

@@ -88,14 +88,19 @@ Shown on first launch or when credentials are missing/invalid.
 │                              │
 │                              │
 │        [ Full Image ]        │
+│                    [13:37]   │ ← clock overlay (draggable)
 │                              │
 │                              │
 │                              │
-│                              │
+│  ░░░░░░░░░░░░░░░░░░░░░░░░░░  │ ← progress bar (time remaining)
 └──────────────────────────────┘
 ```
 
 Fullscreen, immersive mode (status bar + nav bar hidden).
+
+- Clock overlay appears when enabled. Long-press and drag to reposition.
+- Progress bar at the bottom shows elapsed/remaining time for current image.
+- Video assets (when Skip Videos is off) play inline with ExoPlayer.
 
 **On tap** — overlay controls fade in:
 
@@ -131,31 +136,58 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  ← Settings                  │
 ├──────────────────────────────┤
 │                              │
-│  SERVER                      │
-│  Immich Server URL           │
-│  ┌────────────────────────┐  │
-│  │ https://photos.dav3.cc │  │
+│  SLIDESHOW                   │
+│  Interval: 30s          [───]│ ← slider 5-120s
+│                              │
+│  IMAGE                       │
+│  Fill: [Contain] [Cover]     │ ← filter chips
+│  Adaptive Background    [○]  │ ← toggle (letterbox color fill)
+│                              │
+│  Shuffle                [●]  │ ← toggle
+│  Skip Videos            [●]  │ ← toggle
+│  Muted                  [●]  │ ← toggle
+│  Photo Animations       [○]  │ ← toggle (expandable)
+│  ┌─ Zoom In          [●]  ┐  │ ← shown when animations on
+│  │  Zoom Out         [○]  │  │
+│  │  Pan Left         [○]  │  │
+│  │  Pan Right        [●]  │  │
+│  │  Pan Up           [○]  │  │
+│  │  Pan Down         [○]  │  │
+│  │  Random           [●]  │  │
 │  └────────────────────────┘  │
-│  API Key                     │
+│                              │
+│  Fullscreen             [●]  │ ← toggle
+│  Keep Screen On         [●]  │ ← toggle
+│  Start on Boot          [○]  │ ← toggle (+ OEM autostart prompt)
+│  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
+│                              │
+│  CLOCK                       │
+│  Show Clock             [○]  │ ← toggle
 │  ┌────────────────────────┐  │
-│  │ ••••••••••             │  │
+│  │      13:37             │  │ ← preview at current size
 │  └────────────────────────┘  │
+│  Clock Size: 48sp       [───]│ ← slider 24-96
+│  "Drag clock to reposition"  │ ← helper text
+│  Snap to Grid           [●]  │ ← toggle
+│                              │
+│  ALBUMS                      │
 │  ┌──────────────────────┐    │
-│  │   Test Connection    │    │
+│  │ 📷 Change Selection  │    │ ← button → album picker
 │  └──────────────────────┘    │
 │                              │
-│  SLIDESHOW                   │
-│  Interval: 30s          [───]│ ← slider 5-300s
-│  Transition: 1s         [───]│ ← slider 0-3s
-│  Fill Mode: Contain     [▾]  │ ← dropdown
-│  Ken Burns Effect       [○]  │ ← toggle
-│  Show Clock             [○]  │ ← toggle
-│  Keep Screen On         [●]  │ ← toggle
+│  CONNECTION                  │
+│  ┌──────────────────────┐    │
+│  │ Server URL   [Edit]  │    │
+│  │ API Key      [Edit]  │    │
+│  │ [Test Connection]    │    │
+│  └──────────────────────┘    │
+│                              │
+│  Reset All Settings          │ ← red text button
 │                              │
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Server, Slideshow.
+- Organized into sections: Slideshow, Image, Clock, Albums, Connection.
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
 - Back arrow returns to previous screen.
@@ -163,6 +195,11 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
   effect next time the app fetches data (or when user manually restarts
   the slideshow).
 - Changing selected albums navigates back to the album picker.
+- Auto-Update toggle is hidden when installed from Play Store
+  (`getInstallSourceInfo() == "com.android.vending"`).
+- Start on Boot shows an "Open Autostart Settings" button when enabled,
+  which deep-links to the OEM-specific autostart permission screen
+  (Xiaomi, Oppo, Vivo, Huawei, Honor, Asus, etc.).
 
 ## Color Palette
 

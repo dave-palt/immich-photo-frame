@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" width="960" height="660" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e1e1e"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="660" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" font-size="22" font-weight="700" fill="#1e1e1e">ImmichFrame — Architecture Comparison</text>
+  <text x="480" y="52" text-anchor="middle" font-size="14" fill="#868e96">Native direct-API  vs.  Docker + WebView middleman</text>
+
+  <!-- ════════ GREEN ZONE: This App ════════ -->
+  <rect x="20" y="75" width="920" height="240" rx="12" fill="#ebfbee" stroke="#37b24d" stroke-width="1.5" opacity="0.5"/>
+  <text x="40" y="100" font-size="16" font-weight="700" fill="#2b8a3e">ImmichFrame — This App (Native Android)</text>
+
+  <!-- Device (native) -->
+  <rect x="80" y="130" width="220" height="90" rx="10" fill="#d0ebff" stroke="#4a9eed" stroke-width="2"/>
+  <text x="190" y="168" text-anchor="middle" font-size="16" font-weight="600" fill="#1e1e1e">Android Device</text>
+  <text x="190" y="190" text-anchor="middle" font-size="14" fill="#495057">Native Compose UI</text>
+
+  <!-- Arrow: device -> immich (direct) -->
+  <line x1="300" y1="175" x2="490" y2="175" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="395" y="160" text-anchor="middle" font-size="13" fill="#343a40">x-api-key header</text>
+  <text x="395" y="198" text-anchor="middle" font-size="12" fill="#868e96">direct Retrofit call</text>
+
+  <!-- Immich server (top) -->
+  <rect x="500" y="130" width="220" height="90" rx="10" fill="#c3fae8" stroke="#37b24d" stroke-width="2"/>
+  <text x="610" y="168" text-anchor="middle" font-size="16" font-weight="600" fill="#1e1e1e">Immich Server</text>
+  <text x="610" y="190" text-anchor="middle" font-size="14" fill="#495057">your photos</text>
+
+  <!-- Green features -->
+  <text x="760" y="135" font-size="13" font-weight="700" fill="#2b8a3e">Key traits:</text>
+  <text x="760" y="155" font-size="12" fill="#495057">
+    <tspan x="760" dy="0">• Scoped key (4 perms)</tspan>
+    <tspan x="760" dy="17">• AES-256 on-device</tspan>
+    <tspan x="760" dy="17">• Album multi-select</tspan>
+    <tspan x="760" dy="17">• No Docker needed</tspan>
+    <tspan x="760" dy="17">• No WebView layer</tspan>
+  </text>
+
+  <!-- One hop badge -->
+  <rect x="330" y="240" width="300" height="28" rx="14" fill="#d3f9d8" stroke="#37b24d" stroke-width="1"/>
+  <text x="480" y="259" text-anchor="middle" font-size="13" font-weight="600" fill="#2b8a3e">1 hop — direct, no middleman</text>
+
+  <!-- ════════ ORANGE ZONE: Other App ════════ -->
+  <rect x="20" y="335" width="920" height="290" rx="12" fill="#fff4e6" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+  <text x="40" y="360" font-size="16" font-weight="700" fill="#d9480f">ImmichFrame_Android (the other one)</text>
+
+  <!-- Device (WebView) -->
+  <rect x="80" y="390" width="170" height="90" rx="10" fill="#d0ebff" stroke="#4a9eed" stroke-width="2"/>
+  <text x="165" y="428" text-anchor="middle" font-size="16" font-weight="600" fill="#1e1e1e">Android Device</text>
+  <text x="165" y="450" text-anchor="middle" font-size="14" fill="#495057">(WebView)</text>
+
+  <!-- Arrow 1: device -> frame server -->
+  <line x1="250" y1="435" x2="370" y2="435" stroke="#1e1e1e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="310" y="422" text-anchor="middle" font-size="12" fill="#343a40">loads web UI</text>
+
+  <!-- Frame server (Docker) -->
+  <rect x="380" y="390" width="200" height="90" rx="10" fill="#fff3bf" stroke="#f59e0b" stroke-width="2"/>
+  <text x="480" y="425" text-anchor="middle" font-size="15" font-weight="600" fill="#1e1e1e">ImmichFrame Server</text>
+  <text x="480" y="447" text-anchor="middle" font-size="13" fill="#866a04">Docker container</text>
+  <text x="480" y="465" text-anchor="middle" font-size="11" fill="#a07a06">holds your API key</text>
+
+  <!-- Arrow 2: frame server -> immich -->
+  <line x1="580" y1="435" x2="710" y2="435" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="645" y="422" text-anchor="middle" font-size="12" fill="#866a04">fetches + serves</text>
+
+  <!-- Immich server (bottom) -->
+  <rect x="720" y="390" width="180" height="90" rx="10" fill="#c3fae8" stroke="#37b24d" stroke-width="2"/>
+  <text x="810" y="428" text-anchor="middle" font-size="16" font-weight="600" fill="#1e1e1e">Immich Server</text>
+  <text x="810" y="450" text-anchor="middle" font-size="14" fill="#495057">your photos</text>
+
+  <!-- Two hops badge -->
+  <rect x="330" y="500" width="300" height="28" rx="14" fill="#ffe8cc" stroke="#f59e0b" stroke-width="1"/>
+  <text x="480" y="519" text-anchor="middle" font-size="13" font-weight="600" fill="#d9480f">2 hops — extra server in the middle</text>
+
+  <!-- Drawbacks -->
+  <text x="80" y="558" font-size="13" font-weight="700" fill="#d9480f">Drawbacks:</text>
+  <text x="80" y="580" font-size="12" fill="#495057">
+    <tspan x="80" dy="0">• Extra Docker container to run and maintain</tspan>
+    <tspan x="80" dy="17">• Server holds your full API key (not scoped on-device)</tspan>
+    <tspan x="80" dy="17">• WebView = heavier, less native feel</tspan>
+    <tspan x="80" dy="17">• Every screen shows the same content — unless you run multiple containers</tspan>
+  </text>
+
+  <!-- Footer -->
+  <text x="480" y="645" text-anchor="middle" font-size="13" font-style="italic" fill="#868e96">One hop vs. two — the app cuts out the middleman entirely.</text>
+</svg>

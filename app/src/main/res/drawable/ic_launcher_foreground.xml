@@ -1,0 +1,55 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z" />
+
+    <!-- Frame segments (clockwise from top), scaled from 512→108 viewBox -->
+    <!-- stroke-width ~8.5 (40/512*108), rounded corners at 96/512*108 ≈ 20 -->
+
+    <!-- Red: top edge + top-right corner -->
+    <path
+        android:strokeColor="#FA2921"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
+        android:fillColor="#00000000"
+        android:pathData="M 54,20 L 88,20 A 1.7,1.7 0 0,1 89.5,21.7 L 89.5,42" />
+
+    <!-- Orange: right edge + bottom-right corner -->
+    <path
+        android:strokeColor="#FFB400"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
+        android:fillColor="#00000000"
+        android:pathData="M 89.5,42 L 89.5,86 A 1.7,1.7 0 0,1 88,87.7 L 67.5,87.7" />
+
+    <!-- Green: bottom edge (left half) -->
+    <path
+        android:strokeColor="#18C249"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
+        android:fillColor="#00000000"
+        android:pathData="M 67.5,87.7 L 40.5,87.7" />
+
+    <!-- Blue: bottom-left corner + left edge -->
+    <path
+        android:strokeColor="#1E83F7"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
+        android:fillColor="#00000000"
+        android:pathData="M 40.5,87.7 L 20,87.7 A 1.7,1.7 0 0,1 18.5,86 L 18.5,42" />
+
+    <!-- Purple: left edge + top-left corner -->
+    <path
+        android:strokeColor="#ED79B5"
+        android:strokeWidth="8.5"
+        android:strokeLineCap="butt"
+        android:fillColor="#00000000"
+        android:pathData="M 18.5,42 L 18.5,21.7 A 1.7,1.7 0 0,1 20,20 L 54,20" />
+
+</vector>

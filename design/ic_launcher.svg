@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#1a1a2e"/>
+  <g fill="none" stroke-width="40" stroke-linecap="butt">
+    <path stroke="#FA2921" d="M 256,96 L 416,96 A 8,8 0 0,1 424,104 L 424,200"/>
+    <path stroke="#FFB400" d="M 424,200 L 424,408 A 8,8 0 0,1 416,416 L 320,416"/>
+    <path stroke="#18C249" d="M 320,416 L 192,416"/>
+    <path stroke="#1E83F7" d="M 192,416 L 96,416 A 8,8 0 0,1 88,408 L 88,200"/>
+    <path stroke="#ED79B5" d="M 88,200 L 88,104 A 8,8 0 0,1 96,96 L 256,96"/>
+  </g>
+  <text x="256" y="261" text-anchor="middle" dominant-baseline="central"
+        font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif"
+        font-size="54" font-weight="700" fill="#e8e8e8" letter-spacing="2">FRAME</text>
+</svg>

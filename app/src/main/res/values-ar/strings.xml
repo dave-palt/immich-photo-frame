@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">التشغيل</string>
+    <string name="section_display">العرض</string>
+    <string name="section_clock">الساعة</string>
+    <string name="section_system">النظام</string>
+    <string name="section_albums">الألبومات</string>
+    <string name="section_connection">الاتصال</string>
+
+    <!-- Playback -->
+    <string name="interval">الفاصل الزمني</string>
+    <string name="shuffle">عشوائي</string>
+    <string name="shuffle_desc">ترتيب عشوائي للصور</string>
+    <string name="skip_videos">تخطي مقاطع الفيديو</string>
+    <string name="skip_videos_desc">عرض الصور فقط</string>
+    <string name="muted">كتم الصوت</string>
+    <string name="muted_desc">كتم صوت مقاطع الفيديو</string>
+    <string name="photo_animations">رسوم متحركة للصور</string>
+    <string name="photo_animations_desc">تأثيرات دقيقة للتقريب والتحريك على الصور</string>
+    <string name="photo_animations_hint">يتم اختيار تأثير عشوائي من الأنواع الممكّنة لكل صورة</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">تقريب</string>
+    <string name="anim_zoom_out">تصغير</string>
+    <string name="anim_pan_left">تحريك لليسار</string>
+    <string name="anim_pan_right">تحريك لليمين</string>
+    <string name="anim_pan_up">تحريك لأعلى</string>
+    <string name="anim_pan_down">تحريك لأسفل</string>
+
+    <!-- Display -->
+    <string name="image_fit">ملاءمة الصورة</string>
+    <string name="contain">احتواء</string>
+    <string name="cover">تغطية</string>
+    <string name="adaptive_background">خلفية متكيفة</string>
+    <string name="adaptive_background_desc">ملء الأشرطة السوداء بمتوسط لون كل صورة</string>
+    <string name="fullscreen">ملء الشاشة</string>
+    <string name="fullscreen_desc">إخفاء أشرطة النظام</string>
+    <string name="keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
+
+    <!-- Clock -->
+    <string name="show_clock">إظهار الساعة</string>
+    <string name="clock_size">حجم الساعة</string>
+    <string name="drag_clock_hint">اسحب الساعة على شاشة العرض لإعادة وضعها</string>
+    <string name="snap_to_grid">محاذاة إلى الشبكة</string>
+    <string name="snap_to_grid_desc">محاذاة الساعة إلى الشبكة بناءً على حجمها عند الإفلات</string>
+
+    <!-- System -->
+    <string name="start_on_boot">التشغيل عند الإقلاع</string>
+    <string name="start_on_boot_desc">تشغيل التطبيق تلقائيًا عند بدء الجهاز</string>
+    <string name="boot_not_verified_desc">قد لا يكون إذن التشغيل التلقائي ممنوحاً — أعد التشغيل للتحقق. إذا لم يتم التشغيل، استخدم الزر أدناه لفتح إعدادات التشغيل التلقائي لجهازك.</string>
+    <string name="open_autostart">فتح إعدادات التشغيل التلقائي</string>
+    <string name="auto_update">التحديث التلقائي</string>
+    <string name="auto_update_desc">التحقق من GitHub بحثًا عن إصدارات جديدة وتنزيلها تلقائيًا</string>
+
+    <!-- Albums -->
+    <string name="change_albums">تغيير اختيار الألبومات</string>
+
+    <!-- Connection -->
+    <string name="server">الخادم</string>
+    <string name="server_url">عنوان URL للخادم</string>
+    <string name="api_key">مفتاح API</string>
+    <string name="not_set">غير مضبوط</string>
+    <string name="edit">تحرير</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- Settings UI -->
+    <string name="settings">الإعدادات</string>
+    <string name="back">رجوع</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">إذن التشغيل التلقائي</string>
+    <string name="autostart_perm_message">تمنع بعض الأجهزة التطبيقات من التشغيل تلقائيًا. لضمان تشغيل التطبيق عند الإقلاع، قد تحتاج إلى منح إذن التشغيل التلقائي في إعدادات جهازك.</string>
+    <string name="open_settings">فتح الإعدادات</string>
+    <string name="skip">تخطي</string>
+    <string name="reset_title">إعادة تعيين كل شيء؟</string>
+    <string name="reset_message">سيؤدي هذا إلى مسح عنوان URL للخادم ومفتاح API والألبومات المحددة وجميع إعدادات العرض. ستتم إعادتك إلى شاشة الإعداد.</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="reset_all">إعادة تعيين جميع الإعدادات</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">إعداد ImmichFrame</string>
+    <string name="setup_subtitle">اتصل بخادم Immich الخاص بك</string>
+    <string name="protocol">البروتوكول</string>
+    <string name="domain">النطاق</string>
+    <string name="domain_placeholder">photos.example.com</string>
+    <string name="full_url_preview">عنوان URL الكامل</string>
+    <string name="test_connection">اختبار الاتصال</string>
+    <string name="connecting">جارٍ الاتصال…</string>
+    <string name="next">التالي</string>
+    <string name="select_albums">تحديد الألبومات</string>
+    <string name="done">تم</string>
+    <string name="no_albums">لم يتم العثور على ألبومات</string>
+    <string name="loading_albums">جارٍ تحميل الألبومات…</string>
+    <string name="hide_key">إخفاء المفتاح</string>
+    <string name="show_key">إظهار المفتاح</string>
+    <string name="connected_as">متصل باسم %1$s</string>
+    <string name="connection_failed">فشل الاتصال</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">تم تحديد %1$d</string>
+    <string name="start_slideshow">بدء العرض</string>
+    <string name="retry">إعادة المحاولة</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">تحديث متاح</string>
+    <string name="update_message">تم تنزيل إصدار جديد وهو جاهز للتثبيت.\n\nالإصدار: %1$s…</string>
+    <string name="install">تثبيت</string>
+    <string name="later">لاحقًا</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d صور</string>
+</resources>

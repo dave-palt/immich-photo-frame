@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">Wiedergabe</string>
+    <string name="section_display">Anzeige</string>
+    <string name="section_clock">Uhr</string>
+    <string name="section_system">System</string>
+    <string name="section_albums">Alben</string>
+    <string name="section_connection">Verbindung</string>
+
+    <!-- Playback -->
+    <string name="interval">Intervall</string>
+    <string name="shuffle">Zufallswiedergabe</string>
+    <string name="shuffle_desc">Bildreihenfolge zufällig</string>
+    <string name="skip_videos">Videos überspringen</string>
+    <string name="skip_videos_desc">Nur Fotos anzeigen</string>
+    <string name="muted">Stummgeschaltet</string>
+    <string name="muted_desc">Video-Audio stummschalten</string>
+    <string name="photo_animations">Foto-Animationen</string>
+    <string name="photo_animations_desc">Dezente Zoom- und Schwenkeffekte bei Fotos</string>
+    <string name="photo_animations_hint">Für jedes Foto wird zufällig ein Effekt aus den aktivierten Typen gewählt</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">Heranzoomen</string>
+    <string name="anim_zoom_out">Herauszoomen</string>
+    <string name="anim_pan_left">Nach links schwenken</string>
+    <string name="anim_pan_right">Nach rechts schwenken</string>
+    <string name="anim_pan_up">Nach oben schwenken</string>
+    <string name="anim_pan_down">Nach unten schwenken</string>
+
+    <!-- Display -->
+    <string name="image_fit">Bildanpassung</string>
+    <string name="contain">Einpassen</string>
+    <string name="cover">Ausfüllen</string>
+    <string name="adaptive_background">Adaptiver Hintergrund</string>
+    <string name="adaptive_background_desc">Füllt die schwarzen Balken mit der Durchschnittsfarbe jedes Fotos</string>
+    <string name="fullscreen">Vollbild</string>
+    <string name="fullscreen_desc">Systemleisten ausblenden</string>
+    <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
+
+    <!-- Clock -->
+    <string name="show_clock">Uhr anzeigen</string>
+    <string name="clock_size">Uhrgröße</string>
+    <string name="drag_clock_hint">Ziehen Sie die Uhr auf der Diashow-Anzeige, um sie zu verschieben</string>
+    <string name="snap_to_grid">Am Raster ausrichten</string>
+    <string name="snap_to_grid_desc">Uhr beim Loslassen anhand ihrer Größe am Raster ausrichten</string>
+
+    <!-- System -->
+    <string name="start_on_boot">Beim Start ausführen</string>
+    <string name="start_on_boot_desc">App automatisch starten, wenn das Gerät eingeschaltet wird</string>
+    <string name="boot_not_verified_desc">Autostart-Berechtigung ist möglicherweise nicht erteilt — zum Verifizieren neu starten. Wenn die App nicht startet, verwenden Sie die Schaltfläche unten, um die Autostart-Einstellungen Ihres Geräts zu öffnen.</string>
+    <string name="open_autostart">Autostart-Einstellungen öffnen</string>
+    <string name="auto_update">Automatische Updates</string>
+    <string name="auto_update_desc">Auf GitHub nach neuen Versionen suchen und automatisch herunterladen</string>
+
+    <!-- Albums -->
+    <string name="change_albums">Albumauswahl ändern</string>
+
+    <!-- Connection -->
+    <string name="server">Server</string>
+    <string name="server_url">Server-URL</string>
+    <string name="api_key">API-Schlüssel</string>
+    <string name="not_set">Nicht festgelegt</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
+
+    <!-- Settings UI -->
+    <string name="settings">Einstellungen</string>
+    <string name="back">Zurück</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">Autostart-Berechtigung</string>
+    <string name="autostart_perm_message">Einige Geräte blockieren das automatische Starten von Apps. Um sicherzustellen, dass die App beim Start ausgeführt wird, müssen Sie möglicherweise die Autostart-Berechtigung in Ihren Geräteeinstellungen erteilen.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
+    <string name="skip">Überspringen</string>
+    <string name="reset_title">Alles zurücksetzen?</string>
+    <string name="reset_message">Dies löscht die Server-URL, den API-Schlüssel, die ausgewählten Alben und alle Diashow-Einstellungen. Sie kehren zum Einrichtungsbildschirm zurück.</string>
+    <string name="reset">Zurücksetzen</string>
+    <string name="reset_all">Alle Einstellungen zurücksetzen</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">ImmichFrame-Einrichtung</string>
+    <string name="setup_subtitle">Mit Ihrem Immich-Server verbinden</string>
+    <string name="protocol">Protokoll</string>
+    <string name="domain">Domäne</string>
+    <string name="domain_placeholder">fotos.beispiel.de</string>
+    <string name="full_url_preview">Vollständige URL</string>
+    <string name="test_connection">Verbindung testen</string>
+    <string name="connecting">Verbindung wird hergestellt…</string>
+    <string name="next">Weiter</string>
+    <string name="select_albums">Alben auswählen</string>
+    <string name="done">Fertig</string>
+    <string name="no_albums">Keine Alben gefunden</string>
+    <string name="loading_albums">Alben werden geladen…</string>
+    <string name="hide_key">Schlüssel ausblenden</string>
+    <string name="show_key">Schlüssel anzeigen</string>
+    <string name="connected_as">Verbunden als %1$s</string>
+    <string name="connection_failed">Verbindung fehlgeschlagen</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">%1$d ausgewählt</string>
+    <string name="start_slideshow">Diashow starten</string>
+    <string name="retry">Erneut versuchen</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">Update verfügbar</string>
+    <string name="update_message">Ein neuer Build wurde heruntergeladen und ist zur Installation bereit.\n\nVersion: %1$s…</string>
+    <string name="install">Installieren</string>
+    <string name="later">Später</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d Fotos</string>
+</resources>

@@ -14,3 +14,9 @@ local.env
 *.dex
 # Kotlin
 /.kotlin
+# Build outputs
+/app/build
+/app/release.jks
+app/local signing.properties
+debug.keystore
+release.jks
