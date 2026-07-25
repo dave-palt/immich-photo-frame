@@ -3,6 +3,7 @@ package com.dav3.immichframe.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
+import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
@@ -56,7 +57,14 @@ constructor(
 
     fun toggleBurnInProtection() = update { it.copy(burnInProtection = !it.burnInProtection) }
 
-    fun toggleClock() = update { it.copy(showClock = !it.showClock) }
+    fun toggleClock() = update {
+        val newShowClock = !it.showClock
+        it.copy(
+            showClock = newShowClock,
+            // Reset to center when enabling
+            clockPosition = if (newShowClock) ClockPosition(0.5f, 0.5f) else it.clockPosition,
+        )
+    }
 
     fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
 

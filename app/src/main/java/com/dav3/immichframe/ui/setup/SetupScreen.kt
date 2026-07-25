@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
     onSuccess: () -> Unit,
@@ -56,15 +57,66 @@ fun SetupScreen(
             )
             Spacer(Modifier.height(32.dp))
 
-            OutlinedTextField(
-                value = state.serverUrl,
-                onValueChange = viewModel::updateServerUrl,
-                label = { Text("Immich Server URL") },
-                placeholder = { Text("https://photos.example.com") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                var protocolExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = protocolExpanded,
+                    onExpandedChange = { protocolExpanded = it },
+                ) {
+                    OutlinedTextField(
+                        value = if (state.useHttps) "https://" else "http://",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Protocol") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(protocolExpanded) },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .width(120.dp),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = protocolExpanded,
+                        onDismissRequest = { protocolExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("https://") },
+                            onClick = {
+                                viewModel.updateProtocol(true)
+                                protocolExpanded = false
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("http://") },
+                            onClick = {
+                                viewModel.updateProtocol(false)
+                                protocolExpanded = false
+                            },
+                        )
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                OutlinedTextField(
+                    value = state.domain,
+                    onValueChange = viewModel::updateDomain,
+                    label = { Text("Domain") },
+                    placeholder = { Text("photos.example.com") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            // Show resulting URL
+            if (state.domain.isNotBlank()) {
+                Text(
+                    state.serverUrl,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(top = 6.dp, start = 4.dp),
+                )
+            }
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(

@@ -15,12 +15,15 @@ import javax.inject.Inject
 enum class ConnectionState { IDLE, CONNECTING, SUCCESS, ERROR }
 
 data class SetupUiState(
-    val serverUrl: String = "",
+    val useHttps: Boolean = true,
+    val domain: String = "",
     val apiKey: String = "",
     val connectionState: ConnectionState = ConnectionState.IDLE,
     val errorMessage: String? = null,
     val connectedEmail: String? = null,
-)
+) {
+    val serverUrl: String get() = "${if (useHttps) "https" else "http"}://$domain".removeSuffix("/")
+}
 
 @HiltViewModel
 class SetupViewModel
@@ -36,12 +39,28 @@ constructor(
         viewModelScope.launch {
             val url = settingsRepo.serverUrl.first()
             val key = settingsRepo.apiKey.first()
-            _uiState.value = _uiState.value.copy(serverUrl = url, apiKey = key)
+            val (https, domain) = parseUrl(url)
+            _uiState.value = _uiState.value.copy(useHttps = https, domain = domain, apiKey = key)
         }
     }
 
-    fun updateServerUrl(url: String) {
-        _uiState.value = _uiState.value.copy(serverUrl = url, connectionState = ConnectionState.IDLE)
+    fun updateProtocol(https: Boolean) {
+        _uiState.value = _uiState.value.copy(useHttps = https, connectionState = ConnectionState.IDLE)
+    }
+
+    fun updateDomain(input: String) {
+        // Parse pasted URLs that include protocol — strip it, set dropdown accordingly
+        val (https, domain) = parseUrl(input)
+        _uiState.value = _uiState.value.copy(useHttps = https, domain = domain, connectionState = ConnectionState.IDLE)
+    }
+
+    private fun parseUrl(input: String): Pair<Boolean, String> {
+        val trimmed = input.trim().trimEnd('/')
+        return when {
+            trimmed.startsWith("https://") -> true to trimmed.removePrefix("https://")
+            trimmed.startsWith("http://") -> false to trimmed.removePrefix("http://")
+            else -> _uiState.value.useHttps to trimmed
+        }
     }
 
     fun updateApiKey(key: String) {
@@ -50,7 +69,7 @@ constructor(
 
     fun testConnection() {
         val state = _uiState.value
-        if (state.serverUrl.isBlank() || state.apiKey.isBlank()) {
+        if (state.domain.isBlank() || state.apiKey.isBlank()) {
             _uiState.value =
                 state.copy(
                     connectionState = ConnectionState.ERROR,
@@ -66,7 +85,7 @@ constructor(
                     errorMessage = null,
                 )
 
-            settingsRepo.setServerUrl(state.serverUrl.trim().trimEnd('/'))
+            settingsRepo.setServerUrl(state.serverUrl)
             settingsRepo.setApiKey(state.apiKey.trim())
 
             // Invalidate repo cache so it picks up new credentials
