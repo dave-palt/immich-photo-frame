@@ -2,13 +2,13 @@
 #
 # generate-api-key.sh
 #
-# Creates or updates a least-privilege Immich API key for ImmichPhotoFrame.
+# Creates or updates a least-privilege Immich API key for ImmichFrame.
 # The key is scoped to only the 4 permissions the app needs:
 #
 #   album.read   — list and get albums
-#   asset.read   — asset metadata
-#   asset.view   — view thumbnails and preview images
-#   user.read    — current user info (setup validation)
+#   asset.read   — search/list assets in albums
+#   asset.view   — view thumbnails, previews, and originals
+#   user.read    — validate API key (GET /users/me)
 #
 # Usage:
 #   ./generate-api-key.sh <server-url> <email> [password]
@@ -16,12 +16,12 @@
 #   ./generate-api-key.sh https://photos.example.com:2283 user@example.com
 #
 # If password is omitted, you'll be prompted securely.
-# If an existing "ImmichPhotoFrame" key is found, you'll be asked to update
+# If an existing "ImmichFrame" key is found, you'll be asked to update
 # or recreate it. Otherwise a new key is created.
 #
 set -euo pipefail
 
-KEY_NAME="ImmichPhotoFrame"
+KEY_NAME="ImmichFrame"
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 <server-url> <email> [password]"
@@ -62,28 +62,25 @@ fi
 
 echo "Login successful."
 
-# --- Step 2: Check for existing ImmichPhotoFrame key ---
+# --- Step 2: Check for existing ImmichFrame key ---
 
 EXISTING_KEYS=$(curl -sf "${SERVER_URL}/api/api-keys" \
     -H "Authorization: Bearer ${ACCESS_TOKEN}" 2>&1) || EXISTING_KEYS="[]"
 
-# Find key ID(s) matching our name
-EXISTING_ID=$(echo "$EXISTING_KEYS" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
+# Check if any key has our name (|| true prevents pipefail exit when grep finds no match)
+KEY_NAMES=$(echo "$EXISTING_KEYS" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//;s/"$//' || true)
 
-# Check if any key has our name
-KEY_NAMES=$(echo "$EXISTING_KEYS" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//;s/"$//')
-
-if echo "$KEY_NAMES" | grep -q "$KEY_NAME"; then
+if [ -n "$KEY_NAMES" ] && echo "$KEY_NAMES" | grep -q "$KEY_NAME"; then
     echo "Found existing '$KEY_NAME' key."
 
-    # Extract the ID of the matching key (find the name, then grab the nearest id)
-    MATCHING_ID=$(echo "$EXISTING_KEYS" | tr ',' '\n' | grep -A1 "\"name\".*\"$KEY_NAME\"" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//')
-    # Fallback: try a looser match
+    # Extract the ID of the matching key
+    MATCHING_ID=$(echo "$EXISTING_KEYS" | tr ',' '\n' | grep -A1 "\"name\".*\"$KEY_NAME\"" | grep -o '"id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"id"[[:space:]]*:[[:space:]]*"//;s/"$//' || true)
+    # Fallback: try python3 for robust JSON parsing
     if [ -z "$MATCHING_ID" ]; then
         MATCHING_ID=$(echo "$EXISTING_KEYS" | python3 -c "
 import sys, json
 for k in json.load(sys.stdin):
-    if k.get('name') == '$KEY_NAME':
+    if k.get('name') == '${KEY_NAME}':
         print(k['id'])
         break
 " 2>/dev/null || true)
@@ -126,7 +123,7 @@ KEY_RESPONSE=$(curl -sf -X POST "${SERVER_URL}/api/api-keys" \
     exit 1
 }
 
-API_KEY=$(echo "$KEY_RESPONSE" | grep -o '"secret"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"secret"[[:space:]]*:[[:space:]]*"//;s/"$//')
+API_KEY=$(echo "$KEY_RESPONSE" | grep -o '"apiKey"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"apiKey"[[:space:]]*:[[:space:]]*"//;s/"$//')
 
 if [ -z "$API_KEY" ]; then
     echo "Error: Could not parse API key from response."
@@ -146,4 +143,4 @@ echo ""
 echo "Permissions: album.read, asset.read, asset.view, user.read"
 echo "This key will NOT be shown again."
 echo ""
-echo "Enter it in the ImmichPhotoFrame app under Setup."
+echo "Enter it in the ImmichFrame app under Setup."

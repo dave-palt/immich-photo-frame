@@ -2,7 +2,7 @@
 #
 # check-api-key.sh — Diagnose an Immich API key's permissions
 #
-# Tests the exact endpoints ImmichPhotoFrame uses, in order:
+# Tests the exact endpoints ImmichFrame uses, in order:
 #   1. GET  /server/ping
 #   2. GET  /users/me
 #   3. GET  /albums

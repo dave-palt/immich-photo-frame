@@ -38,12 +38,50 @@ The API key needs 4 scoped permissions:
 | Permission | Used for |
 |---|---|
 | `album.read` | List albums, get album info |
-| `asset.read` | Search/list assets in albums |
-| `asset.view` | Download/view assets (images, videos, thumbnails) |
+| `asset.read` | Search/list assets in albums (POST /search/metadata) |
+| `asset.view` | Download/view assets (images, videos, thumbnails via `?apiKey=`) |
 | `user.read` | Validate API key (GET /users/me) |
 
-## Endpoints Used
+These permissions are the minimum required for ImmichFrame to function. You can create a key with these exact permissions using the provided `keymgr` tool (or the shell/PowerShell scripts). Requires Immich v1.135+ for scoped keys.
 
+## API Key Management Tools
+
+ImmichFrame provides several cross-platform tools for generating and validating API keys:
+
+| Tool | Platform | Description |
+|---|---|---|
+| `keymgr` | macOS, Linux, Windows (compiled binary) | Unified CLI: `keymgr generate <url> <email>` and `keymgr check <url> <key>` |
+| `keymgr.exe` | Windows | Pre-compiled Windows binary |
+| `generate-api-key.sh` / `check-api-key.sh` | macOS, Linux | Bash scripts using `curl` |
+| `generate-api-key.ps1` / `check-api-key.ps1` | Windows (PowerShell 5.1+) | Native PowerShell scripts using `Invoke-RestMethod` |
+
+### Quick Start (macOS/Linux)
+
+```bash
+# Download the release assets from GitHub Releases
+chmod +x keymgr
+./keymgr generate https://photos.example.com user@example.com
+# Enter password when prompted
+# Copy the output key into ImmichFrame Settings > API Key
+./keymgr check https://photos.example.com <your-api-key>
+```
+
+### Quick Start (Windows PowerShell)
+
+```powershell
+# Download the release assets from GitHub Releases
+.\keymgr.exe generate https://photos.example.com user@example.com
+# Enter password when prompted
+.\keymgr.exe check https://photos.example.com <your-api-key>
+```
+
+Or use the native PowerShell scripts directly:
+```powershell
+.\generate-api-key.ps1 https://photos.example.com user@example.com
+.\check-api-key.ps1 https://photos.example.com <your-api-key>
+```
+
+> **Note**: All tools require Immich v1.135+ for scoped API key support. The server version is checked automatically.
 ### 1. Health Check
 
 ```

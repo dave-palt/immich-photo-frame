@@ -14,6 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build keymgr binary (Linux/macOS)
+        run: |
+          cd scripts
+          bun build keymgr.ts --compile --outfile keymgr
+          cd ..
+        # Note: Windows cross-compilation requires a Windows runner or --compile-executable-path
+        # Windows users can compile locally with: bun build scripts/keymgr.ts --compile --outfile keymgr.exe
+
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
@@ -89,3 +102,8 @@ jobs:
           files: |
             app/build/outputs/apk/release/*.apk
             app/build/outputs/bundle/release/*.aab
+            scripts/keymgr
+            scripts/generate-api-key.sh
+            scripts/check-api-key.sh
+            scripts/generate-api-key.ps1
+            scripts/check-api-key.ps1
