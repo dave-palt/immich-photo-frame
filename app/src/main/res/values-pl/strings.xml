@@ -39,9 +39,6 @@
     <string name="fullscreen">Pełny ekran</string>
     <string name="fullscreen_desc">Ukryj paski systemowe</string>
     <string name="keep_screen_on">Utrzymuj ekran włączony</string>
-    <string name="burn_in_protection">Ochrona przed wypaleniem</string>
-    <string name="burn_in_desc">Powolne panoramowanie obrazu, aby zapobiec wypaleniu OLED (interwał ≥ 30s)</string>
-    <string name="burn_in_warning">Twój interwał wynosi %1$ds — długie czasy wyświetlania zwiększają ryzyko wypalenia. Rozważ włączenie tej opcji.</string>
 
     <!-- Clock -->
     <string name="show_clock">Pokaż zegar</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">Uruchom przy starcie</string>
     <string name="start_on_boot_desc">Automatycznie uruchamiaj aplikację po włączeniu urządzenia</string>
+    <string name="boot_not_verified_desc">Uprawnienie automatycznego uruchamiania może nie być przyznane — uruchom ponownie, aby zweryfikować. Jeśli aplikacja się nie uruchomi, użyj przycisku poniżej, aby otworzyć ustawienia autostartu urządzenia.</string>
     <string name="open_autostart">Otwórz ustawienia autostartu</string>
     <string name="auto_update">Automatyczna aktualizacja</string>
     <string name="auto_update_desc">Sprawdzaj GitHub pod kątem nowych kompilacji i pobieraj je automatycznie</string>

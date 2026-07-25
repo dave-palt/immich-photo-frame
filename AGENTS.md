@@ -131,6 +131,26 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-25** — Burn-in Protection setting removed. Photo animations now
+  serve double duty as burn-in protection (the slow pan/zoom is what prevents
+  OLED burn-in for always-on displays). Removed: `burnInProtection` field from
+  `SlideshowSettings`, `BURN_IN` DataStore key, `toggleBurnInProtection()`,
+  `BurnInProtectionSetting` composable, and the 3 `burn_in_*` strings (EN + 12
+  locales). The clock drift feature is retained but now gated on
+  `photoAnimations` (renamed param `burnInProtection` → `driftProtection` in
+  `DraggableClock`). Settings count: 25 → 24. Updated: functional-spec,
+  technical-spec, ui-spec, overview, README.
+
+- **2026-07-25** — Added boot verification self-test. `BootReceiver` now writes
+  a `bootVerified` flag to DataStore on every successful `BOOT_COMPLETED`
+  reception. Toggling `Start on Boot` resets it to false. The "Open Autostart
+  Settings" button in Settings now only shows when the device is a restricted
+  OEM, startOnBoot is on, and bootVerified is false — i.e., the receiver hasn't
+  fired yet since the toggle. This fixes the false-positive UX where the button
+  always showed even after the feature was working. Settings count: 24 → 25
+  (bootVerified is internal, not user-facing as a separate setting). Added
+  `boot_not_verified_desc` string (EN + 12 locales).
+
 ## Things to Never Do
 
 - Create a second `preferencesDataStore` delegate (crashes at runtime).

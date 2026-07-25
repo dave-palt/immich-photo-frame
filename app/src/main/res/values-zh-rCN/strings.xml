@@ -39,9 +39,6 @@
     <string name="fullscreen">全屏</string>
     <string name="fullscreen_desc">隐藏系统栏</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
-    <string name="burn_in_protection">防烧屏保护</string>
-    <string name="burn_in_desc">缓慢平移图像以防止OLED烧屏（需间隔 ≥ 30秒）</string>
-    <string name="burn_in_warning">您的间隔为 %1$d秒 — 长时间显示会增加烧屏风险。建议启用此功能。</string>
 
     <!-- Clock -->
     <string name="show_clock">显示时钟</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">开机启动</string>
     <string name="start_on_boot_desc">设备开机时自动启动应用</string>
+    <string name="boot_not_verified_desc">可能未授予自动启动权限 — 请重启设备以验证。如果未启动，请使用下方按钮打开设备的自动启动设置。</string>
     <string name="open_autostart">打开自动启动设置</string>
     <string name="auto_update">自动更新</string>
     <string name="auto_update_desc">检查GitHub上的新版本并自动下载</string>

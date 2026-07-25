@@ -138,7 +138,6 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  SLIDESHOW                   │
 │  Interval: 30s          [───]│ ← slider 5-120s
-│  Burn-in Protection     [○]  │ ← toggle (+ warning if interval≥60s)
 │                              │
 │  IMAGE                       │
 │  Fill: [Contain] [Cover]     │ ← filter chips

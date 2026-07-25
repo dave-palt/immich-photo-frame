@@ -39,9 +39,6 @@
     <string name="fullscreen">Vollbild</string>
     <string name="fullscreen_desc">Systemleisten ausblenden</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
-    <string name="burn_in_protection">Burn-in-Schutz</string>
-    <string name="burn_in_desc">Langsames Schwenken des Bildes zur Vermeidung von OLED-Burn-in (Intervall ≥ 30s erforderlich)</string>
-    <string name="burn_in_warning">Ihr Intervall beträgt %1$ds — lange Anzeigezeiten erhöhen das Burn-in-Risiko. Erwägen Sie, dies zu aktivieren.</string>
 
     <!-- Clock -->
     <string name="show_clock">Uhr anzeigen</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">Beim Start ausführen</string>
     <string name="start_on_boot_desc">App automatisch starten, wenn das Gerät eingeschaltet wird</string>
+    <string name="boot_not_verified_desc">Autostart-Berechtigung ist möglicherweise nicht erteilt — zum Verifizieren neu starten. Wenn die App nicht startet, verwenden Sie die Schaltfläche unten, um die Autostart-Einstellungen Ihres Geräts zu öffnen.</string>
     <string name="open_autostart">Autostart-Einstellungen öffnen</string>
     <string name="auto_update">Automatische Updates</string>
     <string name="auto_update_desc">Auf GitHub nach neuen Versionen suchen und automatisch herunterladen</string>

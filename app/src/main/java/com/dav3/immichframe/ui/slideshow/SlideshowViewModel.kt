@@ -101,6 +101,12 @@ constructor(
         }
     }
 
+    fun setMuted(value: Boolean) {
+        viewModelScope.launch {
+            settingsRepo.setSlideshowSettings(settings.value.copy(muted = value))
+        }
+    }
+
     fun imageUrl(assetId: String): String = immichRepo.imageUrl(assetId)
 
     fun videoUrl(assetId: String): String = immichRepo.videoUrl(assetId)

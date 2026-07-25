@@ -68,7 +68,7 @@ When **Show Clock** is enabled, a clock is displayed on top of the slideshow.
 - **Size**: Configurable via slider (24–96 sp).
 - **Snap to Grid**: When enabled (default on), the clock snaps to a grid based on
   its font size when released after dragging.
-- **Burn-in drift**: When burn-in protection is on, the clock also drifts slightly
+- **Clock drift**: When photo animations are enabled, the clock also drifts slightly
   (±4 px horizontal over 30s, ±3 px vertical over 45s) to prevent OLED burn-in.
 
 ### F5: Subsequent Launch (Auto-Resume)
@@ -84,6 +84,14 @@ When **Start on Boot** is enabled, the app launches automatically when the devic
 boots. On certain OEMs (Xiaomi, Oppo, Vivo, Huawei, Honor, etc.) that restrict
 autostart, the app detects the manufacturer and prompts the user to grant the
 autostart permission, deep-linking to the correct system settings screen.
+
+The app self-tests whether the BootReceiver actually fired after a reboot by
+tracking a `bootVerified` flag. Toggling **Start on Boot** resets this flag to
+false. After each reboot, the BootReceiver sets it to true (if it received the
+broadcast). In Settings, the "Open Autostart Settings" button is shown only when
+the feature is on, the device is a restricted OEM, and the flag is false — i.e.,
+the receiver hasn't proven itself yet. Once verified by a successful reboot, the
+button disappears and a normal description is shown.
 
 ### F5c: Self-Update via GitHub Releases
 
@@ -103,8 +111,6 @@ Accessible from:
 
 Options:
 - **Slideshow Interval** — seconds per image (5–120, default 30)
-- **Burn-in Protection** — slow zoom/pan on images (default off, warning shown
-  if interval ≥60s and off)
 - **Image Fit** — Contain (letterbox) or Cover (crop to fill)
 - **Adaptive Background** — fill letterbox bars with dominant color from each
   photo (uses Palette API, default off)
@@ -112,12 +118,13 @@ Options:
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)
 - **Photo Animations** — subtle Ken Burns zoom/pan on each photo (default off).
-  When enabled, reveals individual toggles for: Zoom In, Zoom Out, Pan Left,
+  Also serves as burn-in protection for always-on displays. When enabled,
+  reveals individual toggles for: Zoom In, Zoom Out, Pan Left,
   Pan Right, Pan Up, Pan Down, Random. Random picks from other enabled types
   and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
-- **Start on Boot** — launch on device boot (default off)
+- **Start on Boot** — launch on device boot (default off). On Chinese OEMs, shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play
   Store installed)
 - **Clock** section:

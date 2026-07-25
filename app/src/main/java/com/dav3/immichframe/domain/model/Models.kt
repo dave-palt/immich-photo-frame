@@ -23,7 +23,6 @@ data class SlideshowSettings(
     val intervalSeconds: Int = 30,
     val transitionSeconds: Float = 1f,
     val fillMode: FillMode = FillMode.CONTAIN,
-    val burnInProtection: Boolean = false,
     val showClock: Boolean = false,
     val clockSize: Float = 48f, // sp
     val clockPosition: ClockPosition = ClockPosition(),
@@ -33,6 +32,7 @@ data class SlideshowSettings(
     val skipVideos: Boolean = true,
     val muted: Boolean = true,
     val startOnBoot: Boolean = false,
+    val bootVerified: Boolean = false,
     val autoUpdate: Boolean = true,
     val clockSnapToGrid: Boolean = true,
     val adaptiveBackground: Boolean = false,

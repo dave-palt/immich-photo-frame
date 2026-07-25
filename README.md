@@ -27,8 +27,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Configurable interval, transition speed, fill mode (Contain/Cover)
 - Video playback with mute and skip options (Media3/ExoPlayer)
 - Draggable clock overlay with configurable size and snap-to-grid
-- Burn-in protection (slow Ken Burns-style pan/zoom on each image)
-- Photo animations (toggleable Ken Burns: zoom in/out, pan left/right/up/down, or random)
+- Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image

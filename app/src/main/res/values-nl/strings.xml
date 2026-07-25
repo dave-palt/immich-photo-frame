@@ -39,9 +39,6 @@
     <string name="fullscreen">Volledig scherm</string>
     <string name="fullscreen_desc">Systeembalken verbergen</string>
     <string name="keep_screen_on">Scherm aan laten</string>
-    <string name="burn_in_protection">Burn-in-bescherming</string>
-    <string name="burn_in_desc">Langzaam pannen van afbeelding om OLED burn-in te voorkomen (interval ≥ 30s)</string>
-    <string name="burn_in_warning">Uw interval is %1$ds — lange weergavetijden verhogen het risico op burn-in. Overweeg om dit in te schakelen.</string>
 
     <!-- Clock -->
     <string name="show_clock">Klok tonen</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">Starten bij opstarten</string>
     <string name="start_on_boot_desc">App automatisch starten wanneer het apparaat opstart</string>
+    <string name="boot_not_verified_desc">Autostart-permissie is mogelijk niet verleend — herstart om te verifiëren. Als de app niet start, gebruik de knop hieronder om de autostart-instellingen van je apparaat te openen.</string>
     <string name="open_autostart">Autostart-instellingen openen</string>
     <string name="auto_update">Automatische update</string>
     <string name="auto_update_desc">GitHub controleren op nieuwe versies en deze automatisch downloaden</string>

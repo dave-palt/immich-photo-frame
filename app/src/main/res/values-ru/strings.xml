@@ -39,9 +39,6 @@
     <string name="fullscreen">Полноэкранный режим</string>
     <string name="fullscreen_desc">Скрыть системные панели</string>
     <string name="keep_screen_on">Не выключать экран</string>
-    <string name="burn_in_protection">Защита от выгорания</string>
-    <string name="burn_in_desc">Медленное панорамирование изображения для предотвращения выгорания OLED (интервал ≥ 30с)</string>
-    <string name="burn_in_warning">Ваш интервал — %1$dс — длительное отображение увеличивает риск выгорания. Рекомендуем включить эту функцию.</string>
 
     <!-- Clock -->
     <string name="show_clock">Показывать часы</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">Запуск при включении</string>
     <string name="start_on_boot_desc">Запускать приложение автоматически при включении устройства</string>
+    <string name="boot_not_verified_desc">Разрешение на автозапуск может быть не предоставлено — перезагрузите для проверки. Если приложение не запустится, используйте кнопку ниже, чтобы открыть настройки автозапуска вашего устройства.</string>
     <string name="open_autostart">Открыть настройки автозапуска</string>
     <string name="auto_update">Автообновление</string>
     <string name="auto_update_desc">Проверять GitHub на наличие новых сборок и загружать их автоматически</string>

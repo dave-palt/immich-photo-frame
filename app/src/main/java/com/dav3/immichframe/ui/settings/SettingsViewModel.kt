@@ -56,8 +56,6 @@ constructor(
 
     fun updateFillMode(mode: FillMode) = update { it.copy(fillMode = mode) }
 
-    fun toggleBurnInProtection() = update { it.copy(burnInProtection = !it.burnInProtection) }
-
     fun toggleClock() = update {
         val newShowClock = !it.showClock
         it.copy(
@@ -79,7 +77,9 @@ constructor(
 
     fun toggleMuted() = update { it.copy(muted = !it.muted) }
 
-    fun toggleStartOnBoot() = update { it.copy(startOnBoot = !it.startOnBoot) }
+    fun toggleStartOnBoot() = update {
+        it.copy(startOnBoot = !it.startOnBoot, bootVerified = false)
+    }
 
     fun toggleAutoUpdate() = update { it.copy(autoUpdate = !it.autoUpdate) }
 

@@ -228,7 +228,6 @@ fun SlideshowScreen(
                                 photoAnimations = s.photoAnimations,
                                 enabledAnims = s.enabledAnimations,
                                 durationMs = s.intervalSeconds * 1000L,
-                                burnIn = s.burnInProtection,
                             )
                         }
                     }
@@ -245,7 +244,7 @@ fun SlideshowScreen(
                         fontSize = s.clockSize,
                         position = s.clockPosition,
                         containerSize = containerSize,
-                        burnInProtection = s.burnInProtection,
+                        driftProtection = s.photoAnimations,
                         snapToGrid = s.clockSnapToGrid,
                         onPositionChanged = { normX, normY ->
                             viewModel.setClockPosition(ClockPosition(normX, normY))
@@ -336,7 +335,7 @@ fun SlideshowScreen(
                         )
                     }
                     Spacer(Modifier.width(16.dp))
-                    IconButton(onClick = { /* mute handled via settings */ }) {
+                    IconButton(onClick = { viewModel.setMuted(!s.muted) }) {
                         Icon(
                             if (s.muted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
                             "Mute",
@@ -355,7 +354,6 @@ fun SlideshowScreen(
  * so each photo always gets the same animation (stable across recompositions).
  *
  * - No animations enabled / master toggle off → static image
- * - Burn-in on → slow alternating pan/zoom (infinite, reverses)
  * - Ken Burns on with enabled types → one-shot linear zoom/pan across display duration
  */
 @Composable
@@ -366,7 +364,6 @@ private fun KenBurnsImage(
     photoAnimations: Boolean,
     enabledAnims: List<PhotoAnimation>,
     durationMs: Long,
-    burnIn: Boolean,
 ) {
     // Deterministic pick from enabled set
     val anim = remember(assetId, enabledAnims) {
@@ -377,38 +374,12 @@ private fun KenBurnsImage(
         }
     }
 
-    if (anim == null && !burnIn) {
+    if (anim == null) {
         AsyncImage(
             model = url,
             contentDescription = null,
             contentScale = contentScale,
             modifier = Modifier.fillMaxSize(),
-        )
-        return
-    }
-
-    if (anim == null && burnIn) {
-        // Fallback: burn-in only (slow alternating pan)
-        val transition = rememberInfiniteTransition(label = "burnIn")
-        val progress by transition.animateFloat(
-            0f,
-            1f,
-            infiniteRepeatable(tween(durationMs.toInt(), easing = LinearEasing), RepeatMode.Reverse),
-            label = "burnProgress",
-        )
-        val scale = 1f + 0.08f * progress
-        val dx = (if (assetId.hashCode() % 2 == 0) -1 else 1) * 20f * progress
-        val dy = (if ((assetId.hashCode() / 2) % 2 == 0) -1 else 1) * 20f * progress
-        AsyncImage(
-            model = url,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                translationX = dx
-                translationY = dy
-            },
         )
         return
     }
@@ -463,7 +434,7 @@ private fun KenBurnsImage(
     AsyncImage(
         model = url,
         contentDescription = null,
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer {
@@ -481,7 +452,7 @@ private fun DraggableClock(
     fontSize: Float,
     position: ClockPosition,
     containerSize: IntSize,
-    burnInProtection: Boolean,
+    driftProtection: Boolean,
     snapToGrid: Boolean,
     onPositionChanged: (Float, Float) -> Unit,
 ) {
@@ -532,8 +503,8 @@ private fun DraggableClock(
         }
     }
 
-    // Burn-in drift
-    val driftX = if (burnInProtection) {
+    // Clock drift to reduce burn-in (same guard as photo animations)
+    val driftX = if (driftProtection) {
         rememberInfiniteTransition(label = "clockDriftX").animateFloat(
             -4f,
             4f,
@@ -543,7 +514,7 @@ private fun DraggableClock(
     } else {
         0f
     }
-    val driftY = if (burnInProtection) {
+    val driftY = if (driftProtection) {
         rememberInfiniteTransition(label = "clockDriftY").animateFloat(
             -3f,
             3f,

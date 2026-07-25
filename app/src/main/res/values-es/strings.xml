@@ -39,9 +39,6 @@
     <string name="fullscreen">Pantalla completa</string>
     <string name="fullscreen_desc">Ocultar barras del sistema</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
-    <string name="burn_in_protection">Protección contra burn-in</string>
-    <string name="burn_in_desc">Desplazamiento lento de la imagen para evitar el burn-in OLED (intervalo ≥ 30s)</string>
-    <string name="burn_in_warning">Tu intervalo es de %1$ds — los tiempos de visualización prolongados aumentan el riesgo de burn-in. Considera activar esta opción.</string>
 
     <!-- Clock -->
     <string name="show_clock">Mostrar reloj</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">Iniciar al arrancar</string>
     <string name="start_on_boot_desc">Iniciar la aplicación automáticamente cuando el dispositivo se encienda</string>
+    <string name="boot_not_verified_desc">Es posible que no se haya concedido el permiso de inicio automático — reinicia para verificar. Si la app no se inicia, usa el botón de abajo para abrir los ajustes de inicio automático de tu dispositivo.</string>
     <string name="open_autostart">Abrir ajustes de inicio automático</string>
     <string name="auto_update">Actualización automática</string>
     <string name="auto_update_desc">Comprobar GitHub en busca de nuevas versiones y descargarlas automáticamente</string>

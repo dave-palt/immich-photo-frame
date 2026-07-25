@@ -150,7 +150,6 @@ Setup → Albums → Slideshow
 | Slideshow interval | DataStore | `interval_sec` | Int (5–120) |
 | Transition duration | DataStore | `transition_sec` | Float (0–3) |
 | Image fill mode | DataStore | `fill_mode` | String enum (CONTAIN/COVER) |
-| Burn-in protection | DataStore | `burn_in_protection` | String bool |
 | Show clock | DataStore | `show_clock` | String bool |
 | Clock size | DataStore | `clock_size` | Float (24–96 sp) |
 | Clock X position | DataStore | `clock_x` | Float (0.0–1.0 normalized, -1 = default) |
@@ -162,6 +161,7 @@ Setup → Albums → Slideshow
 | Skip videos | DataStore | `skip_videos` | String bool |
 | Muted | DataStore | `muted` | String bool |
 | Start on boot | DataStore | `start_on_boot` | String bool |
+| Boot verified | DataStore | `boot_verified` | String bool (self-test: BootReceiver sets true on successful fire) |
 | Auto-update | DataStore | `auto_update` | String bool |
 | Adaptive background | DataStore | `adaptive_background` | String bool |
 | Photo animations | DataStore | `photo_animations` | String bool |

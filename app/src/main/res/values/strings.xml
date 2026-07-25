@@ -19,7 +19,7 @@
     <string name="muted">Muted</string>
     <string name="muted_desc">Silence video audio</string>
     <string name="photo_animations">Photo Animations</string>
-    <string name="photo_animations_desc">Subtle zoom and pan effects on photos</string>
+    <string name="photo_animations_desc">Subtle zoom and pan effects on photos (also reduces OLED burn-in)</string>
     <string name="photo_animations_hint">A random effect is picked from the enabled types for each photo</string>
 
     <!-- Animation types -->
@@ -39,9 +39,6 @@
     <string name="fullscreen">Fullscreen</string>
     <string name="fullscreen_desc">Hide system bars</string>
     <string name="keep_screen_on">Keep Screen On</string>
-    <string name="burn_in_protection">Burn-in Protection</string>
-    <string name="burn_in_desc">Slowly pan image to prevent OLED burn-in (needs interval ≥ 30s)</string>
-    <string name="burn_in_warning">Your interval is %1$ds — long display times increase burn-in risk. Consider enabling this.</string>
 
     <!-- Clock -->
     <string name="show_clock">Show Clock</string>
@@ -52,7 +49,8 @@
 
     <!-- System -->
     <string name="start_on_boot">Start on Boot</string>
-    <string name="start_on_boot_desc">Launch app automatically when device starts</string>
+    <string name="start_on_boot_desc">Launch the app automatically after device reboot</string>
+    <string name="boot_not_verified_desc">Autostart permission may not be granted — reboot to verify. If it doesn\'t launch, use the button below to open your device\'s autostart settings.</string>
     <string name="open_autostart">Open Autostart Settings</string>
     <string name="auto_update">Auto-Update</string>
     <string name="auto_update_desc">Check GitHub for new builds and download them automatically</string>

@@ -190,11 +190,6 @@ fun SettingsScreen(
                 checked = s.adaptiveBackground,
                 onToggle = { viewModel.toggleAdaptiveBackground() },
             )
-            BurnInProtectionSetting(
-                enabled = s.burnInProtection,
-                intervalSeconds = s.intervalSeconds,
-                onToggle = { viewModel.toggleBurnInProtection() },
-            )
             SwitchItem(
                 title = stringResource(R.string.fullscreen),
                 subtitle = stringResource(R.string.fullscreen_desc),
@@ -257,7 +252,11 @@ fun SettingsScreen(
 
             SwitchItem(
                 title = stringResource(R.string.start_on_boot),
-                subtitle = stringResource(R.string.start_on_boot_desc),
+                subtitle = if (s.startOnBoot && needsBootPermission(context) && !s.bootVerified) {
+                    stringResource(R.string.boot_not_verified_desc)
+                } else {
+                    stringResource(R.string.start_on_boot_desc)
+                },
                 checked = s.startOnBoot,
                 onToggle = {
                     viewModel.toggleStartOnBoot()
@@ -266,7 +265,7 @@ fun SettingsScreen(
                     }
                 },
             )
-            if (s.startOnBoot) {
+            if (s.startOnBoot && needsBootPermission(context) && !s.bootVerified) {
                 TextButton(
                     onClick = { openBootPermissionSettings(context) },
                     modifier = Modifier.fillMaxWidth(),
@@ -459,39 +458,6 @@ private fun PhotoAnimation.displayName(): String = when (this) {
     PhotoAnimation.PAN_RIGHT -> stringResource(R.string.anim_pan_right)
     PhotoAnimation.PAN_UP -> stringResource(R.string.anim_pan_up)
     PhotoAnimation.PAN_DOWN -> stringResource(R.string.anim_pan_down)
-}
-
-@Composable
-private fun BurnInProtectionSetting(
-    enabled: Boolean,
-    intervalSeconds: Int,
-    onToggle: () -> Unit,
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.burn_in_protection)) },
-            supportingContent = {
-                Text(stringResource(R.string.burn_in_desc))
-            },
-            trailingContent = { Switch(checked = enabled, onCheckedChange = { onToggle() }) },
-        )
-        if (intervalSeconds >= 60 && !enabled) {
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-            ) {
-                Text(
-                    stringResource(R.string.burn_in_warning, intervalSeconds),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(12.dp),
-                )
-            }
-        }
-    }
 }
 
 // --- Boot permission helpers ---

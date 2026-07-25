@@ -39,9 +39,6 @@
     <string name="fullscreen">전체 화면</string>
     <string name="fullscreen_desc">시스템 바 숨기기</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
-    <string name="burn_in_protection">번인 보호</string>
-    <string name="burn_in_desc">OLED 번인 방지를 위해 이미지를 천천히 패닝 (간격 ≥ 30초 필요)</string>
-    <string name="burn_in_warning">현재 간격은 %1$d초입니다 — 긴 표시 시간은 번인 위험을 증가시킵니다. 이 기능 활성화를 권장합니다.</string>
 
     <!-- Clock -->
     <string name="show_clock">시계 표시</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">부팅 시 시작</string>
     <string name="start_on_boot_desc">장치가 시작될 때 자동으로 앱 실행</string>
+    <string name="boot_not_verified_desc">자동 시작 권한이 부여되지 않았을 수 있습니다 — 재부팅하여 확인하세요. 시작되지 않으면 아래 버튼을 사용하여 기기의 자동 시작 설정을 여세요.</string>
     <string name="open_autostart">자동 시작 설정 열기</string>
     <string name="auto_update">자동 업데이트</string>
     <string name="auto_update_desc">GitHub에서 새 빌드를 확인하고 자동으로 다운로드</string>

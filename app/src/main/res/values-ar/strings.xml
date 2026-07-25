@@ -39,9 +39,6 @@
     <string name="fullscreen">ملء الشاشة</string>
     <string name="fullscreen_desc">إخفاء أشرطة النظام</string>
     <string name="keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
-    <string name="burn_in_protection">الحماية من الاحتراق</string>
-    <string name="burn_in_desc">تحريك الصورة ببطء لمنع احتراق شاشة OLED (يتطلب فاصل زمني ≥ 30 ثانية)</string>
-    <string name="burn_in_warning">الفاصل الزمني لديك هو %1$d ثانية — أوقات العرض الطويلة تزيد من خطر الاحتراق. ننصح بتفعيل هذا الخيار.</string>
 
     <!-- Clock -->
     <string name="show_clock">إظهار الساعة</string>
@@ -53,6 +50,7 @@
     <!-- System -->
     <string name="start_on_boot">التشغيل عند الإقلاع</string>
     <string name="start_on_boot_desc">تشغيل التطبيق تلقائيًا عند بدء الجهاز</string>
+    <string name="boot_not_verified_desc">قد لا يكون إذن التشغيل التلقائي ممنوحاً — أعد التشغيل للتحقق. إذا لم يتم التشغيل، استخدم الزر أدناه لفتح إعدادات التشغيل التلقائي لجهازك.</string>
     <string name="open_autostart">فتح إعدادات التشغيل التلقائي</string>
     <string name="auto_update">التحديث التلقائي</string>
     <string name="auto_update_desc">التحقق من GitHub بحثًا عن إصدارات جديدة وتنزيلها تلقائيًا</string>
