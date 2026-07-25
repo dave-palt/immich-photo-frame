@@ -49,7 +49,7 @@ constructor(
     fun load() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            val s = settings.value
+            val s = settingsRepo.slideshowSettings.first()
             val albumIds = settingsRepo.selectedAlbumIds.first()
             if (albumIds.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = "No albums selected")
@@ -67,6 +67,9 @@ constructor(
 
             if (cachedAssets.isNotEmpty()) {
                 // Show cached assets immediately
+                val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
+                val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
+                android.util.Log.d("SlideshowLoad", "Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
                 val filteredAssets = if (s.skipVideos) cachedAssets.filter { it.type == AssetType.IMAGE } else cachedAssets
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
                 _uiState.value = if (ordered.isNotEmpty()) {
@@ -91,6 +94,7 @@ constructor(
                 }
 
                 val filteredAssets = if (s.skipVideos) allAssets.filter { it.type == AssetType.IMAGE } else allAssets
+                android.util.Log.d("SlideshowLoad", "Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
 
                 _uiState.value = when {
