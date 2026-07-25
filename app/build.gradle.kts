@@ -154,4 +154,5 @@ dependencies {
     // Media3 (ExoPlayer) for video playback
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.palette)
 }

@@ -34,6 +34,8 @@ data class SlideshowSettings(
     val muted: Boolean = true,
     val startOnBoot: Boolean = false,
     val autoUpdate: Boolean = true,
+    val clockSnapToGrid: Boolean = true,
+    val adaptiveBackground: Boolean = false,
 )
 
 enum class FillMode { CONTAIN, COVER }

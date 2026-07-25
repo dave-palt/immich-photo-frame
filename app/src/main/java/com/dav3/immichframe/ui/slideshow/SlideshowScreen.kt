@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -46,19 +47,21 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -159,25 +162,25 @@ fun SlideshowScreen(
         }
     }
 
-    // Clock drag position (pixels), synced from persisted normalized position
-    var clockOffsetPx by remember(s.clockPosition) {
-        mutableStateOf(
-            if (s.clockPosition.x >= 0 && containerSize.width > 0) {
-                Offset(
-                    s.clockPosition.x * containerSize.width,
-                    s.clockPosition.y * containerSize.height,
-                )
-            } else {
-                Offset.Zero
-            },
-        )
+    // Adaptive background — extract dominant color from current image
+    var dominantColor by remember { mutableStateOf(Color.Black) }
+    val context = LocalContext.current
+    LaunchedEffect(state.currentIndex, s.adaptiveBackground) {
+        if (s.adaptiveBackground && state.assets.isNotEmpty()) {
+            val asset = state.assets[state.currentIndex]
+            if (asset.type != AssetType.VIDEO) {
+                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset.id))
+            }
+        } else {
+            dominantColor = Color.Black
+        }
     }
 
     Surface(color = Color.Black) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(if (s.adaptiveBackground) dominantColor else Color.Black)
                 .onSizeChanged { containerSize = it }
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { controlsVisible = !controlsVisible })
@@ -221,39 +224,19 @@ fun SlideshowScreen(
                 }
             }
 
-            // Draggable clock overlay
+            // Draggable clock overlay — placed anywhere via absolute offset
             if (s.showClock && currentTime.isNotEmpty()) {
-                val defaultPos = s.clockPosition.x < 0
-                val clockDragHandler = { offset: Offset ->
-                    clockOffsetPx = offset
-                    if (containerSize.width > 0 && containerSize.height > 0) {
-                        viewModel.setClockPosition(
-                            ClockPosition(
-                                x = offset.x / containerSize.width,
-                                y = offset.y / containerSize.height,
-                            ),
-                        )
-                    }
-                }
-                if (defaultPos) {
-                    Box(modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)) {
-                        DraggableClock(
-                            time = currentTime,
-                            fontSize = s.clockSize,
-                            offset = clockOffsetPx,
-                            burnInProtection = s.burnInProtection,
-                            onPositionChanged = clockDragHandler,
-                        )
-                    }
-                } else {
-                    DraggableClock(
-                        time = currentTime,
-                        fontSize = s.clockSize,
-                        offset = clockOffsetPx,
-                        burnInProtection = s.burnInProtection,
-                        onPositionChanged = clockDragHandler,
-                    )
-                }
+                DraggableClock(
+                    time = currentTime,
+                    fontSize = s.clockSize,
+                    position = s.clockPosition,
+                    containerSize = containerSize,
+                    burnInProtection = s.burnInProtection,
+                    snapToGrid = s.clockSnapToGrid,
+                    onPositionChanged = { normX, normY ->
+                        viewModel.setClockPosition(ClockPosition(normX, normY))
+                    },
+                )
             }
 
             // Progress bar (bottom, thin line) — shows when controls visible
@@ -410,11 +393,37 @@ private fun BurnInPanImage(
 private fun DraggableClock(
     time: String,
     fontSize: Float,
-    offset: Offset,
+    position: ClockPosition,
+    containerSize: IntSize,
     burnInProtection: Boolean,
-    onPositionChanged: (Offset) -> Unit,
+    snapToGrid: Boolean,
+    onPositionChanged: (Float, Float) -> Unit,
 ) {
-    // Subtle slow drift to prevent clock burn-in
+    // Default position: bottom-left with padding
+    val isDefault = position.x < 0f
+    val defaultNormX = 0.02f
+    val defaultNormY = 0.85f
+    val normX = if (isDefault) defaultNormX else position.x
+    val normY = if (isDefault) defaultNormY else position.y
+
+    // Snap-to-grid: grid cell size based on clock font size
+    // Clock is roughly fontSize wide per character, ~5 chars in "HH:MM"
+    val clockApproxWidth = fontSize * 3.5f + 80f // padding
+    val clockApproxHeight = fontSize * 1.5f + 32f
+    val gridStepX = (clockApproxWidth * 0.5f).coerceAtLeast(20f) // half clock width
+    val gridStepY = (clockApproxHeight * 0.5f).coerceAtLeast(20f) // half clock height
+
+    // Current pixel position from normalized coords
+    var pxX by remember(position) { mutableFloatStateOf(normX * containerSize.width) }
+    var pxY by remember(position) { mutableFloatStateOf(normY * containerSize.height) }
+
+    // Update when container size changes
+    LaunchedEffect(containerSize) {
+        pxX = normX * containerSize.width
+        pxY = normY * containerSize.height
+    }
+
+    // Burn-in drift: slow oscillation centered on the clock's position
     val driftX = if (burnInProtection) {
         val t = rememberInfiniteTransition(label = "clockDriftX")
         t.animateFloat(
@@ -448,14 +457,30 @@ private fun DraggableClock(
         color = Color(0x80000000),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
+            .offset { IntOffset(pxX.toInt(), pxY.toInt()) }
             .graphicsLayer {
                 translationX = driftX
                 translationY = driftY
             }
             .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
+                detectDragGestures(
+                    onDragEnd = {
+                        if (snapToGrid) {
+                            val snappedX = ((pxX + gridStepX / 2) / gridStepX).toInt() * gridStepX
+                            val snappedY = ((pxY + gridStepY / 2) / gridStepY).toInt() * gridStepY
+                            pxX = snappedX.coerceIn(0f, (containerSize.width - clockApproxWidth).coerceAtLeast(0f))
+                            pxY = snappedY.coerceIn(0f, (containerSize.height - clockApproxHeight).coerceAtLeast(0f))
+                        }
+                        if (containerSize.width > 0 && containerSize.height > 0) {
+                            onPositionChanged(pxX / containerSize.width, pxY / containerSize.height)
+                        }
+                    },
+                ) { change, dragAmount ->
                     change.consume()
-                    onPositionChanged(Offset(offset.x + dragAmount.x, offset.y + dragAmount.y))
+                    pxX = (pxX + dragAmount.x)
+                        .coerceIn(0f, (containerSize.width - clockApproxWidth).coerceAtLeast(0f))
+                    pxY = (pxY + dragAmount.y)
+                        .coerceIn(0f, (containerSize.height - clockApproxHeight).coerceAtLeast(0f))
                 }
             },
     ) {
@@ -507,4 +532,26 @@ private fun VideoPlayer(
         },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+/** Downloads bitmap via Coil and extracts dominant color via Palette. */
+private suspend fun extractDominantColor(
+    context: android.content.Context,
+    url: String,
+): Color = try {
+    val loader = coil3.ImageLoader(context)
+    val request = coil3.request.ImageRequest.Builder(context)
+        .data(url)
+        .size(64)
+        .build()
+    val result = loader.execute(request)
+    val image = result.image as? coil3.BitmapImage
+    if (image != null) {
+        val palette = androidx.palette.graphics.Palette.from(image.bitmap).generate()
+        Color(palette.getDominantColor(0xFF000000.toInt()))
+    } else {
+        Color.Black
+    }
+} catch (_: Exception) {
+    Color.Black
 }

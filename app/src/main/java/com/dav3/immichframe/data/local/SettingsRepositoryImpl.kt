@@ -47,6 +47,8 @@ constructor(
         val MUTED = stringPreferencesKey("muted")
         val START_ON_BOOT = stringPreferencesKey("start_on_boot")
         val AUTO_UPDATE = stringPreferencesKey("auto_update")
+        val CLOCK_SNAP_TO_GRID = stringPreferencesKey("clock_snap_to_grid")
+        val ADAPTIVE_BACKGROUND = stringPreferencesKey("adaptive_background")
     }
 
     private val masterKey by lazy {
@@ -99,6 +101,8 @@ constructor(
                 muted = prefs[Keys.MUTED]?.toBoolean() ?: true,
                 startOnBoot = prefs[Keys.START_ON_BOOT]?.toBoolean() ?: false,
                 autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
+                clockSnapToGrid = prefs[Keys.CLOCK_SNAP_TO_GRID]?.toBoolean() ?: true,
+                adaptiveBackground = prefs[Keys.ADAPTIVE_BACKGROUND]?.toBoolean() ?: false,
             )
         }
 
@@ -131,6 +135,8 @@ constructor(
             it[Keys.MUTED] = settings.muted.toString()
             it[Keys.START_ON_BOOT] = settings.startOnBoot.toString()
             it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
+            it[Keys.CLOCK_SNAP_TO_GRID] = settings.clockSnapToGrid.toString()
+            it[Keys.ADAPTIVE_BACKGROUND] = settings.adaptiveBackground.toString()
         }
     }
 

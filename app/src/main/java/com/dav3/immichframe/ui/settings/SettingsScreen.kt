@@ -136,6 +136,15 @@ fun SettingsScreen(
                 FilterChip(s.fillMode == FillMode.CONTAIN, "Contain") { viewModel.updateFillMode(FillMode.CONTAIN) }
                 FilterChip(s.fillMode == FillMode.COVER, "Cover") { viewModel.updateFillMode(FillMode.COVER) }
             }
+            ListItem(
+                headlineContent = { Text("Adaptive Background") },
+                supportingContent = {
+                    Text("Fill letterbox bars with average color from each photo")
+                },
+                trailingContent = {
+                    Switch(checked = s.adaptiveBackground, onCheckedChange = { viewModel.toggleAdaptiveBackground() })
+                },
+            )
 
             HorizontalDivider()
 
@@ -242,6 +251,15 @@ fun SettingsScreen(
                     "Drag the clock on the slideshow screen to reposition",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                ListItem(
+                    headlineContent = { Text("Snap to Grid") },
+                    supportingContent = {
+                        Text("Align clock to grid based on its size when released")
+                    },
+                    trailingContent = {
+                        Switch(checked = s.clockSnapToGrid, onCheckedChange = { viewModel.toggleClockSnapToGrid() })
+                    },
                 )
             }
 

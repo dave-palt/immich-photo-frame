@@ -74,6 +74,10 @@ constructor(
 
     fun toggleAutoUpdate() = update { it.copy(autoUpdate = !it.autoUpdate) }
 
+    fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
+
+    fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }
+
     fun updateServerUrl(url: String) = viewModelScope.launch {
         settingsRepo.setServerUrl(url.trim().trimEnd('/'))
         (immichRepo as ImmichRepositoryImpl).invalidateCache()
