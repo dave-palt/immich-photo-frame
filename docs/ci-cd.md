@@ -53,7 +53,7 @@ Triggers on push to `main` or manual `workflow_dispatch`
 - Builds signed release **AAB** (`bundleRelease`) with R8 minification + resource shrinking
 - Builds signed release **APK** (`assembleRelease`)
 - Uploads both as artifacts (90-day retention)
-- Creates a GitHub Release with `softprops/action-gh-release@v2`
+- Creates a GitHub Release with `softprops/action-gh-release@v3`
 
 ### Required GitHub Secrets (prod)
 
