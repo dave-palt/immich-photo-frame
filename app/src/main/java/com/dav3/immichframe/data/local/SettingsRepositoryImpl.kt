@@ -46,6 +46,7 @@ constructor(
         val SKIP_VIDEOS = stringPreferencesKey("skip_videos")
         val MUTED = stringPreferencesKey("muted")
         val START_ON_BOOT = stringPreferencesKey("start_on_boot")
+        val AUTO_UPDATE = stringPreferencesKey("auto_update")
     }
 
     private val masterKey by lazy {
@@ -97,6 +98,7 @@ constructor(
                 skipVideos = prefs[Keys.SKIP_VIDEOS]?.toBoolean() ?: true,
                 muted = prefs[Keys.MUTED]?.toBoolean() ?: true,
                 startOnBoot = prefs[Keys.START_ON_BOOT]?.toBoolean() ?: false,
+                autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
             )
         }
 
@@ -128,6 +130,7 @@ constructor(
             it[Keys.SKIP_VIDEOS] = settings.skipVideos.toString()
             it[Keys.MUTED] = settings.muted.toString()
             it[Keys.START_ON_BOOT] = settings.startOnBoot.toString()
+            it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
         }
     }
 

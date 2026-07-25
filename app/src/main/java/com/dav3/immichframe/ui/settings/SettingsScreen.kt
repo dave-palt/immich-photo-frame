@@ -67,6 +67,21 @@ fun SettingsScreen(
     val state by viewModel.uiState.collectAsState()
     val s = state.settings
     val context = LocalContext.current
+    val installedFromPlayStore = remember {
+        try {
+            val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.packageManager
+                    .getInstallSourceInfo(context.packageName)
+                    .installingPackageName
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getInstallerPackageName(context.packageName)
+            }
+            installer == "com.android.vending"
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     var editingUrl by remember { mutableStateOf(false) }
     var editingKey by remember { mutableStateOf(false) }
@@ -179,6 +194,19 @@ fun SettingsScreen(
                 ) {
                     Text("Open Autostart Settings", style = MaterialTheme.typography.labelLarge)
                 }
+            }
+
+            // Auto-update — only shown if NOT installed from Play Store
+            if (!installedFromPlayStore) {
+                ListItem(
+                    headlineContent = { Text("Auto-Update") },
+                    supportingContent = {
+                        Text("Check GitHub for new builds and download them automatically")
+                    },
+                    trailingContent = {
+                        Switch(checked = s.autoUpdate, onCheckedChange = { viewModel.toggleAutoUpdate() })
+                    },
+                )
             }
 
             HorizontalDivider()
