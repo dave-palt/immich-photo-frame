@@ -53,7 +53,8 @@ Triggers on push to `main` or manual `workflow_dispatch`
 - Builds signed release **AAB** (`bundleRelease`) with R8 minification + resource shrinking
 - Builds signed release **APK** (`assembleRelease`)
 - Uploads both as artifacts (90-day retention)
-- Creates a GitHub Release with `softprops/action-gh-release@v3`
+- Builds cross-platform `keymgr` binaries (Bun `--compile`) and zips shell/PowerShell scripts as release assets
+- Creates a GitHub Release with `softprops/action-gh-release@v3` (includes APK, AAB, keymgr binaries, and script zip)
 
 ### Required GitHub Secrets (prod)
 

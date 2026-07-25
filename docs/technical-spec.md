@@ -17,7 +17,7 @@
 | Local Storage | DataStore (Preferences) | 1.1+ |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Dependency Injection | Hilt | 2.52+ |
-| Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
+| Code Formatting | Spotless + ktlint | 8.8.0 / 1.4.1 |
 | Build System | Gradle Kotlin DSL | 8.10.2 (AGP 8.7.3) |
 | JDK | OpenJDK 17 | Required for builds |
 

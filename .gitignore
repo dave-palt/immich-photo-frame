@@ -20,3 +20,6 @@ local.env
 app/local signing.properties
 debug.keystore
 release.jks
+
+# Key manager compiled binaries
+tools/keymgr/dist/

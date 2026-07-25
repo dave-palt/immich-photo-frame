@@ -23,6 +23,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -51,6 +54,17 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
+
+      - name: Build key manager binaries
+        run: cd tools/keymgr && bash build.sh
+
+      - name: Zip shell scripts
+        run: |
+          zip -j keymgr-scripts.zip \
+            scripts/generate-api-key.sh \
+            scripts/check-api-key.sh \
+            scripts/generate-api-key.ps1 \
+            scripts/check-api-key.ps1
 
       - name: Upload AAB
         uses: actions/upload-artifact@v7
@@ -89,3 +103,9 @@ jobs:
           files: |
             app/build/outputs/apk/release/*.apk
             app/build/outputs/bundle/release/*.aab
+            tools/keymgr/dist/keymgr-darwin-arm64
+            tools/keymgr/dist/keymgr-darwin-x64
+            tools/keymgr/dist/keymgr-linux-arm64
+            tools/keymgr/dist/keymgr-linux-x64
+            tools/keymgr/dist/keymgr-windows-x64.exe
+            keymgr-scripts.zip
