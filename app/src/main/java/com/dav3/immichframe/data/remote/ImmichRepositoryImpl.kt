@@ -29,7 +29,7 @@ constructor(
     private var cachedApi: ImmichApi? = null
     private var cachedBaseUrl: String? = null
 
-    fun invalidateCache() {
+    override fun invalidateCache() {
         cachedApi = null
         cachedBaseUrl = null
     }

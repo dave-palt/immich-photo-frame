@@ -1,9 +1,5 @@
 package com.dav3.immichframe.ui.settings
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -54,10 +50,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
+import com.dav3.immichframe.domain.system.needsBootPermission
+import com.dav3.immichframe.domain.system.openBootPermissionSettings
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.provider.Settings as AndroidSettings
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -252,7 +249,7 @@ fun SettingsScreen(
 
             SwitchItem(
                 title = stringResource(R.string.start_on_boot),
-                subtitle = if (s.startOnBoot && needsBootPermission(context) && !s.bootVerified) {
+                subtitle = if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
                     stringResource(R.string.boot_not_verified_desc)
                 } else {
                     stringResource(R.string.start_on_boot_desc)
@@ -260,12 +257,12 @@ fun SettingsScreen(
                 checked = s.startOnBoot,
                 onToggle = {
                     viewModel.toggleStartOnBoot()
-                    if (!s.startOnBoot && needsBootPermission(context)) {
+                    if (!s.startOnBoot && needsBootPermission()) {
                         showBootPermissionDialog = true
                     }
                 },
             )
-            if (s.startOnBoot && needsBootPermission(context) && !s.bootVerified) {
+            if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
                 TextButton(
                     onClick = { openBootPermissionSettings(context) },
                     modifier = Modifier.fillMaxWidth(),
@@ -303,65 +300,44 @@ fun SettingsScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (!editingUrl) {
-                        Text(stringResource(R.string.server), style = MaterialTheme.typography.labelSmall)
-                        Text(state.serverUrl.ifBlank { stringResource(R.string.not_set) }, style = MaterialTheme.typography.bodyMedium)
-                    } else {
-                        OutlinedTextField(
-                            value = urlDraft,
-                            onValueChange = { urlDraft = it },
-                            label = { Text(stringResource(R.string.server_url)) },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                        if (editingUrl) {
-                            TextButton(onClick = {
-                                urlDraft = state.serverUrl
-                                editingUrl = false
-                            }) { Text(stringResource(R.string.cancel)) }
-                            Button(onClick = {
-                                viewModel.updateServerUrl(urlDraft)
-                                editingUrl = false
-                            }) { Text(stringResource(R.string.save)) }
-                        } else {
-                            TextButton(onClick = { editingUrl = true }) { Text(stringResource(R.string.edit)) }
-                        }
-                    }
+                    EditableFieldRow(
+                        label = stringResource(R.string.server),
+                        displayValue = state.serverUrl.ifBlank { stringResource(R.string.not_set) },
+                        fieldLabel = stringResource(R.string.server_url),
+                        draft = urlDraft,
+                        onDraftChange = { urlDraft = it },
+                        editing = editingUrl,
+                        onEdit = { editingUrl = true },
+                        onCancel = {
+                            urlDraft = state.serverUrl
+                            editingUrl = false
+                        },
+                        onSave = {
+                            viewModel.updateServerUrl(urlDraft)
+                            editingUrl = false
+                        },
+                        keyboardType = KeyboardType.Uri,
+                    )
 
                     HorizontalDivider()
 
-                    if (!editingKey) {
-                        Text(stringResource(R.string.api_key), style = MaterialTheme.typography.labelSmall)
-                        Text(
-                            if (state.apiKey.isBlank()) stringResource(R.string.not_set) else "•".repeat(20),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    } else {
-                        OutlinedTextField(
-                            value = keyDraft,
-                            onValueChange = { keyDraft = it },
-                            label = { Text(stringResource(R.string.api_key)) },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                        if (editingKey) {
-                            TextButton(onClick = {
-                                keyDraft = state.apiKey
-                                editingKey = false
-                            }) { Text(stringResource(R.string.cancel)) }
-                            Button(onClick = {
-                                viewModel.updateApiKey(keyDraft)
-                                editingKey = false
-                            }) { Text(stringResource(R.string.save)) }
-                        } else {
-                            TextButton(onClick = { editingKey = true }) { Text(stringResource(R.string.edit)) }
-                        }
-                    }
+                    EditableFieldRow(
+                        label = stringResource(R.string.api_key),
+                        displayValue = if (state.apiKey.isBlank()) stringResource(R.string.not_set) else "•".repeat(20),
+                        fieldLabel = stringResource(R.string.api_key),
+                        draft = keyDraft,
+                        onDraftChange = { keyDraft = it },
+                        editing = editingKey,
+                        onEdit = { editingKey = true },
+                        onCancel = {
+                            keyDraft = state.apiKey
+                            editingKey = false
+                        },
+                        onSave = {
+                            viewModel.updateApiKey(keyDraft)
+                            editingKey = false
+                        },
+                    )
                 }
             }
 
@@ -437,6 +413,45 @@ private fun SwitchItem(
     )
 }
 
+/**
+ * Read/edit/save row for a text field — shared by server URL and API key.
+ */
+@Composable
+private fun EditableFieldRow(
+    label: String,
+    displayValue: String,
+    fieldLabel: String,
+    draft: String,
+    onDraftChange: (String) -> Unit,
+    editing: Boolean,
+    onEdit: () -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text,
+) {
+    if (!editing) {
+        Text(label, style = MaterialTheme.typography.labelSmall)
+        Text(displayValue, style = MaterialTheme.typography.bodyMedium)
+    } else {
+        OutlinedTextField(
+            value = draft,
+            onValueChange = onDraftChange,
+            label = { Text(fieldLabel) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+        if (editing) {
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
+            Button(onClick = onSave) { Text(stringResource(R.string.save)) }
+        } else {
+            TextButton(onClick = onEdit) { Text(stringResource(R.string.edit)) }
+        }
+    }
+}
+
 @Composable
 private fun FilterChip(
     selected: Boolean,
@@ -458,102 +473,4 @@ private fun PhotoAnimation.displayName(): String = when (this) {
     PhotoAnimation.PAN_RIGHT -> stringResource(R.string.anim_pan_right)
     PhotoAnimation.PAN_UP -> stringResource(R.string.anim_pan_up)
     PhotoAnimation.PAN_DOWN -> stringResource(R.string.anim_pan_down)
-}
-
-// --- Boot permission helpers ---
-
-private fun needsBootPermission(context: Context): Boolean {
-    // Stock Android (Pixel, Motorola) and Samsung don't restrict boot launch.
-    // Chinese OEMs add an extra autostart management layer.
-    val manufacturer = Build.MANUFACTURER.lowercase()
-    return manufacturer in setOf(
-        "xiaomi", "redmi", "oppo", "oplus", "vivo", "iqoo",
-        "honor", "huawei", "realme", "oneplus", "letv",
-        "tecno", "infinix", "asus",
-    )
-}
-
-/** All known autostart-setting components per OEM family. */
-private fun autostartCandidates(manufacturer: String): List<ComponentName> {
-    val oplus = listOf(
-        // ColorOS 15 / Oplus (newest)
-        ComponentName("com.oplus.safecenter", "com.oplus.safecenter.startupapp.StartupAppListActivity"),
-        ComponentName("com.oplus.safecenter", "com.oplus.safecenter.permission.startup.StartupAppListActivity"),
-        // ColorOS 13–14
-        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity"),
-        // ColorOS ≤12
-        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"),
-        // OnePlus (OxygenOS, pre-merge)
-        ComponentName("com.oneplus.security", "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"),
-        // Realme (also BBK)
-        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"),
-    )
-    return when (manufacturer) {
-        "xiaomi", "redmi" -> listOf(
-            ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"),
-            ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity"),
-        )
-        "oppo", "oplus", "oneplus", "realme" -> oplus
-        "vivo", "iqoo" -> listOf(
-            ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"),
-            ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager"),
-        )
-        "honor", "huawei" -> listOf(
-            ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"),
-            ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"),
-        )
-        "asus" -> listOf(
-            ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.entry.FunctionActivity"),
-            ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.autostart.AutoStartActivity"),
-        )
-        "samsung" -> listOf(
-            ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity"),
-        )
-        else -> emptyList()
-    }
-}
-
-private fun openBootPermissionSettings(context: Context) {
-    val manufacturer = Build.MANUFACTURER.lowercase()
-    val pm = context.packageManager
-
-    // Try each candidate — use the first that actually resolves
-    for (candidate in autostartCandidates(manufacturer)) {
-        val resolved = pm.resolveActivity(
-            Intent().apply { component = candidate },
-            android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
-        )
-        if (resolved != null) {
-            try {
-                val intent = Intent().apply {
-                    component = candidate
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    // Asus needs an extra to jump to the right fragment
-                    if (manufacturer == "asus") {
-                        putExtra("showFragment", "com.asus.mobilemanager.autostart.AutoStartActivity")
-                    }
-                }
-                context.startActivity(intent)
-                return
-            } catch (_: Exception) {
-                // resolved but won't launch — try next candidate
-            }
-        }
-    }
-
-    // Fallback: app details page
-    try {
-        context.startActivity(
-            Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            },
-        )
-    } catch (_: Exception) {
-        context.startActivity(
-            Intent(AndroidSettings.ACTION_SETTINGS).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            },
-        )
-    }
 }

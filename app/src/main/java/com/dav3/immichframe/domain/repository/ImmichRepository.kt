@@ -17,4 +17,7 @@ interface ImmichRepository {
     fun thumbnailUrl(assetId: String): String
 
     fun videoUrl(assetId: String): String
+
+    /** Invalidate cached API/client so new credentials take effect. */
+    fun invalidateCache()
 }

@@ -4,30 +4,20 @@ import android.app.Activity
 import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
@@ -49,46 +39,37 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import coil3.compose.AsyncImage
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
-import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
+import com.dav3.immichframe.util.extractDominantColor
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.round
 
 @Composable
 fun SlideshowScreen(
@@ -210,7 +191,10 @@ fun SlideshowScreen(
 
                     AnimatedContent(
                         targetState = asset.id,
-                        transitionSpec = { fadeIn(tween(1000)) togetherWith fadeOut(tween(1000)) },
+                        transitionSpec = {
+                            val ms = (s.transitionSeconds * 1000).toInt()
+                            fadeIn(tween(ms)) togetherWith fadeOut(tween(ms))
+                        },
                         label = "slideshow",
                     ) { assetId ->
                         val currentAsset = state.assets.find { it.id == assetId }
@@ -244,7 +228,7 @@ fun SlideshowScreen(
                         fontSize = s.clockSize,
                         position = s.clockPosition,
                         containerSize = containerSize,
-                        driftProtection = s.photoAnimations,
+                        clockDrift = s.photoAnimations,
                         snapToGrid = s.clockSnapToGrid,
                         onPositionChanged = { normX, normY ->
                             viewModel.setClockPosition(ClockPosition(normX, normY))
@@ -349,254 +333,6 @@ fun SlideshowScreen(
     }
 }
 
-/**
- * Per-image animation. Picks from [enabledAnims] deterministically by [assetId]
- * so each photo always gets the same animation (stable across recompositions).
- *
- * - No animations enabled / master toggle off → static image
- * - Ken Burns on with enabled types → one-shot linear zoom/pan across display duration
- */
-@Composable
-private fun KenBurnsImage(
-    url: String,
-    contentScale: ContentScale,
-    assetId: String,
-    photoAnimations: Boolean,
-    enabledAnims: List<PhotoAnimation>,
-    durationMs: Long,
-) {
-    // Deterministic pick from enabled set
-    val anim = remember(assetId, enabledAnims) {
-        if (photoAnimations && enabledAnims.isNotEmpty()) {
-            enabledAnims[Math.floorMod(assetId.hashCode(), enabledAnims.size)]
-        } else {
-            null
-        }
-    }
-
-    if (anim == null) {
-        AsyncImage(
-            model = url,
-            contentDescription = null,
-            contentScale = contentScale,
-            modifier = Modifier.fillMaxSize(),
-        )
-        return
-    }
-
-    // Ken Burns: one-shot linear from 0→1 across the interval
-    requireNotNull(anim)
-    var progress by remember(assetId) { mutableFloatStateOf(0f) }
-    LaunchedEffect(assetId) {
-        animate(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = tween(durationMs.toInt(), easing = LinearEasing),
-        ) { value, _ -> progress = value }
-    }
-
-    val scale: Float
-    val dx: Float
-    val dy: Float
-    when (anim) {
-        PhotoAnimation.ZOOM_IN -> {
-            scale = 1f + 0.15f * progress
-            dx = 0f
-            dy = 0f
-        }
-        PhotoAnimation.ZOOM_OUT -> {
-            scale = 1.15f - 0.15f * progress
-            dx = 0f
-            dy = 0f
-        }
-        PhotoAnimation.PAN_LEFT -> {
-            scale = 1.1f
-            dx = 40f * (1f - progress) // start shifted right, pan left
-            dy = 0f
-        }
-        PhotoAnimation.PAN_RIGHT -> {
-            scale = 1.1f
-            dx = -40f * (1f - progress) // start shifted left, pan right
-            dy = 0f
-        }
-        PhotoAnimation.PAN_UP -> {
-            scale = 1.1f
-            dx = 0f
-            dy = 40f * (1f - progress) // start shifted down, pan up
-        }
-        PhotoAnimation.PAN_DOWN -> {
-            scale = 1.1f
-            dx = 0f
-            dy = -40f * (1f - progress) // start shifted up, pan down
-        }
-    }
-
-    AsyncImage(
-        model = url,
-        contentDescription = null,
-        contentScale = contentScale,
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                translationX = dx
-                translationY = dy
-            },
-    )
-}
-
-@Composable
-private fun DraggableClock(
-    time: String,
-    fontSize: Float,
-    position: ClockPosition,
-    containerSize: IntSize,
-    driftProtection: Boolean,
-    snapToGrid: Boolean,
-    onPositionChanged: (Float, Float) -> Unit,
-) {
-    if (containerSize.width == 0) return
-
-    val isDefault = position.x < 0f
-    val normX = if (isDefault) 0.5f else position.x
-    val normY = if (isDefault) 0.5f else position.y
-
-    val clockW = fontSize * 3.5f + 80f
-    val clockH = fontSize * 1.5f + 32f
-    // Actual measured size — updated via onGloballyPositioned
-    var measuredW by remember { mutableFloatStateOf(clockW) }
-    var measuredH by remember { mutableFloatStateOf(clockH) }
-    val halfW = measuredW / 2f
-    val halfH = measuredH / 2f
-    val gridStep = (clockW * 0.5f).coerceAtLeast(20f)
-
-    // Bounds for clock CENTER (keeps full clock visible)
-    val minCX = halfW
-    val maxCX = (containerSize.width - halfW).coerceAtLeast(halfW)
-    val minCY = halfH
-    val maxCY = (containerSize.height - halfH).coerceAtLeast(halfH)
-
-    // Raw center tracks finger freely; display is snapped view of raw
-    var rawX by remember { mutableFloatStateOf((normX * containerSize.width).coerceIn(minCX, maxCX)) }
-    var rawY by remember { mutableFloatStateOf((normY * containerSize.height).coerceIn(minCY, maxCY)) }
-    var isDragging by remember { mutableStateOf(false) }
-
-    fun snap(x: Float, y: Float): Pair<Float, Float> {
-        if (!snapToGrid) return x to y
-        val scx = containerSize.width / 2f
-        val scy = containerSize.height / 2f
-        val sx = scx + round((x - scx) / gridStep) * gridStep
-        val sy = scy + round((y - scy) / gridStep) * gridStep
-        return sx.coerceIn(minCX, maxCX) to sy.coerceIn(minCY, maxCY)
-    }
-
-    // Displayed position: raw when no snap, snapped view when grid enabled + dragging
-    val cx = if (snapToGrid && isDragging) snap(rawX, rawY).first else rawX
-    val cy = if (snapToGrid && isDragging) snap(rawX, rawY).second else rawY
-
-    // Sync from external position — only when not actively dragging
-    LaunchedEffect(normX, normY, containerSize) {
-        if (!isDragging) {
-            rawX = (normX * containerSize.width).coerceIn(minCX, maxCX)
-            rawY = (normY * containerSize.height).coerceIn(minCY, maxCY)
-        }
-    }
-
-    // Clock drift to reduce burn-in (same guard as photo animations)
-    val driftX = if (driftProtection) {
-        rememberInfiniteTransition(label = "clockDriftX").animateFloat(
-            -4f,
-            4f,
-            infiniteRepeatable(tween(30_000, easing = LinearEasing), RepeatMode.Reverse),
-            label = "driftX",
-        ).value
-    } else {
-        0f
-    }
-    val driftY = if (driftProtection) {
-        rememberInfiniteTransition(label = "clockDriftY").animateFloat(
-            -3f,
-            3f,
-            infiniteRepeatable(tween(45_000, easing = LinearEasing), RepeatMode.Reverse),
-            label = "driftY",
-        ).value
-    } else {
-        0f
-    }
-
-    val density = LocalDensity.current
-    val dotRadiusPx = with(density) { 3.dp.toPx() }
-    val dotColor = Color(0x88FFFFFF)
-
-    // Full-screen overlay: grid canvas + clock
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Grid dots — full screen, centered, uniform spacing
-        if (isDragging && snapToGrid) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val scx = size.width / 2f
-                val scy = size.height / 2f
-                val cols = (size.width / gridStep / 2).toInt() + 2
-                val rows = (size.height / gridStep / 2).toInt() + 2
-                for (i in -cols..cols) {
-                    for (j in -rows..rows) {
-                        drawCircle(
-                            color = dotColor,
-                            radius = dotRadiusPx,
-                            center = androidx.compose.ui.geometry.Offset(scx + i * gridStep, scy + j * gridStep),
-                        )
-                    }
-                }
-            }
-        }
-
-        // Clock — positioned so CENTER is at (cx, cy)
-        Surface(
-            color = Color(0x80000000),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .onGloballyPositioned { coords ->
-                    measuredW = coords.size.width.toFloat()
-                    measuredH = coords.size.height.toFloat()
-                }
-                .offset { IntOffset((cx - halfW).toInt(), (cy - halfH).toInt()) }
-                .graphicsLayer {
-                    translationX = driftX
-                    translationY = driftY
-                }
-                .pointerInput(snapToGrid) {
-                    detectDragGestures(
-                        onDragStart = { isDragging = true },
-                        onDragEnd = {
-                            isDragging = false
-                            // Snap raw to final position on release
-                            val (sx, sy) = snap(rawX, rawY)
-                            rawX = sx
-                            rawY = sy
-                            if (containerSize.width > 0) {
-                                onPositionChanged(rawX / containerSize.width, rawY / containerSize.height)
-                            }
-                        },
-                        onDragCancel = { isDragging = false },
-                    ) { change, dragAmount ->
-                        change.consume()
-                        // Accumulate finger movement in raw — display snaps live via cx/cy
-                        rawX = (rawX + dragAmount.x).coerceIn(minCX, maxCX)
-                        rawY = (rawY + dragAmount.y).coerceIn(minCY, maxCY)
-                    }
-                },
-        ) {
-            Text(
-                time,
-                color = Color.White,
-                fontSize = fontSize.sp,
-                fontWeight = FontWeight.Light,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-            )
-        }
-    }
-}
-
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 private fun VideoPlayer(
@@ -635,34 +371,4 @@ private fun VideoPlayer(
         },
         modifier = Modifier.fillMaxSize(),
     )
-}
-
-/** Downloads bitmap via Coil and extracts dominant color via Palette. */
-private suspend fun extractDominantColor(
-    context: android.content.Context,
-    url: String,
-): Color = try {
-    val loader = coil3.ImageLoader(context)
-    val request = coil3.request.ImageRequest.Builder(context)
-        .data(url)
-        .size(128)
-        .build()
-    val result = loader.execute(request)
-    val image = result.image as? coil3.BitmapImage
-    if (image != null) {
-        // Palette needs a software bitmap — Coil 3 returns HARDWARE by default
-        val bitmap = if (image.bitmap.config == android.graphics.Bitmap.Config.HARDWARE) {
-            image.bitmap.copy(android.graphics.Bitmap.Config.ARGB_8888, false)
-        } else {
-            image.bitmap
-        }
-        val palette = androidx.palette.graphics.Palette.from(bitmap).generate()
-        Color(palette.getDominantColor(0xFF000000.toInt()))
-    } else {
-        android.util.Log.w("AdaptiveBg", "Coil returned no image for $url")
-        Color.Black
-    }
-} catch (e: Exception) {
-    android.util.Log.e("AdaptiveBg", "Failed to extract color", e)
-    Color.Black
 }

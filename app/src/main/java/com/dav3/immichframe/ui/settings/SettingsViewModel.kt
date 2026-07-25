@@ -2,7 +2,6 @@ package com.dav3.immichframe.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
@@ -102,12 +101,12 @@ constructor(
 
     fun updateServerUrl(url: String) = viewModelScope.launch {
         settingsRepo.setServerUrl(url.trim().trimEnd('/'))
-        (immichRepo as ImmichRepositoryImpl).invalidateCache()
+        immichRepo.invalidateCache()
     }
 
     fun updateApiKey(key: String) = viewModelScope.launch {
         settingsRepo.setApiKey(key.trim())
-        (immichRepo as ImmichRepositoryImpl).invalidateCache()
+        immichRepo.invalidateCache()
     }
 
     fun resetAll() = viewModelScope.launch {

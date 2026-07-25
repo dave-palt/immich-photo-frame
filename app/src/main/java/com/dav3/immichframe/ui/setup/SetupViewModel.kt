@@ -2,7 +2,6 @@ package com.dav3.immichframe.ui.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,7 +88,7 @@ constructor(
             settingsRepo.setApiKey(state.apiKey.trim())
 
             // Invalidate repo cache so it picks up new credentials
-            (immichRepo as ImmichRepositoryImpl).invalidateCache()
+            immichRepo.invalidateCache()
 
             val pingResult = immichRepo.ping()
             if (pingResult.isFailure) {
