@@ -91,19 +91,20 @@ jobs:
 
       - name: Publish dev pre-release
         if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: dev-${{ github.sha }}
-          name: "Dev Build (unstable)"
-          body: |
-            ⚠️ **Unstable development build** — auto-generated from latest develop branch.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "dev-${{ github.sha }}" \
+            --repo ${{ github.repository }} \
+            --title "Dev Build (unstable)" \
+            --notes "⚠️ **Unstable development build** — auto-generated from latest develop branch.
 
-            **Commit:** ${{ github.event.head_commit.message }}
-            **SHA:** ${{ github.sha }}
+          **Commit:** ${{ github.event.head_commit.message }}
+          **SHA:** ${{ github.sha }}
 
-            Install at your own risk. Not a stable release.
-          prerelease: true
-          files: app/build/outputs/apk/debug/*.apk
+          Install at your own risk. Not a stable release." \
+            --prerelease \
+            app/build/outputs/apk/debug/*.apk
 
       - name: Delete old dev pre-releases
         if: github.event_name == 'push' && github.ref == 'refs/heads/develop'

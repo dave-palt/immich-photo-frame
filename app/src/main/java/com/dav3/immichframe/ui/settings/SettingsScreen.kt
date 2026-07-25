@@ -190,33 +190,26 @@ fun SettingsScreen(
                 trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
             )
             if (s.showClock) {
-                // Clock size slider OUTSIDE ListItem so it doesn't conflict with touch targets
-                Text("Clock Size: ${s.clockSize.toInt()}sp")
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
+                // Clock preview above slider — full size, accurate representation
+                Surface(
+                    color = Color(0x80000000),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                 ) {
-                    Slider(
-                        value = s.clockSize,
-                        onValueChange = { viewModel.updateClockSize(it) },
-                        valueRange = 24f..96f,
-                        modifier = Modifier.weight(1f),
+                    Text(
+                        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                        color = Color.White,
+                        fontSize = s.clockSize.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                     )
-                    // Live preview
-                    Surface(
-                        color = Color(0x80000000),
-                        shape = RoundedCornerShape(8.dp),
-                    ) {
-                        Text(
-                            SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
-                            color = Color.White,
-                            fontSize = (s.clockSize * 0.35f).sp,
-                            fontWeight = FontWeight.Light,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        )
-                    }
                 }
+                Text("Clock Size: ${s.clockSize.toInt()}sp")
+                Slider(
+                    value = s.clockSize,
+                    onValueChange = { viewModel.updateClockSize(it) },
+                    valueRange = 24f..96f,
+                )
                 Text(
                     "Drag the clock on the slideshow screen to reposition",
                     style = MaterialTheme.typography.bodySmall,
