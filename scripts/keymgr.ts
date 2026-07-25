@@ -3,7 +3,7 @@
  * keymgr.ts - Immich API Key Manager CLI
  *
  * A unified cross-platform tool for generating and validating Immich API keys
- * with the 4 permissions ImmichFrame needs.
+ * with the 5 permissions Immich Media Frame needs.
  *
  * Usage:
  *   bun run scripts/keymgr.ts generate <server-url> <email> [password]
@@ -15,8 +15,8 @@
  *   ./keymgr check https://immich.example.com immich_apikey_xxx
  */
 
-const REQUIRED_PERMS = ["album.read", "asset.read", "asset.view", "user.read"] as const;
-const KEY_NAME = "ImmichFrame";
+const REQUIRED_PERMS = ["album.read", "asset.read", "asset.view", "asset.download", "user.read"] as const;
+const KEY_NAME = "ImmichMediaFrame";
 
 type Perm = typeof REQUIRED_PERMS[number];
 
@@ -138,6 +138,23 @@ async function deleteKey(serverUrl: string, token: string, keyId: string): Promi
   });
 }
 
+async function updateKey(
+  serverUrl: string,
+  token: string,
+  keyId: string,
+  permissions: readonly string[],
+): Promise<void> {
+  logStep(`Updating permissions on existing key (ID: ${keyId})...`);
+
+  await fetchJson(`${serverUrl}/api/api-keys/${keyId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name: KEY_NAME, permissions: [...permissions] }),
+  });
+
+  logSuccess("Existing key updated with all required permissions");
+}
+
 async function createKey(serverUrl: string, token: string, permissions: readonly string[]): Promise<string> {
   logStep(`Creating API key "${KEY_NAME}" with ${permissions.length} permissions...`);
 
@@ -192,7 +209,7 @@ async function testEndpoint(
 }
 
 /**
- * Check an API key against all 4 required ImmichFrame endpoints.
+ * Check an API key against all 4 required Immich Media Frame endpoints.
  * Exits 0 if all pass, 1 if any fail.
  */
 async function checkApiKey(serverUrl: string, apiKey: string): Promise<void> {
@@ -288,28 +305,42 @@ async function checkApiKey(serverUrl: string, apiKey: string): Promise<void> {
     logWarn("Skipping asset.view test — no assets found to test thumbnail with");
   }
 
+  // --- 6. asset.download: HEAD /assets/{id}/original ---
+  if (firstAssetId) {
+    logStep(`Testing GET /api/assets/${firstAssetId}/original (asset.download) ...`);
+    const result = await testEndpoint(serverUrl, apiKey, `/api/assets/${firstAssetId}/original`);
+    if (result.ok) {
+      logSuccess(`${colorize("asset.download", Colors.cyan)} → Download original (${result.status})`);
+    } else {
+      logError(`${colorize("asset.download", Colors.red)} → Download original (${result.status})`);
+      allPassed = false;
+    }
+  } else {
+    logWarn("Skipping asset.download test — no assets found to test download with");
+  }
+
   console.log();
 
   if (allPassed) {
     logSuccess("All required permissions work correctly!");
-    logInfo("This API key is ready to use with ImmichFrame.");
+    logInfo("This API key is ready to use with Immich Media Frame.");
   } else {
     logError("Some permissions failed. Check your API key permissions in Immich.");
     logWarn(`Required permissions: ${REQUIRED_PERMS.join(", ")}`);
-    logInfo("Go to Immich Settings → API Keys → Edit key → ensure all 4 permissions are checked.");
+    logInfo("Go to Immich Settings → API Keys → Edit key → ensure all 5 permissions are checked.");
     process.exit(1);
   }
 }
 
 async function generateKey(serverUrl: string, email: string, password: string): Promise<void> {
-  logInfo(`ImmichFrame API Key Generator`);
+  logInfo(`Immich Media Frame API Key Generator`);
   logInfo(`Server: ${colorize(serverUrl, Colors.cyan)}`);
   logInfo(`Account: ${colorize(email, Colors.cyan)}`);
   console.log();
 
   const token = await login(serverUrl, email, password);
 
-  logStep("Checking for existing ImmichFrame API key...");
+  logStep("Checking for existing Immich Media Frame API key...");
   const existingKeys = await getExistingKeys(serverUrl, token);
   const existing = await findKeyByName(existingKeys, KEY_NAME);
 
@@ -317,27 +348,30 @@ async function generateKey(serverUrl: string, email: string, password: string): 
     logWarn(`Found existing "${KEY_NAME}" key (ID: ${existing.id})`);
 
     if (process.stdin.isTTY) {
-      const confirm = await prompt("Delete and recreate with fresh permissions? [y/N] ");
-      if (!confirm.toLowerCase().startsWith("y")) {
-        logInfo("Keeping existing key. Use 'check' command to verify permissions.");
+      const confirm = await prompt("Update permissions on this key? [Y/n] ");
+      if (confirm.toLowerCase().startsWith("n")) {
+        logInfo("Keeping existing key as-is. Use 'check' command to verify permissions.");
         return;
       }
-    } else {
-      logInfo("Non-interactive mode: recreating key automatically...");
     }
 
-    logStep("Deleting old key...");
-    await deleteKey(serverUrl, token, existing.id);
-    logSuccess("Old key deleted");
+    // Edit in-place — preserves the key value so the app keeps working
+    await updateKey(serverUrl, token, existing.id, REQUIRED_PERMS);
+
+    console.log();
+    logSuccess(`Done! "${KEY_NAME}" key updated with ${REQUIRED_PERMS.length} permissions.`);
+    logInfo("The key value is unchanged — no need to re-enter it in Immich Media Frame.");
+    logInfo("Run 'keymgr check <server-url> <api-key>' to verify.");
+    return;
   }
 
   const apiKey = await createKey(serverUrl, token, REQUIRED_PERMS);
 
   console.log();
-  logSuccess("Done! Your ImmichFrame API key:");
+  logSuccess("Done! Your Immich Media Frame API key:");
   console.log(colorize(`  ${apiKey}`, Colors.bold + Colors.green));
   console.log();
-  logInfo("Copy this key into ImmichFrame Settings → API Key");
+  logInfo("Copy this key into Immich Media Frame Settings → API Key");
   logInfo("Run 'keymgr check <server-url> <api-key>' to verify it works.");
 }
 
@@ -351,14 +385,14 @@ async function prompt(question: string): Promise<string> {
 }
 
 function printUsage(): void {
-  console.log(colorize("ImmichFrame API Key Manager", Colors.bold + Colors.cyan));
+  console.log(colorize("Immich Media Frame API Key Manager", Colors.bold + Colors.cyan));
   console.log();
   console.log("Usage:");
   console.log("  keymgr generate <server-url> <email> [password]");
   console.log("  keymgr check <server-url> <api-key>");
   console.log();
   console.log("Commands:");
-  console.log("  generate  Create or recreate an ImmichFrame API key with required permissions");
+  console.log("  generate  Create or recreate an Immich Media Frame API key with required permissions");
   console.log("  check     Test an API key against all 4 required endpoints");
   console.log();
   console.log("Required permissions:");

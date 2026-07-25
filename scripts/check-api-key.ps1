@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Test an Immich API key against all endpoints ImmichFrame uses.
+    Test an Immich API key against all endpoints Immich Media Frame uses.
     
 .DESCRIPTION
-    Validates that an API key has the 4 required permissions by testing each
+    Validates that an API key has the 5 required permissions by testing each
     endpoint the app calls. Reports pass/fail with helpful hints for missing
     permissions.
     
@@ -13,6 +13,7 @@
       3. GET  /api/albums            — album.read permission
       4. POST /api/search/metadata   — asset.read permission
       5. GET  /api/assets/{id}/thumbnail?size=preview — asset.view permission
+      6. GET  /api/assets/{id}/original              — asset.download permission
 
 .PARAMETER ServerUrl
     Base URL of your Immich server (e.g. https://photos.example.com:2283)
@@ -147,6 +148,16 @@ if ($search.ok) {
         } else {
             Write-ErrorMsg "Thumbnail failed (HTTP $($thumb.status))"
             if ($thumb.status -eq 403) { Write-Host "  → Key is missing 'asset.view' permission" -ForegroundColor Yellow }
+        }
+
+        # --- 6. Download original (video playback) ---
+        Write-Step "Testing download: GET /assets/$firstAssetId/original ..."
+        $download = Test-Endpoint -Path "/assets/$firstAssetId/original" -Permission "asset.download" -Description "Download original"
+        if ($download.ok) {
+            Write-Success "Original download OK (HTTP 200)"
+        } else {
+            Write-ErrorMsg "Download failed (HTTP $($download.status))"
+            if ($download.status -eq 403) { Write-Host "  → Key is missing 'asset.download' permission (required for video playback)" -ForegroundColor Yellow }
         }
     } else {
         Write-Warn "No assets to test thumbnails with"

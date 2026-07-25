@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# build.sh — Cross-compile the ImmichFrame key manager into standalone
+# build.sh — Cross-compile the Immich Media Frame key manager into standalone
 # executables for macOS, Linux, and Windows using Bun's --compile feature.
 #
 # Output goes to dist/. Each binary is a self-contained executable with

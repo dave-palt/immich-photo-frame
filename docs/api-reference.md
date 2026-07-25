@@ -33,13 +33,14 @@ scoped to specific permissions.
 
 ### Required Permissions
 
-The API key needs 4 scoped permissions:
+The API key needs 5 scoped permissions:
 
 | Permission | Used for |
 |---|---|
 | `album.read` | List albums, get album info |
 | `asset.read` | Search/list assets in albums (POST /search/metadata) |
-| `asset.view` | Download/view assets (images, videos, thumbnails via `?apiKey=`) |
+| `asset.view` | View thumbnails and previews (images via `?apiKey=`) |
+| `asset.download` | Download original files (video playback via ExoPlayer) |
 | `user.read` | Validate API key (GET /users/me) |
 
 These permissions are the minimum required for ImmichFrame to function. You can create a key with these exact permissions using the provided `keymgr` tool (or the shell/PowerShell scripts). Requires Immich v1.135+ for scoped keys.
@@ -213,7 +214,8 @@ GET /api/assets/{id}/original
 ```
 
 Returns the original binary data (video file). Used by ExoPlayer when
-Skip Videos is off.
+Skip Videos is off. Requires the `asset.download` permission (distinct from
+`asset.view`, which only covers thumbnails/previews).
 
 URL construction is in `ImmichRepositoryImpl.kt`:
 - `imageUrl(assetId)` → `{base}/api/assets/{id}/thumbnail?size=preview&apiKey={key}`

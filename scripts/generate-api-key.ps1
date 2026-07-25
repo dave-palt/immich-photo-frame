@@ -1,13 +1,14 @@
 <#
 .SYNOPSIS
-    Generate an Immich API key scoped to the 4 permissions ImmichFrame needs.
+    Generate an Immich API key scoped to the 4 permissions Immich Media Frame needs.
     
 .DESCRIPTION
-    Creates or updates an "ImmichFrame" API key on your Immich server with the exact
-    permissions required by the ImmichFrame Android app:
+    Creates or updates an "Immich Media Frame" API key on your Immich server with the exact
+    permissions required by the Immich Media Frame Android app:
       - album.read   (list albums)
       - asset.read   (asset metadata)
-      - asset.view   (download thumbnails & originals)
+      - asset.view   (view thumbnails & previews)
+      - asset.download (download originals for video playback)
       - user.read    (validate key via /users/me)
       
     Requires Immich v1.135+ for scoped API keys.
@@ -42,8 +43,8 @@ param(
     [string]$Password
 )
 
-$KEY_NAME = "ImmichFrame"
-$REQUIRED_PERMS = @("album.read", "asset.read", "asset.view", "user.read")
+$KEY_NAME = "ImmichMediaFrame"
+$REQUIRED_PERMS = @("album.read", "asset.read", "asset.view", "asset.download", "user.read")
 $ServerUrl = $ServerUrl.TrimEnd('/')
 
 function Write-Info { param([string]$msg) Write-Host "ℹ $msg" -ForegroundColor Cyan }
@@ -86,7 +87,7 @@ function Invoke-ImmichRequest {
 }
 
 try {
-    Write-Info "ImmichFrame API Key Generator"
+    Write-Info "Immich Media Frame API Key Generator"
     Write-Info "Server: $ServerUrl"
     Write-Info "Account: $Email"
     Write-Host ""
@@ -106,19 +107,20 @@ try {
     
     if ($existing) {
         Write-Warn "Found existing '$KEY_NAME' key (ID: $($existing.id))"
-        if ($Host.UI.RawUI.WindowTitle -ne "NonInteractive") {
-            $confirm = Read-Host "Delete and recreate with fresh permissions? [y/N]"
-            if ($confirm -notmatch '^y$') {
-                Write-Info "Keeping existing key. Use check-api-key.ps1 to verify permissions."
-                exit 0
-            }
+        $confirm = Read-Host "Update permissions on this key? [Y/n]"
+        if ($confirm -notmatch '^n$') {
+            Write-Step "Updating permissions on existing key..."
+            Invoke-ImmichRequest -Url "$ServerUrl/api/api-keys/$($existing.id)" -Method PUT -Token $token `
+                -Body (ConvertTo-Json @{ name = $KEY_NAME; permissions = $REQUIRED_PERMS } -Depth 3)
+            Write-Success "'$KEY_NAME' key updated with $($REQUIRED_PERMS.Count) permissions"
+            Write-Host ""
+            Write-Info "The key value is unchanged — no need to re-enter it in Immich Media Frame."
+            Write-Info "Run `.\check-api-key.ps1 $ServerUrl <your-api-key>` to verify."
+            exit 0
         } else {
-            Write-Info "Non-interactive mode: recreating key automatically..."
+            Write-Info "Keeping existing key as-is."
+            exit 0
         }
-        
-        Write-Step "Deleting old key..."
-        Invoke-ImmichRequest -Url "$ServerUrl/api/api-keys/$($existing.id)" -Method DELETE -Token $token
-        Write-Success "Old key deleted"
     }
     
     # Step 3: Create new key
@@ -130,10 +132,10 @@ try {
     if (-not $apiKey) { throw "API key created but no key returned" }
     
     Write-Host ""
-    Write-Success "Done! Your ImmichFrame API key:"
+    Write-Success "Done! Your Immich Media Frame API key:"
     Write-Host "  $apiKey" -ForegroundColor Green -BackgroundColor DarkGray
     Write-Host ""
-    Write-Info "Copy this key into ImmichFrame Settings → API Key"
+    Write-Info "Copy this key into Immich Media Frame Settings → API Key"
     Write-Info "Run `.\check-api-key.ps1 $ServerUrl $apiKey` to verify it works."
 }
 catch {
