@@ -1,5 +1,10 @@
 package com.dav3.immichframe.ui.settings
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -48,6 +54,7 @@ import com.dav3.immichframe.domain.model.FillMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.provider.Settings as AndroidSettings
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -59,10 +66,12 @@ fun SettingsScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val s = state.settings
+    val context = LocalContext.current
 
     var editingUrl by remember { mutableStateOf(false) }
     var editingKey by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+    var showBootPermissionDialog by remember { mutableStateOf(false) }
 
     var urlDraft by remember(state.serverUrl) { mutableStateOf(state.serverUrl) }
     var keyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey) }
@@ -96,6 +105,13 @@ fun SettingsScreen(
                 onValueChange = { viewModel.updateInterval(it.toInt()) },
                 valueRange = 5f..120f,
                 steps = 22,
+            )
+
+            // Burn-in protection — directly under interval (relates to display time)
+            BurnInProtectionSetting(
+                enabled = s.burnInProtection,
+                intervalSeconds = s.intervalSeconds,
+                onToggle = { viewModel.toggleBurnInProtection() },
             )
 
             HorizontalDivider()
@@ -135,38 +151,33 @@ fun SettingsScreen(
                 headlineContent = { Text("Keep Screen On") },
                 trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) },
             )
+
+            // Start on Boot — with permission awareness
             ListItem(
                 headlineContent = { Text("Start on Boot") },
                 supportingContent = { Text("Launch app automatically when device starts") },
-                trailingContent = { Switch(checked = s.startOnBoot, onCheckedChange = { viewModel.toggleStartOnBoot() }) },
-            )
-
-            HorizontalDivider()
-
-            // --- Burn-in Protection ---
-            Text("Screen Protection", style = MaterialTheme.typography.titleSmall)
-            ListItem(
-                headlineContent = { Text("Burn-in Protection") },
-                supportingContent = {
-                    Text(
-                        "Slowly pan and zoom images to prevent screen burn-in on displays showing the same photo for extended periods",
+                trailingContent = {
+                    Switch(
+                        checked = s.startOnBoot,
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                viewModel.toggleStartOnBoot()
+                                if (needsBootPermission(context)) {
+                                    showBootPermissionDialog = true
+                                }
+                            } else {
+                                viewModel.toggleStartOnBoot()
+                            }
+                        },
                     )
                 },
-                trailingContent = { Switch(checked = s.burnInProtection, onCheckedChange = { viewModel.toggleBurnInProtection() }) },
             )
-            if (s.intervalSeconds >= 60 && !s.burnInProtection) {
-                Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(8.dp),
+            if (s.startOnBoot) {
+                TextButton(
+                    onClick = { openBootPermissionSettings(context) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(
-                        "Your interval is ${s.intervalSeconds}s — long display times increase burn-in risk. " +
-                            "Consider enabling this.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(12.dp),
-                    )
+                    Text("Open Autostart Settings", style = MaterialTheme.typography.labelLarge)
                 }
             }
 
@@ -179,7 +190,7 @@ fun SettingsScreen(
                 trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
             )
             if (s.showClock) {
-                // Clock size slider with live preview
+                // Clock size slider OUTSIDE ListItem so it doesn't conflict with touch targets
                 Text("Clock Size: ${s.clockSize.toInt()}sp")
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -192,7 +203,7 @@ fun SettingsScreen(
                         valueRange = 24f..96f,
                         modifier = Modifier.weight(1f),
                     )
-                    // Live preview of clock at current size
+                    // Live preview
                     Surface(
                         color = Color(0x80000000),
                         shape = RoundedCornerShape(8.dp),
@@ -306,6 +317,30 @@ fun SettingsScreen(
         }
     }
 
+    // Boot permission dialog
+    if (showBootPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showBootPermissionDialog = false },
+            title = { Text("Autostart Permission") },
+            text = {
+                Text(
+                    "Some devices block apps from starting automatically. " +
+                        "To ensure the app launches on boot, you may need to grant " +
+                        "autostart permission in your device settings.",
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBootPermissionDialog = false
+                    openBootPermissionSettings(context)
+                }) { Text("Open Settings") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBootPermissionDialog = false }) { Text("Skip") }
+            },
+        )
+    }
+
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -322,6 +357,107 @@ fun SettingsScreen(
                 TextButton(onClick = { showResetDialog = false }) { Text("Cancel") }
             },
         )
+    }
+}
+
+@Composable
+private fun BurnInProtectionSetting(
+    enabled: Boolean,
+    intervalSeconds: Int,
+    onToggle: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = { Text("Burn-in Protection") },
+            supportingContent = {
+                Text(
+                    "Slowly pan and zoom images to prevent screen burn-in on displays showing the same photo for extended periods",
+                )
+            },
+            trailingContent = { Switch(checked = enabled, onCheckedChange = { onToggle() }) },
+        )
+        if (intervalSeconds >= 60 && !enabled) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+            ) {
+                Text(
+                    "Your interval is ${intervalSeconds}s — long display times increase burn-in risk. " +
+                        "Consider enabling this.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(12.dp),
+                )
+            }
+        }
+    }
+}
+
+// --- Boot permission helpers ---
+
+private fun needsBootPermission(context: Context): Boolean {
+    // Most OEMs that restrict autostart are Chinese manufacturers
+    val manufacturer = Build.MANUFACTURER.lowercase()
+    return manufacturer in setOf(
+        "xiaomi", "oppo", "vivo", "honor", "huawei",
+        "realme", "asus", "oneplus", "letv", "tecno", "infinix",
+    )
+}
+
+private fun openBootPermissionSettings(context: Context) {
+    val manufacturer = Build.MANUFACTURER.lowercase()
+    val intent = Intent().apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    val component = when (manufacturer) {
+        "xiaomi", "redmi" -> ComponentName(
+            "com.miui.securitycenter",
+            "com.miui.permcenter.autostart.AutoStartManagementActivity",
+        )
+        "oppo" -> ComponentName(
+            "com.coloros.safecenter",
+            "com.coloros.safecenter.permission.startup.StartupAppListActivity",
+        )
+        "vivo" -> ComponentName(
+            "com.vivo.permissionmanager",
+            "com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+        )
+        "honor", "huawei" -> ComponentName(
+            "com.huawei.systemmanager",
+            "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+        )
+        "asus" -> ComponentName(
+            "com.asus.mobilemanager",
+            "com.asus.mobilemanager.entry.FunctionActivity",
+        ).also { intent.putExtra("showFragment", "com.asus.mobilemanager.autostart.AutoStartActivity") }
+        "samsung" -> null // Samsung doesn't typically block, but try general settings
+        else -> null
+    }
+
+    if (component != null) {
+        intent.component = component
+        try {
+            context.startActivity(intent)
+            return
+        } catch (_: Exception) {
+            // fall through to general settings
+        }
+    }
+
+    // Fallback: app details settings (where user can find permissions)
+    intent.action = AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS
+    intent.data = Uri.fromParts("package", context.packageName, null)
+    try {
+        context.startActivity(intent)
+    } catch (_: Exception) {
+        // Last resort: general settings
+        intent.action = AndroidSettings.ACTION_SETTINGS
+        intent.data = null
+        context.startActivity(intent)
     }
 }
 

@@ -224,24 +224,25 @@ fun SlideshowScreen(
             // Draggable clock overlay
             if (s.showClock && currentTime.isNotEmpty()) {
                 val defaultPos = s.clockPosition.x < 0
+                val clockDragHandler = { offset: Offset ->
+                    clockOffsetPx = offset
+                    if (containerSize.width > 0 && containerSize.height > 0) {
+                        viewModel.setClockPosition(
+                            ClockPosition(
+                                x = offset.x / containerSize.width,
+                                y = offset.y / containerSize.height,
+                            ),
+                        )
+                    }
+                }
                 if (defaultPos) {
-                    // Default: bottom-start corner
                     Box(modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)) {
                         DraggableClock(
                             time = currentTime,
                             fontSize = s.clockSize,
                             offset = clockOffsetPx,
-                            onPositionChanged = { offset ->
-                                clockOffsetPx = offset
-                                if (containerSize.width > 0 && containerSize.height > 0) {
-                                    viewModel.setClockPosition(
-                                        ClockPosition(
-                                            x = offset.x / containerSize.width,
-                                            y = offset.y / containerSize.height,
-                                        ),
-                                    )
-                                }
-                            },
+                            burnInProtection = s.burnInProtection,
+                            onPositionChanged = clockDragHandler,
                         )
                     }
                 } else {
@@ -249,17 +250,8 @@ fun SlideshowScreen(
                         time = currentTime,
                         fontSize = s.clockSize,
                         offset = clockOffsetPx,
-                        onPositionChanged = { offset ->
-                            clockOffsetPx = offset
-                            if (containerSize.width > 0 && containerSize.height > 0) {
-                                viewModel.setClockPosition(
-                                    ClockPosition(
-                                        x = offset.x / containerSize.width,
-                                        y = offset.y / containerSize.height,
-                                    ),
-                                )
-                            }
-                        },
+                        burnInProtection = s.burnInProtection,
+                        onPositionChanged = clockDragHandler,
                     )
                 }
             }
@@ -419,12 +411,47 @@ private fun DraggableClock(
     time: String,
     fontSize: Float,
     offset: Offset,
+    burnInProtection: Boolean,
     onPositionChanged: (Offset) -> Unit,
 ) {
+    // Subtle slow drift to prevent clock burn-in
+    val driftX = if (burnInProtection) {
+        val t = rememberInfiniteTransition(label = "clockDriftX")
+        t.animateFloat(
+            initialValue = -4f,
+            targetValue = 4f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(30_000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "driftX",
+        ).value
+    } else {
+        0f
+    }
+    val driftY = if (burnInProtection) {
+        val t = rememberInfiniteTransition(label = "clockDriftY")
+        t.animateFloat(
+            initialValue = -3f,
+            targetValue = 3f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(45_000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "driftY",
+        ).value
+    } else {
+        0f
+    }
+
     Surface(
         color = Color(0x80000000),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier
+            .graphicsLayer {
+                translationX = driftX
+                translationY = driftY
+            }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()

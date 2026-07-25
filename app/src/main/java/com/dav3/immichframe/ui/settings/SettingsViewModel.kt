@@ -11,8 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 data class SettingsUiState(
@@ -37,12 +40,14 @@ constructor(
             SettingsUiState(slideshow, url, key)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
-    val settings: StateFlow<SlideshowSettings> =
-        settingsRepo.slideshowSettings
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SlideshowSettings())
+    private val updateMutex = Mutex()
 
+    /** Reads the LATEST persisted state from DataStore (not stale StateFlow cache). */
     private fun update(block: (SlideshowSettings) -> SlideshowSettings) = viewModelScope.launch {
-        settingsRepo.setSlideshowSettings(block(settings.value))
+        updateMutex.withLock {
+            val current = settingsRepo.slideshowSettings.first()
+            settingsRepo.setSlideshowSettings(block(current))
+        }
     }
 
     fun updateInterval(seconds: Int) = update { it.copy(intervalSeconds = seconds) }
