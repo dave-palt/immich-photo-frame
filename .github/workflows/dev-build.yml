@@ -104,3 +104,16 @@ jobs:
             Install at your own risk. Not a stable release.
           prerelease: true
           files: app/build/outputs/apk/debug/*.apk
+
+      - name: Delete old dev pre-releases
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Keep only the 3 most recent dev releases
+          gh api repos/${{ github.repository }}/releases --paginate \
+            --jq '[.[] | select(.tag_name | startswith("dev-"))] | sort_by(.published_at) | reverse | .[3:][] | .tag_name' \
+          | while read -r tag; do
+              echo "Deleting old release: $tag"
+              gh release delete "$tag" --repo ${{ github.repository }} --yes --cleanup-tag
+            done
