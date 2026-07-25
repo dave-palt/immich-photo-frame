@@ -49,7 +49,7 @@ constructor(
 
     fun updateFillMode(mode: FillMode) = update { it.copy(fillMode = mode) }
 
-    fun toggleKenBurns() = update { it.copy(kenBurns = !it.kenBurns) }
+    fun toggleBurnInProtection() = update { it.copy(burnInProtection = !it.burnInProtection) }
 
     fun toggleClock() = update { it.copy(showClock = !it.showClock) }
 
@@ -64,6 +64,8 @@ constructor(
     fun toggleSkipVideos() = update { it.copy(skipVideos = !it.skipVideos) }
 
     fun toggleMuted() = update { it.copy(muted = !it.muted) }
+
+    fun toggleStartOnBoot() = update { it.copy(startOnBoot = !it.startOnBoot) }
 
     fun updateServerUrl(url: String) = viewModelScope.launch {
         settingsRepo.setServerUrl(url.trim().trimEnd('/'))

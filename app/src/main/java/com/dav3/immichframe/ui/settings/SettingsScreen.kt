@@ -135,6 +135,40 @@ fun SettingsScreen(
                 headlineContent = { Text("Keep Screen On") },
                 trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) },
             )
+            ListItem(
+                headlineContent = { Text("Start on Boot") },
+                supportingContent = { Text("Launch app automatically when device starts") },
+                trailingContent = { Switch(checked = s.startOnBoot, onCheckedChange = { viewModel.toggleStartOnBoot() }) },
+            )
+
+            HorizontalDivider()
+
+            // --- Burn-in Protection ---
+            Text("Screen Protection", style = MaterialTheme.typography.titleSmall)
+            ListItem(
+                headlineContent = { Text("Burn-in Protection") },
+                supportingContent = {
+                    Text(
+                        "Slowly pan and zoom images to prevent screen burn-in on displays showing the same photo for extended periods",
+                    )
+                },
+                trailingContent = { Switch(checked = s.burnInProtection, onCheckedChange = { viewModel.toggleBurnInProtection() }) },
+            )
+            if (s.intervalSeconds >= 60 && !s.burnInProtection) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        "Your interval is ${s.intervalSeconds}s — long display times increase burn-in risk. " +
+                            "Consider enabling this.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(12.dp),
+                    )
+                }
+            }
 
             HorizontalDivider()
 

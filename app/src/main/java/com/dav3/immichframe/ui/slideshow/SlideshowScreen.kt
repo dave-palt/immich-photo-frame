@@ -4,6 +4,11 @@ import android.app.Activity
 import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -48,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -204,11 +210,11 @@ fun SlideshowScreen(
                                 muted = s.muted,
                             )
                         } else {
-                            AsyncImage(
-                                model = viewModel.imageUrl(assetId),
-                                contentDescription = null,
+                            BurnInPanImage(
+                                url = viewModel.imageUrl(assetId),
                                 contentScale = scale,
-                                modifier = Modifier.fillMaxSize(),
+                                enabled = s.burnInProtection,
+                                durationMs = s.intervalSeconds * 1000L,
                             )
                         }
                     }
@@ -352,6 +358,60 @@ fun SlideshowScreen(
             }
         }
     }
+}
+
+@Composable
+private fun BurnInPanImage(
+    url: String,
+    contentScale: ContentScale,
+    enabled: Boolean,
+    durationMs: Long,
+) {
+    if (!enabled) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            contentScale = contentScale,
+            modifier = Modifier.fillMaxSize(),
+        )
+        return
+    }
+
+    // Slow pan + slight zoom over the display interval.
+    // Alternates direction per image via hash of URL to avoid predictable patterns.
+    val seed = url.hashCode()
+    val panX = if (seed % 2 == 0) -1 else 1
+    val panY = if ((seed / 2) % 2 == 0) -1 else 1
+
+    val transition = rememberInfiniteTransition(label = "burnIn")
+    val progress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMs.toInt(), easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "panProgress",
+    )
+
+    // Scale 1.0 → 1.08, pan ±20px
+    val scale = 1f + 0.08f * progress
+    val dx = panX * 20f * progress
+    val dy = panY * 20f * progress
+
+    AsyncImage(
+        model = url,
+        contentDescription = null,
+        contentScale = ContentScale.Crop, // always crop when panning
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                translationX = dx
+                translationY = dy
+            },
+    )
 }
 
 @Composable

@@ -23,7 +23,7 @@ data class SlideshowSettings(
     val intervalSeconds: Int = 30,
     val transitionSeconds: Float = 1f,
     val fillMode: FillMode = FillMode.CONTAIN,
-    val kenBurns: Boolean = false,
+    val burnInProtection: Boolean = false,
     val showClock: Boolean = false,
     val clockSize: Float = 48f, // sp
     val clockPosition: ClockPosition = ClockPosition(),
@@ -32,6 +32,7 @@ data class SlideshowSettings(
     val shuffle: Boolean = true,
     val skipVideos: Boolean = true,
     val muted: Boolean = true,
+    val startOnBoot: Boolean = false,
 )
 
 enum class FillMode { CONTAIN, COVER }
