@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -414,8 +415,11 @@ private fun DraggableClock(
 
     val clockW = fontSize * 3.5f + 80f
     val clockH = fontSize * 1.5f + 32f
-    val halfW = clockW / 2f
-    val halfH = clockH / 2f
+    // Actual measured size — updated via onGloballyPositioned
+    var measuredW by remember { mutableFloatStateOf(clockW) }
+    var measuredH by remember { mutableFloatStateOf(clockH) }
+    val halfW = measuredW / 2f
+    val halfH = measuredH / 2f
     val gridStep = (clockW * 0.5f).coerceAtLeast(20f)
 
     // Bounds for clock CENTER (keeps full clock visible)
@@ -424,9 +428,9 @@ private fun DraggableClock(
     val minCY = halfH
     val maxCY = (containerSize.height - halfH).coerceAtLeast(halfH)
 
-    // Clock CENTER in screen px
-    var cx by remember(position) { mutableFloatStateOf((normX * containerSize.width).coerceIn(minCX, maxCX)) }
-    var cy by remember(position) { mutableFloatStateOf((normY * containerSize.height).coerceIn(minCY, maxCY)) }
+    // Raw center tracks finger freely; display is snapped view of raw
+    var rawX by remember { mutableFloatStateOf((normX * containerSize.width).coerceIn(minCX, maxCX)) }
+    var rawY by remember { mutableFloatStateOf((normY * containerSize.height).coerceIn(minCY, maxCY)) }
     var isDragging by remember { mutableStateOf(false) }
 
     fun snap(x: Float, y: Float): Pair<Float, Float> {
@@ -438,9 +442,16 @@ private fun DraggableClock(
         return sx.coerceIn(minCX, maxCX) to sy.coerceIn(minCY, maxCY)
     }
 
-    LaunchedEffect(containerSize) {
-        cx = (normX * containerSize.width).coerceIn(minCX, maxCX)
-        cy = (normY * containerSize.height).coerceIn(minCY, maxCY)
+    // Displayed position: raw when no snap, snapped view when grid enabled + dragging
+    val cx = if (snapToGrid && isDragging) snap(rawX, rawY).first else rawX
+    val cy = if (snapToGrid && isDragging) snap(rawX, rawY).second else rawY
+
+    // Sync from external position — only when not actively dragging
+    LaunchedEffect(normX, normY, containerSize) {
+        if (!isDragging) {
+            rawX = (normX * containerSize.width).coerceIn(minCX, maxCX)
+            rawY = (normY * containerSize.height).coerceIn(minCY, maxCY)
+        }
     }
 
     // Burn-in drift
@@ -495,6 +506,10 @@ private fun DraggableClock(
             color = Color(0x80000000),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
+                .onGloballyPositioned { coords ->
+                    measuredW = coords.size.width.toFloat()
+                    measuredH = coords.size.height.toFloat()
+                }
                 .offset { IntOffset((cx - halfW).toInt(), (cy - halfH).toInt()) }
                 .graphicsLayer {
                     translationX = driftX
@@ -505,22 +520,20 @@ private fun DraggableClock(
                         onDragStart = { isDragging = true },
                         onDragEnd = {
                             isDragging = false
-                            val (sx, sy) = snap(cx, cy)
-                            cx = sx
-                            cy = sy
+                            // Snap raw to final position on release
+                            val (sx, sy) = snap(rawX, rawY)
+                            rawX = sx
+                            rawY = sy
                             if (containerSize.width > 0) {
-                                onPositionChanged(cx / containerSize.width, cy / containerSize.height)
+                                onPositionChanged(rawX / containerSize.width, rawY / containerSize.height)
                             }
                         },
                         onDragCancel = { isDragging = false },
                     ) { change, dragAmount ->
                         change.consume()
-                        // Track finger freely, snap center live
-                        val rawCX = (cx + dragAmount.x).coerceIn(minCX, maxCX)
-                        val rawCY = (cy + dragAmount.y).coerceIn(minCY, maxCY)
-                        val (sx, sy) = snap(rawCX, rawCY)
-                        cx = sx
-                        cy = sy
+                        // Accumulate finger movement in raw — display snaps live via cx/cy
+                        rawX = (rawX + dragAmount.x).coerceIn(minCX, maxCX)
+                        rawY = (rawY + dragAmount.y).coerceIn(minCY, maxCY)
                     }
                 },
         ) {

@@ -14,6 +14,10 @@ single photo frame, it's unnecessary complexity.
 This app talks to the Immich API directly using `x-api-key` authentication,
 lets you pick which album(s) to display, and remembers your choice.
 
+![Architecture comparison: this app vs ImmichFrame_Android](docs/architecture-comparison.svg)
+
+> The source for this diagram is in [`docs/architecture-comparison.excalidraw`](docs/architecture-comparison.excalidraw) — open it at [excalidraw.com](https://excalidraw.com) to edit.
+
 ## Features
 
 - Direct Immich API access (no middleman server)

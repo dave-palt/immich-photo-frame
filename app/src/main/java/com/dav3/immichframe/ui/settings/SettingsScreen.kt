@@ -438,72 +438,98 @@ private fun BurnInProtectionSetting(
 // --- Boot permission helpers ---
 
 private fun needsBootPermission(context: Context): Boolean {
-    // Most OEMs that restrict autostart are Chinese manufacturers
+    // Stock Android (Pixel, Motorola) and Samsung don't restrict boot launch.
+    // Chinese OEMs add an extra autostart management layer.
     val manufacturer = Build.MANUFACTURER.lowercase()
     return manufacturer in setOf(
-        "xiaomi", "oppo", "vivo", "honor", "huawei",
-        "realme", "asus", "oneplus", "letv", "tecno", "infinix",
+        "xiaomi", "redmi", "oppo", "oplus", "vivo", "iqoo",
+        "honor", "huawei", "realme", "oneplus", "letv",
+        "tecno", "infinix", "asus",
     )
+}
+
+/** All known autostart-setting components per OEM family. */
+private fun autostartCandidates(manufacturer: String): List<ComponentName> {
+    val oplus = listOf(
+        // ColorOS 15 / Oplus (newest)
+        ComponentName("com.oplus.safecenter", "com.oplus.safecenter.startupapp.StartupAppListActivity"),
+        ComponentName("com.oplus.safecenter", "com.oplus.safecenter.permission.startup.StartupAppListActivity"),
+        // ColorOS 13–14
+        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity"),
+        // ColorOS ≤12
+        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"),
+        // OnePlus (OxygenOS, pre-merge)
+        ComponentName("com.oneplus.security", "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"),
+        // Realme (also BBK)
+        ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"),
+    )
+    return when (manufacturer) {
+        "xiaomi", "redmi" -> listOf(
+            ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"),
+            ComponentName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity"),
+        )
+        "oppo", "oplus", "oneplus", "realme" -> oplus
+        "vivo", "iqoo" -> listOf(
+            ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"),
+            ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager"),
+        )
+        "honor", "huawei" -> listOf(
+            ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity"),
+            ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"),
+        )
+        "asus" -> listOf(
+            ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.entry.FunctionActivity"),
+            ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.autostart.AutoStartActivity"),
+        )
+        "samsung" -> listOf(
+            ComponentName("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity"),
+        )
+        else -> emptyList()
+    }
 }
 
 private fun openBootPermissionSettings(context: Context) {
     val manufacturer = Build.MANUFACTURER.lowercase()
-    val intent = Intent().apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    val pm = context.packageManager
 
-    val component = when (manufacturer) {
-        "xiaomi", "redmi" -> ComponentName(
-            "com.miui.securitycenter",
-            "com.miui.permcenter.autostart.AutoStartManagementActivity",
+    // Try each candidate — use the first that actually resolves
+    for (candidate in autostartCandidates(manufacturer)) {
+        val resolved = pm.resolveActivity(
+            Intent().apply { component = candidate },
+            android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
         )
-        "oppo" -> ComponentName(
-            "com.coloros.safecenter",
-            "com.coloros.safecenter.permission.startup.StartupAppListActivity",
-        )
-        "vivo" -> ComponentName(
-            "com.vivo.permissionmanager",
-            "com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
-        )
-        "honor", "huawei" -> ComponentName(
-            "com.huawei.systemmanager",
-            "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
-        )
-        "asus" -> ComponentName(
-            "com.asus.mobilemanager",
-            "com.asus.mobilemanager.entry.FunctionActivity",
-        ).also { intent.putExtra("showFragment", "com.asus.mobilemanager.autostart.AutoStartActivity") }
-        "oneplus" -> ComponentName(
-            "com.oneplus.security",
-            "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity",
-        )
-        "samsung" -> null // Samsung doesn't typically block, but try general settings
-        else -> null
-    }
-
-    if (component != null) {
-        intent.component = component
-        try {
-            context.startActivity(intent)
-            return
-        } catch (_: Exception) {
-            // fall through to general settings
+        if (resolved != null) {
+            try {
+                val intent = Intent().apply {
+                    component = candidate
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    // Asus needs an extra to jump to the right fragment
+                    if (manufacturer == "asus") {
+                        putExtra("showFragment", "com.asus.mobilemanager.autostart.AutoStartActivity")
+                    }
+                }
+                context.startActivity(intent)
+                return
+            } catch (_: Exception) {
+                // resolved but won't launch — try next candidate
+            }
         }
     }
 
-    // Fallback: app details settings (where user can find permissions)
-    val fallback = Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-        data = Uri.fromParts("package", context.packageName, null)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    // Fallback: app details page
     try {
-        context.startActivity(fallback)
+        context.startActivity(
+            Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
     } catch (_: Exception) {
-        // Last resort: general settings
-        val general = Intent(AndroidSettings.ACTION_SETTINGS).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(general)
+        context.startActivity(
+            Intent(AndroidSettings.ACTION_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
     }
 }
 
