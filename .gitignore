@@ -25,4 +25,5 @@ release.jks
 /scripts/keymgr.exe
 /keymgr
 /keymgr.exe
+/dist/
 /scripts/mock-immich.ts

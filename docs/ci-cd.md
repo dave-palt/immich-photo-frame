@@ -50,13 +50,15 @@ The release is created via `gh release create` (not `softprops/action-gh-release
 Triggers on push to `main` or manual `workflow_dispatch` (workflow: `.github/workflows/prod-build.yml`).
 
 - Sets up Bun to compile the `keymgr` cross-platform binary tools
-- Builds `keymgr` (macOS/Linux) and `keymgr.exe` (Windows) from `scripts/keymgr.ts`
+- Cross-compiles 5 keymgr binaries via `scripts/build.sh`:
+  `keymgr-darwin-arm64`, `keymgr-darwin-x64`, `keymgr-linux-arm64`,
+  `keymgr-linux-x64`, `keymgr-windows-x64.exe`
 - Decodes signing keystore from `SIGNING_KEYSTORE_BASE64` secret
 - Builds signed release **AAB** (`bundleRelease`) with R8 minification + resource shrinking
 - Builds signed release **APK** (`assembleRelease`)
 - Uploads both as artifacts (90-day retention)
 - Creates a GitHub Release with `softprops/action-gh-release@v3`
-- Release assets include: APK, AAB, keymgr binaries, and all key management scripts
+- Release assets include: APK, AAB, keymgr binaries for all platforms, and all key management scripts
 
 #### Required GitHub Secrets (prod)
 

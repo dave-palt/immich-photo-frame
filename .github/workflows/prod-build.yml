@@ -19,13 +19,8 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Build keymgr binary (Linux/macOS)
-        run: |
-          cd scripts
-          bun build keymgr.ts --compile --outfile keymgr
-          cd ..
-        # Note: Windows cross-compilation requires a Windows runner or --compile-executable-path
-        # Windows users can compile locally with: bun build scripts/keymgr.ts --compile --outfile keymgr.exe
+      - name: Build keymgr binaries (macOS/Linux/Windows)
+        run: bash scripts/build.sh
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
@@ -102,7 +97,11 @@ jobs:
           files: |
             app/build/outputs/apk/release/*.apk
             app/build/outputs/bundle/release/*.aab
-            scripts/keymgr
+            dist/keymgr-darwin-arm64
+            dist/keymgr-darwin-x64
+            dist/keymgr-linux-arm64
+            dist/keymgr-linux-x64
+            dist/keymgr-windows-x64.exe
             scripts/generate-api-key.sh
             scripts/check-api-key.sh
             scripts/generate-api-key.ps1
