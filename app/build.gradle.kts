@@ -108,6 +108,11 @@ android {
 }
 
 dependencies {
+    // Kotlin stdlib — force-consistent version to prevent transitive conflicts
+    // (Room/KSP pull in old stdlib; AGP 9.1.0 binary-store serialization fails
+    // on the constraint graph if versions are inconsistent)
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:${libs.versions.kotlin.get()}"))
+
     // AndroidX core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
