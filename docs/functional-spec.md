@@ -28,9 +28,12 @@
 
 ### F3: Slideshow Playback
 
-1. App fetches assets for selected album(s) via `POST /search/metadata` (searching
-   by album ID). This replaces the older `GET /albums/{id}` approach used in v1,
-   which does not work reliably in Immich v3.
+1. App loads assets for selected album(s). **Cache-first**: if assets are
+   already cached locally (Room database), they're displayed immediately
+   without network access. On a cold start (empty cache), the app fetches
+   asset metadata from the server via `POST /search/metadata`. If **Auto
+   Sync** is enabled, a background WorkManager job downloads new/updated
+   assets and reconciles deletions for the next launch.
 2. If multiple albums selected, asset lists are merged.
 3. If **Shuffle** is enabled (default on), the merged list is randomized.
 4. If **Skip Videos** is enabled (default on), video assets are filtered out.
@@ -127,6 +130,12 @@ Options:
 - **Start on Boot** — launch on device boot (default off). On Chinese OEMs, shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play
   Store installed)
+- **Media Cache** section:
+  - **Auto Sync** — automatically download new photos and remove deleted
+    ones in the background (default on)
+  - **Sync Interval** — how often to check for album changes, 1 min or 5–480 min
+    in steps of 5 (default 30; clamped to 15 min minimum by WorkManager)
+  - **Sync Now** — trigger an immediate one-time sync
 - **Clock** section:
   - **Show Clock** — display time overlay (default off)
   - **Clock Size** — slider 24–96 sp (default 48)

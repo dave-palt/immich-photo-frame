@@ -1,10 +1,11 @@
 [versions]
-agp = "8.7.3"
-kotlin = "2.1.0"
-ksp = "2.1.0-1.0.29"
-hilt = "2.54"
-hiltNavCompose = "1.2.0"
-composeBom = "2024.12.01"
+agp = "9.1.0"
+kotlin = "2.4.10"
+ksp = "2.3.10"
+hilt = "2.60.1"
+hiltNavCompose = "1.4.0"
+hiltWork = "1.2.0"
+composeBom = "2026.06.01"
 lifecycle = "2.8.7"
 navCompose = "2.8.5"
 retrofit = "2.11.0"
@@ -16,8 +17,10 @@ datastore = "1.1.1"
 securityCrypto = "1.1.0-alpha06"
 coreKtx = "1.15.0"
 activityCompose = "1.9.3"
-media3 = "1.5.1"
-spotless = "7.0.2"
+media3 = "1.10.1"
+workManager = "2.9.1"
+room = "2.7.1"
+spotless = "8.8.0"
 
 [libraries]
 # AndroidX core
@@ -44,6 +47,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavCompose" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltWork" }
 
 # Retrofit + OkHttp
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -68,6 +73,14 @@ androidx-security-crypto = { group = "androidx.security", name = "security-crypt
 androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 androidx-palette = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
+
+# WorkManager for background sync
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
+
+# Room for local media database
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

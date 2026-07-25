@@ -20,3 +20,10 @@ local.env
 app/local signing.properties
 debug.keystore
 release.jks
+# keymgr compiled binaries (CI compiles fresh per release)
+/scripts/keymgr
+/scripts/keymgr.exe
+/keymgr
+/keymgr.exe
+/dist/
+/scripts/mock-immich.ts

@@ -51,6 +51,8 @@ constructor(
         val ANIM_PAN_RIGHT = stringPreferencesKey("anim_pan_right")
         val ANIM_PAN_UP = stringPreferencesKey("anim_pan_up")
         val ANIM_PAN_DOWN = stringPreferencesKey("anim_pan_down")
+        val AUTO_SYNC = stringPreferencesKey("auto_sync")
+        val SYNC_INTERVAL_MINUTES = intPreferencesKey("sync_interval_minutes")
     }
 
     private val masterKey by lazy {
@@ -112,6 +114,8 @@ constructor(
                 animPanRight = prefs[Keys.ANIM_PAN_RIGHT]?.toBoolean() ?: true,
                 animPanUp = prefs[Keys.ANIM_PAN_UP]?.toBoolean() ?: true,
                 animPanDown = prefs[Keys.ANIM_PAN_DOWN]?.toBoolean() ?: true,
+                autoSync = prefs[Keys.AUTO_SYNC]?.toBoolean() ?: true,
+                syncIntervalMinutes = prefs[Keys.SYNC_INTERVAL_MINUTES] ?: 30,
             )
         }
 
@@ -153,6 +157,8 @@ constructor(
             it[Keys.ANIM_PAN_RIGHT] = settings.animPanRight.toString()
             it[Keys.ANIM_PAN_UP] = settings.animPanUp.toString()
             it[Keys.ANIM_PAN_DOWN] = settings.animPanDown.toString()
+            it[Keys.AUTO_SYNC] = settings.autoSync.toString()
+            it[Keys.SYNC_INTERVAL_MINUTES] = settings.syncIntervalMinutes
         }
     }
 

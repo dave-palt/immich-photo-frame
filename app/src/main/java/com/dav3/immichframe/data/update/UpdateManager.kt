@@ -78,7 +78,14 @@ constructor(
         if (isInstalledFromPlayStore()) return@withContext false
 
         try {
-            val release = api.getLatestRelease()
+            // Debug builds use the dev channel (pre-releases); release builds use /releases/latest
+            val release = if (BuildConfig.DEBUG) {
+                api.listReleases()
+                    .firstOrNull { it.tagName.startsWith("dev-") }
+                    ?: return@withContext false
+            } else {
+                api.getLatestRelease()
+            }
             val latestSha = extractSha(release.tagName) ?: return@withContext false
             val currentSha = BuildConfig.GIT_SHA
 

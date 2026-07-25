@@ -161,6 +161,14 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  Start on Boot          [○]  │ ← toggle (+ OEM autostart prompt)
 │  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
 │                              │
+│  MEDIA CACHE                 │
+│  Auto Sync              [●]  │ ← toggle
+│  Sync Interval: 30 min      │
+│  [────────●──────────────]  │ ← slider (1, 5, 10, ... 480, step 5)
+│  ┌──────────────────────┐    │
+│  │     Sync Now         │    │ ← button → one-time sync
+│  └──────────────────────┘    │
+│                              │
 │  CLOCK                       │
 │  Show Clock             [○]  │ ← toggle
 │  ┌────────────────────────┐  │
@@ -187,7 +195,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Slideshow, Image, Clock, Albums, Connection.
+- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection.
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
 - Back arrow returns to previous screen.

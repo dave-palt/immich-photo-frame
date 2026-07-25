@@ -105,6 +105,26 @@ constructor(
                 Asset(
                     dto.id,
                     if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
+                    dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
+                )
+            }
+    }
+
+    override suspend fun getAlbumAssets(albumId: String, cursor: String?): Result<List<Asset>> = runCatching {
+        val request = SearchMetadataRequest(
+            albumIds = listOf(albumId),
+            size = 1000,
+        )
+        // TODO: Add cursor/pagination support when Immich API supports it
+        getApi()
+            .searchAssets(request)
+            .assets
+            .items
+            .map { dto ->
+                Asset(
+                    dto.id,
+                    if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
+                    dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
                 )
             }
     }

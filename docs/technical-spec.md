@@ -15,8 +15,11 @@
 | Color Extraction | AndroidX Palette | 1.0+ |
 | Animation | Compose Animation Core | (BOM) |
 | Local Storage | DataStore (Preferences) | 1.1+ |
+| Media Cache DB | Room | 2.7.1 |
+| Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Dependency Injection | Hilt | 2.52+ |
+| Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
 | Build System | Gradle Kotlin DSL | 8.10.2 (AGP 8.7.3) |
 | JDK | OpenJDK 17 | Required for builds |
@@ -40,9 +43,17 @@ immich-android/
 │   │   │   │   ├── Dtos.kt            # Immich DTOs
 │   │   │   │   ├── GitHubDtos.kt      # GitHub DTOs
 │   │   │   │   └── ImmichRepositoryImpl.kt
-│   │   │   ├── local/           # DataStore, EncryptedPrefs
+│   │   │   ├── local/           # DataStore, EncryptedPrefs, Room cache
 │   │   │   │   ├── DataStoreProvider.kt  # Shared DataStore singleton
-│   │   │   │   └── SettingsRepositoryImpl.kt
+│   │   │   │   ├── SettingsRepositoryImpl.kt
+│   │   │   │   ├── MediaCacheDatabase.kt # Room DB (cached_assets, album_sync_states)
+│   │   │   │   ├── MediaCacheDao.kt      # Room DAOs
+│   │   │   │   ├── MediaCacheEntities.kt # Room entities
+│   │   │   │   ├── MediaCacheRepositoryImpl.kt
+│   │   │   │   └── Converters.kt         # Room type converters
+│   │   │   ├── sync/            # WorkManager background sync
+│   │   │   │   ├── MediaCacheWorker.kt   # Downloads + reconciles album assets
+│   │   │   │   └── SyncScheduler.kt      # Periodic/one-time sync scheduling
 │   │   │   ├── update/          # Self-update logic
 │   │   │   │   └── UpdateManager.kt
 │   │   │   └── (repository/ is in di/)
@@ -117,6 +128,48 @@ OkHttp interceptor instead.
 > to switch to `key` if the Immich server stops accepting the old param.
 > See [api-reference.md](api-reference.md) for details.
 
+## Media Cache (Room + WorkManager)
+
+The app maintains a local Room database (`media_cache_db`) that stores
+downloaded copies of album assets for offline-capable, instant slideshow
+loading.
+
+### Database schema
+
+- **`cached_assets`** — one row per downloaded asset: `id`, `album_id`,
+  `type` (IMAGE/VIDEO), `file_path`, `thumbnail_path`, `file_size`,
+  `checksum`, `last_modified`, `cached_at`. Indexed on `album_id`,
+  `cached_at`, `last_modified`.
+- **`album_sync_states`** — per-album sync metadata: `album_id` (PK),
+  `last_synced_at`, `last_cursor`, `asset_count`.
+
+### Sync lifecycle
+
+1. **On slideshow load**: the ViewModel first checks the cache. If cached
+   assets exist, they're displayed immediately (offline-capable). If
+   `autoSync` is on, a one-time `MediaCacheWorker` is enqueued to
+   reconcile the cache against the server.
+2. **Periodic sync**: `SyncScheduler` enqueues a periodic
+   `MediaCacheWorker` (minimum interval 15 min, enforced by WorkManager)
+   that fetches album asset lists, downloads new/updated assets, and
+   removes deleted ones.
+3. **Worker logic** (`MediaCacheWorker.performFullSync`):
+   - Fetches remote asset list for each album via `POST /search/metadata`
+   - Deletes cached assets no longer in the remote album
+   - Downloads new/updated assets (original + thumbnail) via OkHttp
+   - Updates `AlbumSyncState` with sync timestamp + asset count
+   - Reports progress via `SyncProgress` StateFlow
+
+Cache files are stored in `getExternalFilesDir("media_cache")`.
+
+### WorkManager initialization
+
+`ImmichFrameApp` implements `Configuration.Provider` and provides a
+`HiltWorkerFactory` so that `MediaCacheWorker` can receive its
+dependencies via Hilt. The default `WorkManagerInitializer` is removed
+in `AndroidManifest.xml` (via `tools:node="remove"`) to avoid the
+duplicate-initialization crash.
+
 ## Security
 
 - API key stored via `EncryptedSharedPreferences` (AES-256, backed by Android Keystore)
@@ -171,6 +224,8 @@ Setup → Albums → Slideshow
 | Anim: Pan Right | DataStore | `anim_pan_right` | String bool |
 | Anim: Pan Up | DataStore | `anim_pan_up` | String bool |
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
+| Auto Sync | DataStore | `auto_sync` | String bool (default true) |
+| Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file

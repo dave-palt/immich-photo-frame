@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -54,7 +55,7 @@ import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -216,7 +217,7 @@ fun SettingsScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                 ) {
                     Text(
-                        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
+                        SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date()),
                         color = Color.White,
                         fontSize = s.clockSize.sp,
                         fontWeight = FontWeight.Light,
@@ -278,6 +279,46 @@ fun SettingsScreen(
                     checked = s.autoUpdate,
                     onToggle = { viewModel.toggleAutoUpdate() },
                 )
+            }
+
+            HorizontalDivider()
+
+            // ============================= MEDIA CACHE =============================
+            SectionHeader(stringResource(R.string.section_media_cache))
+
+            val intervalValues = remember {
+                buildList {
+                    add(1)
+                    var v = 5
+                    while (v <= 480) {
+                        add(v)
+                        v += 5
+                    }
+                }
+            }
+            val currentIntervalIndex = intervalValues.indexOf(s.syncIntervalMinutes).coerceAtLeast(0)
+
+            SwitchItem(
+                title = stringResource(R.string.auto_sync),
+                subtitle = stringResource(R.string.auto_sync_desc),
+                checked = s.autoSync,
+                onToggle = { viewModel.toggleAutoSync() },
+            )
+            Text("${stringResource(R.string.sync_interval)}: ${s.syncIntervalMinutes} min")
+            Slider(
+                value = currentIntervalIndex.toFloat(),
+                onValueChange = {
+                    val newIndex = it.roundToInt().coerceIn(0, intervalValues.lastIndex)
+                    viewModel.updateSyncInterval(intervalValues[newIndex])
+                },
+                valueRange = 0f..intervalValues.lastIndex.toFloat(),
+                steps = intervalValues.lastIndex - 1,
+            )
+            TextButton(
+                onClick = { viewModel.syncNow() },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.sync_now))
             }
 
             HorizontalDivider()

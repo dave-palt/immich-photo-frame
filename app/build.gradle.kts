@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
@@ -9,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.dav3.immichframe"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.dav3.immichframe"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = (System.currentTimeMillis() / 1000).toInt()
         versionName = "0.1.0"
 
@@ -85,8 +84,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     buildFeatures {
@@ -107,6 +108,11 @@ android {
 }
 
 dependencies {
+    // Kotlin stdlib — force-consistent version to prevent transitive conflicts
+    // (Room/KSP pull in old stdlib; AGP 9.1.0 binary-store serialization fails
+    // on the constraint graph if versions are inconsistent)
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:${libs.versions.kotlin.get()}"))
+
     // AndroidX core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -131,6 +137,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Retrofit + OkHttp
     implementation(libs.retrofit)
@@ -155,4 +163,12 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.palette)
+
+    // WorkManager for background sync
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Room for local media database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }
