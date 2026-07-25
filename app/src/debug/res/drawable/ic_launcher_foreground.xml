@@ -4,13 +4,7 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Background -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z" />
-
-    <!-- Frame segments (clockwise from top), scaled from 512→108 viewBox -->
-    <!-- stroke-width ~8.5 (40/512*108), rounded corners at 96/512*108 ≈ 20 -->
+    <!-- Frame segments (same colorful border as release) -->
 
     <!-- Red: top edge + top-right corner -->
     <path
@@ -20,9 +14,9 @@
         android:fillColor="#00000000"
         android:pathData="M 54,20 L 88,20 A 1.7,1.7 0 0,1 89.5,21.7 L 89.5,42" />
 
-    <!-- Orange: right edge + bottom-right corner -->
+    <!-- Dark navy (replaces orange to stand out on amber bg) -->
     <path
-        android:strokeColor="#FFB400"
+        android:strokeColor="#1A1A2E"
         android:strokeWidth="8.5"
         android:strokeLineCap="butt"
         android:fillColor="#00000000"
@@ -52,9 +46,9 @@
         android:fillColor="#00000000"
         android:pathData="M 18.5,42 L 18.5,21.7 A 1.7,1.7 0 0,1 20,20 L 54,20" />
 
-    <!-- Center play-button triangle (dark navy on white for contrast) -->
+    <!-- Center play-button triangle (dark navy on amber for dev) -->
     <path
-        android:fillColor="#1A1A2E"
+        android:fillColor="#FF1A1A2E"
         android:pathData="M 46,38 L 72,54 L 46,70 Z" />
 
 </vector>
