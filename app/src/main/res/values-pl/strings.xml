@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">Odtwarzanie</string>
+    <string name="section_display">Wyświetlanie</string>
+    <string name="section_clock">Zegar</string>
+    <string name="section_system">System</string>
+    <string name="section_albums">Albumy</string>
+    <string name="section_connection">Połączenie</string>
+
+    <!-- Playback -->
+    <string name="interval">Interwał</string>
+    <string name="shuffle">Losowo</string>
+    <string name="shuffle_desc">Losowa kolejność obrazów</string>
+    <string name="skip_videos">Pomiń wideo</string>
+    <string name="skip_videos_desc">Pokazuj tylko zdjęcia</string>
+    <string name="muted">Wyciszony</string>
+    <string name="muted_desc">Wycisz dźwięk wideo</string>
+    <string name="photo_animations">Animacje zdjęć</string>
+    <string name="photo_animations_desc">Subtelne efekty przybliżenia i panoramowania zdjęć</string>
+    <string name="photo_animations_hint">Dla każdego zdjęcia losowo wybierany jest efekt z włączonych typów</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">Przybliż</string>
+    <string name="anim_zoom_out">Oddal</string>
+    <string name="anim_pan_left">Panorama w lewo</string>
+    <string name="anim_pan_right">Panorama w prawo</string>
+    <string name="anim_pan_up">Panorama w górę</string>
+    <string name="anim_pan_down">Panorama w dół</string>
+
+    <!-- Display -->
+    <string name="image_fit">Dopasowanie obrazu</string>
+    <string name="contain">Dopasuj</string>
+    <string name="cover">Wypełnij</string>
+    <string name="adaptive_background">Adaptacyjne tło</string>
+    <string name="adaptive_background_desc">Wypełnia czarne paski średnim kolorem każdego zdjęcia</string>
+    <string name="fullscreen">Pełny ekran</string>
+    <string name="fullscreen_desc">Ukryj paski systemowe</string>
+    <string name="keep_screen_on">Utrzymuj ekran włączony</string>
+    <string name="burn_in_protection">Ochrona przed wypaleniem</string>
+    <string name="burn_in_desc">Powolne panoramowanie obrazu, aby zapobiec wypaleniu OLED (interwał ≥ 30s)</string>
+    <string name="burn_in_warning">Twój interwał wynosi %1$ds — długie czasy wyświetlania zwiększają ryzyko wypalenia. Rozważ włączenie tej opcji.</string>
+
+    <!-- Clock -->
+    <string name="show_clock">Pokaż zegar</string>
+    <string name="clock_size">Rozmiar zegara</string>
+    <string name="drag_clock_hint">Przeciągnij zegar na ekranie pokazu slajdów, aby zmienić jego pozycję</string>
+    <string name="snap_to_grid">Dopasuj do siatki</string>
+    <string name="snap_to_grid_desc">Wyrównaj zegar do siatki na podstawie jego rozmiaru po zwolnieniu</string>
+
+    <!-- System -->
+    <string name="start_on_boot">Uruchom przy starcie</string>
+    <string name="start_on_boot_desc">Automatycznie uruchamiaj aplikację po włączeniu urządzenia</string>
+    <string name="open_autostart">Otwórz ustawienia autostartu</string>
+    <string name="auto_update">Automatyczna aktualizacja</string>
+    <string name="auto_update_desc">Sprawdzaj GitHub pod kątem nowych kompilacji i pobieraj je automatycznie</string>
+
+    <!-- Albums -->
+    <string name="change_albums">Zmień wybór albumów</string>
+
+    <!-- Connection -->
+    <string name="server">Serwer</string>
+    <string name="server_url">Adres URL serwera</string>
+    <string name="api_key">Klucz API</string>
+    <string name="not_set">Nie ustawiono</string>
+    <string name="edit">Edytuj</string>
+    <string name="save">Zapisz</string>
+    <string name="cancel">Anuluj</string>
+
+    <!-- Settings UI -->
+    <string name="settings">Ustawienia</string>
+    <string name="back">Wstecz</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">Uprawnienie autostartu</string>
+    <string name="autostart_perm_message">Niektóre urządzenia blokują automatyczne uruchamianie aplikacji. Aby zapewnić uruchomienie aplikacji przy starcie, konieczne może być nadanie uprawnienia autostartu w ustawieniach urządzenia.</string>
+    <string name="open_settings">Otwórz ustawienia</string>
+    <string name="skip">Pomiń</string>
+    <string name="reset_title">Zresetować wszystko?</string>
+    <string name="reset_message">To usuwa adres URL serwera, klucz API, wybrane albumy i wszystkie ustawienia pokazu slajdów. Zostaniesz przeniesiony do ekranu konfiguracji.</string>
+    <string name="reset">Resetuj</string>
+    <string name="reset_all">Resetuj wszystkie ustawienia</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Konfiguracja ImmichFrame</string>
+    <string name="setup_subtitle">Połącz się z serwerem Immich</string>
+    <string name="protocol">Protokół</string>
+    <string name="domain">Domena</string>
+    <string name="domain_placeholder">zdjęcia.przykład.pl</string>
+    <string name="full_url_preview">Pełny adres URL</string>
+    <string name="test_connection">Testuj połączenie</string>
+    <string name="connecting">Łączenie…</string>
+    <string name="next">Dalej</string>
+    <string name="select_albums">Wybierz albumy</string>
+    <string name="done">Gotowe</string>
+    <string name="no_albums">Nie znaleziono albumów</string>
+    <string name="loading_albums">Ładowanie albumów…</string>
+    <string name="hide_key">Ukryj klucz</string>
+    <string name="show_key">Pokaż klucz</string>
+    <string name="connected_as">Połączono jako %1$s</string>
+    <string name="connection_failed">Połączenie nie powiodło się</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">Wybrano %1$d</string>
+    <string name="start_slideshow">Rozpocznij pokaz slajdów</string>
+    <string name="retry">Ponów</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">Dostępna aktualizacja</string>
+    <string name="update_message">Nowa kompilacja została pobrana i jest gotowa do instalacji.\n\nWersja: %1$s…</string>
+    <string name="install">Zainstaluj</string>
+    <string name="later">Później</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d zdjęć</string>
+</resources>

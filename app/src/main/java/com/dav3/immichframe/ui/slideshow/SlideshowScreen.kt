@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -63,6 +64,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -75,10 +77,12 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil3.compose.AsyncImage
+import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -217,11 +221,14 @@ fun SlideshowScreen(
                                 muted = s.muted,
                             )
                         } else {
-                            BurnInPanImage(
+                            KenBurnsImage(
                                 url = viewModel.imageUrl(assetId),
                                 contentScale = scale,
-                                enabled = s.burnInProtection,
+                                assetId = assetId,
+                                photoAnimations = s.photoAnimations,
+                                enabledAnims = s.enabledAnimations,
                                 durationMs = s.intervalSeconds * 1000L,
+                                burnIn = s.burnInProtection,
                             )
                         }
                     }
@@ -276,7 +283,7 @@ fun SlideshowScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("${state.assets.size} photos", color = Color.White)
+                    Text(stringResource(R.string.photos_count, state.assets.size), color = Color.White)
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onChangeAlbums) {
                         Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
@@ -343,14 +350,34 @@ fun SlideshowScreen(
     }
 }
 
+/**
+ * Per-image animation. Picks from [enabledAnims] deterministically by [assetId]
+ * so each photo always gets the same animation (stable across recompositions).
+ *
+ * - No animations enabled / master toggle off → static image
+ * - Burn-in on → slow alternating pan/zoom (infinite, reverses)
+ * - Ken Burns on with enabled types → one-shot linear zoom/pan across display duration
+ */
 @Composable
-private fun BurnInPanImage(
+private fun KenBurnsImage(
     url: String,
     contentScale: ContentScale,
-    enabled: Boolean,
+    assetId: String,
+    photoAnimations: Boolean,
+    enabledAnims: List<PhotoAnimation>,
     durationMs: Long,
+    burnIn: Boolean,
 ) {
-    if (!enabled) {
+    // Deterministic pick from enabled set
+    val anim = remember(assetId, enabledAnims) {
+        if (photoAnimations && enabledAnims.isNotEmpty()) {
+            enabledAnims[Math.floorMod(assetId.hashCode(), enabledAnims.size)]
+        } else {
+            null
+        }
+    }
+
+    if (anim == null && !burnIn) {
         AsyncImage(
             model = url,
             contentDescription = null,
@@ -360,32 +387,83 @@ private fun BurnInPanImage(
         return
     }
 
-    // Slow pan + slight zoom over the display interval.
-    // Alternates direction per image via hash of URL to avoid predictable patterns.
-    val seed = url.hashCode()
-    val panX = if (seed % 2 == 0) -1 else 1
-    val panY = if ((seed / 2) % 2 == 0) -1 else 1
+    if (anim == null && burnIn) {
+        // Fallback: burn-in only (slow alternating pan)
+        val transition = rememberInfiniteTransition(label = "burnIn")
+        val progress by transition.animateFloat(
+            0f,
+            1f,
+            infiniteRepeatable(tween(durationMs.toInt(), easing = LinearEasing), RepeatMode.Reverse),
+            label = "burnProgress",
+        )
+        val scale = 1f + 0.08f * progress
+        val dx = (if (assetId.hashCode() % 2 == 0) -1 else 1) * 20f * progress
+        val dy = (if ((assetId.hashCode() / 2) % 2 == 0) -1 else 1) * 20f * progress
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize().graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                translationX = dx
+                translationY = dy
+            },
+        )
+        return
+    }
 
-    val transition = rememberInfiniteTransition(label = "burnIn")
-    val progress by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMs.toInt(), easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "panProgress",
-    )
+    // Ken Burns: one-shot linear from 0→1 across the interval
+    requireNotNull(anim)
+    var progress by remember(assetId) { mutableFloatStateOf(0f) }
+    LaunchedEffect(assetId) {
+        animate(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = tween(durationMs.toInt(), easing = LinearEasing),
+        ) { value, _ -> progress = value }
+    }
 
-    // Scale 1.0 → 1.08, pan ±20px
-    val scale = 1f + 0.08f * progress
-    val dx = panX * 20f * progress
-    val dy = panY * 20f * progress
+    val scale: Float
+    val dx: Float
+    val dy: Float
+    when (anim) {
+        PhotoAnimation.ZOOM_IN -> {
+            scale = 1f + 0.15f * progress
+            dx = 0f
+            dy = 0f
+        }
+        PhotoAnimation.ZOOM_OUT -> {
+            scale = 1.15f - 0.15f * progress
+            dx = 0f
+            dy = 0f
+        }
+        PhotoAnimation.PAN_LEFT -> {
+            scale = 1.1f
+            dx = 40f * (1f - progress) // start shifted right, pan left
+            dy = 0f
+        }
+        PhotoAnimation.PAN_RIGHT -> {
+            scale = 1.1f
+            dx = -40f * (1f - progress) // start shifted left, pan right
+            dy = 0f
+        }
+        PhotoAnimation.PAN_UP -> {
+            scale = 1.1f
+            dx = 0f
+            dy = 40f * (1f - progress) // start shifted down, pan up
+        }
+        PhotoAnimation.PAN_DOWN -> {
+            scale = 1.1f
+            dx = 0f
+            dy = -40f * (1f - progress) // start shifted up, pan down
+        }
+    }
 
     AsyncImage(
         model = url,
         contentDescription = null,
-        contentScale = ContentScale.Crop, // always crop when panning
+        contentScale = ContentScale.Crop,
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer {

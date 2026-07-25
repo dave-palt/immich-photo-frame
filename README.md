@@ -28,12 +28,14 @@ lets you pick which album(s) to display, and remembers your choice.
 - Video playback with mute and skip options (Media3/ExoPlayer)
 - Draggable clock overlay with configurable size and snap-to-grid
 - Burn-in protection (slow Ken Burns-style pan/zoom on each image)
+- Photo animations (toggleable Ken Burns: zoom in/out, pan left/right/up/down, or random)
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
 - Start on boot (with OEM autostart permission detection)
 - Self-update via GitHub releases (sideloaded installs only)
 - Auto-resumes last album on launch
+- Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
 - Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
 

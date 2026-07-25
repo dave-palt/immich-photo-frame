@@ -147,6 +147,15 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  Shuffle                [●]  │ ← toggle
 │  Skip Videos            [●]  │ ← toggle
 │  Muted                  [●]  │ ← toggle
+│  Photo Animations       [○]  │ ← toggle (expandable)
+│  ┌─ Zoom In          [●]  ┐  │ ← shown when animations on
+│  │  Zoom Out         [○]  │  │
+│  │  Pan Left         [○]  │  │
+│  │  Pan Right        [●]  │  │
+│  │  Pan Up           [○]  │  │
+│  │  Pan Down         [○]  │  │
+│  │  Random           [●]  │  │
+│  └────────────────────────┘  │
 │                              │
 │  Fullscreen             [●]  │ ← toggle
 │  Keep Screen On         [●]  │ ← toggle

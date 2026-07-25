@@ -45,12 +45,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PhotoAnimation
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -94,10 +97,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
             )
@@ -111,10 +114,10 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // --- Slideshow ---
-            Text("Slideshow", style = MaterialTheme.typography.titleSmall)
+            // ============================= PLAYBACK =============================
+            SectionHeader(stringResource(R.string.section_playback))
 
-            Text("Interval: ${s.intervalSeconds}s")
+            Text("${stringResource(R.string.interval)}: ${s.intervalSeconds}s")
             Slider(
                 value = s.intervalSeconds.toFloat(),
                 onValueChange = { viewModel.updateInterval(it.toInt()) },
@@ -122,112 +125,99 @@ fun SettingsScreen(
                 steps = 22,
             )
 
-            // Burn-in protection — directly under interval (relates to display time)
+            SwitchItem(
+                title = stringResource(R.string.shuffle),
+                subtitle = stringResource(R.string.shuffle_desc),
+                checked = s.shuffle,
+                onToggle = { viewModel.toggleShuffle() },
+            )
+            SwitchItem(
+                title = stringResource(R.string.skip_videos),
+                subtitle = stringResource(R.string.skip_videos_desc),
+                checked = s.skipVideos,
+                onToggle = { viewModel.toggleSkipVideos() },
+            )
+            SwitchItem(
+                title = stringResource(R.string.muted),
+                subtitle = stringResource(R.string.muted_desc),
+                checked = s.muted,
+                onToggle = { viewModel.toggleMuted() },
+            )
+
+            // Photo Animations
+            SwitchItem(
+                title = stringResource(R.string.photo_animations),
+                subtitle = stringResource(R.string.photo_animations_desc),
+                checked = s.photoAnimations,
+                onToggle = { viewModel.togglePhotoAnimations() },
+            )
+            if (s.photoAnimations) {
+                Text(
+                    stringResource(R.string.photo_animations_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                PhotoAnimation.entries.forEach { anim ->
+                    val checked = when (anim) {
+                        PhotoAnimation.ZOOM_IN -> s.animZoomIn
+                        PhotoAnimation.ZOOM_OUT -> s.animZoomOut
+                        PhotoAnimation.PAN_LEFT -> s.animPanLeft
+                        PhotoAnimation.PAN_RIGHT -> s.animPanRight
+                        PhotoAnimation.PAN_UP -> s.animPanUp
+                        PhotoAnimation.PAN_DOWN -> s.animPanDown
+                    }
+                    SwitchItem(
+                        title = anim.displayName(),
+                        checked = checked,
+                        onToggle = { viewModel.toggleAnimation(anim) },
+                    )
+                }
+            }
+
+            HorizontalDivider()
+
+            // ============================= DISPLAY =============================
+            SectionHeader(stringResource(R.string.section_display))
+
+            Text(stringResource(R.string.image_fit), style = MaterialTheme.typography.labelMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(s.fillMode == FillMode.CONTAIN, stringResource(R.string.contain)) { viewModel.updateFillMode(FillMode.CONTAIN) }
+                FilterChip(s.fillMode == FillMode.COVER, stringResource(R.string.cover)) { viewModel.updateFillMode(FillMode.COVER) }
+            }
+            SwitchItem(
+                title = stringResource(R.string.adaptive_background),
+                subtitle = stringResource(R.string.adaptive_background_desc),
+                checked = s.adaptiveBackground,
+                onToggle = { viewModel.toggleAdaptiveBackground() },
+            )
             BurnInProtectionSetting(
                 enabled = s.burnInProtection,
                 intervalSeconds = s.intervalSeconds,
                 onToggle = { viewModel.toggleBurnInProtection() },
             )
-
-            HorizontalDivider()
-
-            Text("Image Fit", style = MaterialTheme.typography.titleSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(s.fillMode == FillMode.CONTAIN, "Contain") { viewModel.updateFillMode(FillMode.CONTAIN) }
-                FilterChip(s.fillMode == FillMode.COVER, "Cover") { viewModel.updateFillMode(FillMode.COVER) }
-            }
-            ListItem(
-                headlineContent = { Text("Adaptive Background") },
-                supportingContent = {
-                    Text("Fill letterbox bars with average color from each photo")
-                },
-                trailingContent = {
-                    Switch(checked = s.adaptiveBackground, onCheckedChange = { viewModel.toggleAdaptiveBackground() })
-                },
+            SwitchItem(
+                title = stringResource(R.string.fullscreen),
+                subtitle = stringResource(R.string.fullscreen_desc),
+                checked = s.fullscreen,
+                onToggle = { viewModel.toggleFullscreen() },
+            )
+            SwitchItem(
+                title = stringResource(R.string.keep_screen_on),
+                checked = s.keepScreenOn,
+                onToggle = { viewModel.toggleKeepScreenOn() },
             )
 
             HorizontalDivider()
 
-            ListItem(
-                headlineContent = { Text("Shuffle") },
-                supportingContent = { Text("Randomize image order") },
-                trailingContent = { Switch(checked = s.shuffle, onCheckedChange = { viewModel.toggleShuffle() }) },
-            )
-            ListItem(
-                headlineContent = { Text("Skip Videos") },
-                supportingContent = { Text("Only show photos") },
-                trailingContent = { Switch(checked = s.skipVideos, onCheckedChange = { viewModel.toggleSkipVideos() }) },
-            )
-            ListItem(
-                headlineContent = { Text("Muted") },
-                supportingContent = { Text("Silence video audio") },
-                trailingContent = { Switch(checked = s.muted, onCheckedChange = { viewModel.toggleMuted() }) },
-            )
+            // ============================= CLOCK =============================
+            SectionHeader(stringResource(R.string.section_clock))
 
-            HorizontalDivider()
-
-            ListItem(
-                headlineContent = { Text("Fullscreen") },
-                supportingContent = { Text("Hide system bars") },
-                trailingContent = { Switch(checked = s.fullscreen, onCheckedChange = { viewModel.toggleFullscreen() }) },
-            )
-            ListItem(
-                headlineContent = { Text("Keep Screen On") },
-                trailingContent = { Switch(checked = s.keepScreenOn, onCheckedChange = { viewModel.toggleKeepScreenOn() }) },
-            )
-
-            // Start on Boot — with permission awareness
-            ListItem(
-                headlineContent = { Text("Start on Boot") },
-                supportingContent = { Text("Launch app automatically when device starts") },
-                trailingContent = {
-                    Switch(
-                        checked = s.startOnBoot,
-                        onCheckedChange = { enabled ->
-                            if (enabled) {
-                                viewModel.toggleStartOnBoot()
-                                if (needsBootPermission(context)) {
-                                    showBootPermissionDialog = true
-                                }
-                            } else {
-                                viewModel.toggleStartOnBoot()
-                            }
-                        },
-                    )
-                },
-            )
-            if (s.startOnBoot) {
-                TextButton(
-                    onClick = { openBootPermissionSettings(context) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Open Autostart Settings", style = MaterialTheme.typography.labelLarge)
-                }
-            }
-
-            // Auto-update — only shown if NOT installed from Play Store
-            if (!installedFromPlayStore) {
-                ListItem(
-                    headlineContent = { Text("Auto-Update") },
-                    supportingContent = {
-                        Text("Check GitHub for new builds and download them automatically")
-                    },
-                    trailingContent = {
-                        Switch(checked = s.autoUpdate, onCheckedChange = { viewModel.toggleAutoUpdate() })
-                    },
-                )
-            }
-
-            HorizontalDivider()
-
-            // --- Clock ---
-            Text("Clock", style = MaterialTheme.typography.titleSmall)
-            ListItem(
-                headlineContent = { Text("Show Clock") },
-                trailingContent = { Switch(checked = s.showClock, onCheckedChange = { viewModel.toggleClock() }) },
+            SwitchItem(
+                title = stringResource(R.string.show_clock),
+                checked = s.showClock,
+                onToggle = { viewModel.toggleClock() },
             )
             if (s.showClock) {
-                // Clock preview above slider — full size, accurate representation
                 Surface(
                     color = Color(0x80000000),
                     shape = RoundedCornerShape(12.dp),
@@ -241,41 +231,73 @@ fun SettingsScreen(
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                     )
                 }
-                Text("Clock Size: ${s.clockSize.toInt()}sp")
+                Text("${stringResource(R.string.clock_size)}: ${s.clockSize.toInt()}sp")
                 Slider(
                     value = s.clockSize,
                     onValueChange = { viewModel.updateClockSize(it) },
                     valueRange = 24f..96f,
                 )
                 Text(
-                    "Drag the clock on the slideshow screen to reposition",
+                    stringResource(R.string.drag_clock_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                ListItem(
-                    headlineContent = { Text("Snap to Grid") },
-                    supportingContent = {
-                        Text("Align clock to grid based on its size when released")
-                    },
-                    trailingContent = {
-                        Switch(checked = s.clockSnapToGrid, onCheckedChange = { viewModel.toggleClockSnapToGrid() })
-                    },
+                SwitchItem(
+                    title = stringResource(R.string.snap_to_grid),
+                    subtitle = stringResource(R.string.snap_to_grid_desc),
+                    checked = s.clockSnapToGrid,
+                    onToggle = { viewModel.toggleClockSnapToGrid() },
                 )
             }
 
             HorizontalDivider()
 
-            // --- Albums ---
-            Text("Albums", style = MaterialTheme.typography.titleSmall)
-            Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.PhotoLibrary, contentDescription = null)
-                Text("Change Album Selection")
+            // ============================= SYSTEM =============================
+            SectionHeader(stringResource(R.string.section_system))
+
+            SwitchItem(
+                title = stringResource(R.string.start_on_boot),
+                subtitle = stringResource(R.string.start_on_boot_desc),
+                checked = s.startOnBoot,
+                onToggle = {
+                    viewModel.toggleStartOnBoot()
+                    if (!s.startOnBoot && needsBootPermission(context)) {
+                        showBootPermissionDialog = true
+                    }
+                },
+            )
+            if (s.startOnBoot) {
+                TextButton(
+                    onClick = { openBootPermissionSettings(context) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.open_autostart), style = MaterialTheme.typography.labelLarge)
+                }
+            }
+
+            if (!installedFromPlayStore) {
+                SwitchItem(
+                    title = stringResource(R.string.auto_update),
+                    subtitle = stringResource(R.string.auto_update_desc),
+                    checked = s.autoUpdate,
+                    onToggle = { viewModel.toggleAutoUpdate() },
+                )
             }
 
             HorizontalDivider()
 
-            // --- Connection ---
-            Text("Connection", style = MaterialTheme.typography.titleSmall)
+            // ============================= ALBUMS =============================
+            SectionHeader(stringResource(R.string.section_albums))
+
+            Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                Text(stringResource(R.string.change_albums))
+            }
+
+            HorizontalDivider()
+
+            // ============================= CONNECTION =============================
+            SectionHeader(stringResource(R.string.section_connection))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -283,13 +305,13 @@ fun SettingsScreen(
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (!editingUrl) {
-                        Text("Server", style = MaterialTheme.typography.labelSmall)
-                        Text(state.serverUrl.ifBlank { "Not set" }, style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.server), style = MaterialTheme.typography.labelSmall)
+                        Text(state.serverUrl.ifBlank { stringResource(R.string.not_set) }, style = MaterialTheme.typography.bodyMedium)
                     } else {
                         OutlinedTextField(
                             value = urlDraft,
                             onValueChange = { urlDraft = it },
-                            label = { Text("Server URL") },
+                            label = { Text(stringResource(R.string.server_url)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                             modifier = Modifier.fillMaxWidth(),
@@ -300,29 +322,29 @@ fun SettingsScreen(
                             TextButton(onClick = {
                                 urlDraft = state.serverUrl
                                 editingUrl = false
-                            }) { Text("Cancel") }
+                            }) { Text(stringResource(R.string.cancel)) }
                             Button(onClick = {
                                 viewModel.updateServerUrl(urlDraft)
                                 editingUrl = false
-                            }) { Text("Save") }
+                            }) { Text(stringResource(R.string.save)) }
                         } else {
-                            TextButton(onClick = { editingUrl = true }) { Text("Edit") }
+                            TextButton(onClick = { editingUrl = true }) { Text(stringResource(R.string.edit)) }
                         }
                     }
 
                     HorizontalDivider()
 
                     if (!editingKey) {
-                        Text("API Key", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.api_key), style = MaterialTheme.typography.labelSmall)
                         Text(
-                            if (state.apiKey.isBlank()) "Not set" else "•".repeat(20),
+                            if (state.apiKey.isBlank()) stringResource(R.string.not_set) else "•".repeat(20),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     } else {
                         OutlinedTextField(
                             value = keyDraft,
                             onValueChange = { keyDraft = it },
-                            label = { Text("API Key") },
+                            label = { Text(stringResource(R.string.api_key)) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -332,13 +354,13 @@ fun SettingsScreen(
                             TextButton(onClick = {
                                 keyDraft = state.apiKey
                                 editingKey = false
-                            }) { Text("Cancel") }
+                            }) { Text(stringResource(R.string.cancel)) }
                             Button(onClick = {
                                 viewModel.updateApiKey(keyDraft)
                                 editingKey = false
-                            }) { Text("Save") }
+                            }) { Text(stringResource(R.string.save)) }
                         } else {
-                            TextButton(onClick = { editingKey = true }) { Text("Edit") }
+                            TextButton(onClick = { editingKey = true }) { Text(stringResource(R.string.edit)) }
                         }
                     }
                 }
@@ -346,12 +368,12 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
-            // --- Danger zone ---
+            // ============================= DANGER ZONE =============================
             TextButton(
                 onClick = { showResetDialog = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Reset All Settings", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.reset_all), color = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -360,22 +382,18 @@ fun SettingsScreen(
     if (showBootPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showBootPermissionDialog = false },
-            title = { Text("Autostart Permission") },
+            title = { Text(stringResource(R.string.autostart_perm_title)) },
             text = {
-                Text(
-                    "Some devices block apps from starting automatically. " +
-                        "To ensure the app launches on boot, you may need to grant " +
-                        "autostart permission in your device settings.",
-                )
+                Text(stringResource(R.string.autostart_perm_message))
             },
             confirmButton = {
                 TextButton(onClick = {
                     showBootPermissionDialog = false
                     openBootPermissionSettings(context)
-                }) { Text("Open Settings") }
+                }) { Text(stringResource(R.string.open_settings)) }
             },
             dismissButton = {
-                TextButton(onClick = { showBootPermissionDialog = false }) { Text("Skip") }
+                TextButton(onClick = { showBootPermissionDialog = false }) { Text(stringResource(R.string.skip)) }
             },
         )
     }
@@ -383,20 +401,64 @@ fun SettingsScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("Reset Everything?") },
-            text = { Text("This clears server URL, API key, selected albums, and all slideshow settings. You'll be sent back to the setup screen.") },
+            title = { Text(stringResource(R.string.reset_title)) },
+            text = { Text(stringResource(R.string.reset_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showResetDialog = false
                     viewModel.resetAll()
                     onReset()
-                }) { Text("Reset", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.reset), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel)) }
             },
         )
     }
+}
+
+// --- Helper composables ---
+
+@Composable
+private fun SectionHeader(title: String) {
+    Text(title, style = MaterialTheme.typography.titleSmall)
+}
+
+@Composable
+private fun SwitchItem(
+    title: String,
+    checked: Boolean,
+    onToggle: () -> Unit,
+    subtitle: String? = null,
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = subtitle?.let { { Text(it) } },
+        trailingContent = { Switch(checked = checked, onCheckedChange = { onToggle() }) },
+    )
+}
+
+@Composable
+private fun FilterChip(
+    selected: Boolean,
+    label: String,
+    onClick: () -> Unit,
+) {
+    androidx.compose.material3.FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+    )
+}
+
+@Composable
+private fun PhotoAnimation.displayName(): String = when (this) {
+    PhotoAnimation.ZOOM_IN -> stringResource(R.string.anim_zoom_in)
+    PhotoAnimation.ZOOM_OUT -> stringResource(R.string.anim_zoom_out)
+    PhotoAnimation.PAN_LEFT -> stringResource(R.string.anim_pan_left)
+    PhotoAnimation.PAN_RIGHT -> stringResource(R.string.anim_pan_right)
+    PhotoAnimation.PAN_UP -> stringResource(R.string.anim_pan_up)
+    PhotoAnimation.PAN_DOWN -> stringResource(R.string.anim_pan_down)
 }
 
 @Composable
@@ -407,11 +469,9 @@ private fun BurnInProtectionSetting(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         ListItem(
-            headlineContent = { Text("Burn-in Protection") },
+            headlineContent = { Text(stringResource(R.string.burn_in_protection)) },
             supportingContent = {
-                Text(
-                    "Slowly pan and zoom images to prevent screen burn-in on displays showing the same photo for extended periods",
-                )
+                Text(stringResource(R.string.burn_in_desc))
             },
             trailingContent = { Switch(checked = enabled, onCheckedChange = { onToggle() }) },
         )
@@ -424,8 +484,7 @@ private fun BurnInProtectionSetting(
                     .padding(horizontal = 4.dp),
             ) {
                 Text(
-                    "Your interval is ${intervalSeconds}s — long display times increase burn-in risk. " +
-                        "Consider enabling this.",
+                    stringResource(R.string.burn_in_warning, intervalSeconds),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(12.dp),
@@ -531,13 +590,4 @@ private fun openBootPermissionSettings(context: Context) {
             },
         )
     }
-}
-
-@Composable
-private fun FilterChip(selected: Boolean, label: String, onClick: () -> Unit) {
-    androidx.compose.material3.FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(label) },
-    )
 }

@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Album
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,10 +36,10 @@ fun AlbumSelectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Albums") },
+                title = { Text(stringResource(R.string.select_albums)) },
                 actions = {
                     IconButton(onClick = onSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                 },
             )
@@ -48,7 +50,7 @@ fun AlbumSelectionScreen(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ) {
                     Text(
-                        "${state.selectedIds.size} selected",
+                        stringResource(R.string.albums_selected, state.selectedIds.size),
                         modifier = Modifier.padding(start = 16.dp),
                     )
                     Spacer(Modifier.weight(1f))
@@ -58,7 +60,7 @@ fun AlbumSelectionScreen(
                             onStartSlideshow()
                         },
                         modifier = Modifier.padding(end = 16.dp),
-                    ) { Text("Start Slideshow") }
+                    ) { Text(stringResource(R.string.start_slideshow)) }
                 }
             }
         },
@@ -74,7 +76,7 @@ fun AlbumSelectionScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(state.error!!, color = MaterialTheme.colorScheme.error)
                         Spacer(Modifier.height(12.dp))
-                        Button(onClick = { viewModel.retry() }) { Text("Retry") }
+                        Button(onClick = { viewModel.retry() }) { Text(stringResource(R.string.retry)) }
                     }
                 }
             }

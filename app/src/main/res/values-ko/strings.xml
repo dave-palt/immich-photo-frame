@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">재생</string>
+    <string name="section_display">표시</string>
+    <string name="section_clock">시계</string>
+    <string name="section_system">시스템</string>
+    <string name="section_albums">앨범</string>
+    <string name="section_connection">연결</string>
+
+    <!-- Playback -->
+    <string name="interval">간격</string>
+    <string name="shuffle">셔플</string>
+    <string name="shuffle_desc">이미지 순서 무작위화</string>
+    <string name="skip_videos">동영상 건너뛰기</string>
+    <string name="skip_videos_desc">사진만 표시</string>
+    <string name="muted">음소거</string>
+    <string name="muted_desc">동영상 오디오 음소거</string>
+    <string name="photo_animations">사진 애니메이션</string>
+    <string name="photo_animations_desc">사진에 미세한 확대 및 패닝 효과 적용</string>
+    <string name="photo_animations_hint">활성화된 유형에서 각 사진마다 임의의 효과가 선택됩니다</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">확대</string>
+    <string name="anim_zoom_out">축소</string>
+    <string name="anim_pan_left">왼쪽 패닝</string>
+    <string name="anim_pan_right">오른쪽 패닝</string>
+    <string name="anim_pan_up">위로 패닝</string>
+    <string name="anim_pan_down">아래로 패닝</string>
+
+    <!-- Display -->
+    <string name="image_fit">이미지 맞춤</string>
+    <string name="contain">포함</string>
+    <string name="cover">채우기</string>
+    <string name="adaptive_background">적응형 배경</string>
+    <string name="adaptive_background_desc">각 사진의 평균 색상으로 레터박스 막대 채우기</string>
+    <string name="fullscreen">전체 화면</string>
+    <string name="fullscreen_desc">시스템 바 숨기기</string>
+    <string name="keep_screen_on">화면 켜짐 유지</string>
+    <string name="burn_in_protection">번인 보호</string>
+    <string name="burn_in_desc">OLED 번인 방지를 위해 이미지를 천천히 패닝 (간격 ≥ 30초 필요)</string>
+    <string name="burn_in_warning">현재 간격은 %1$d초입니다 — 긴 표시 시간은 번인 위험을 증가시킵니다. 이 기능 활성화를 권장합니다.</string>
+
+    <!-- Clock -->
+    <string name="show_clock">시계 표시</string>
+    <string name="clock_size">시계 크기</string>
+    <string name="drag_clock_hint">슬라이드쇼 화면에서 시계를 드래그하여 위치 변경</string>
+    <string name="snap_to_grid">그리드에 스냅</string>
+    <string name="snap_to_grid_desc">놓을 때 크기에 따라 시계를 그리드에 정렬</string>
+
+    <!-- System -->
+    <string name="start_on_boot">부팅 시 시작</string>
+    <string name="start_on_boot_desc">장치가 시작될 때 자동으로 앱 실행</string>
+    <string name="open_autostart">자동 시작 설정 열기</string>
+    <string name="auto_update">자동 업데이트</string>
+    <string name="auto_update_desc">GitHub에서 새 빌드를 확인하고 자동으로 다운로드</string>
+
+    <!-- Albums -->
+    <string name="change_albums">앨범 선택 변경</string>
+
+    <!-- Connection -->
+    <string name="server">서버</string>
+    <string name="server_url">서버 URL</string>
+    <string name="api_key">API 키</string>
+    <string name="not_set">설정되지 않음</string>
+    <string name="edit">편집</string>
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+
+    <!-- Settings UI -->
+    <string name="settings">설정</string>
+    <string name="back">뒤로</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">자동 시작 권한</string>
+    <string name="autostart_perm_message">일부 장치는 앱이 자동으로 시작하지 못하도록 차단합니다. 부팅 시 앱이 실행되도록 하려면 장치 설정에서 자동 시작 권한을 부여해야 할 수 있습니다.</string>
+    <string name="open_settings">설정 열기</string>
+    <string name="skip">건너뛰기</string>
+    <string name="reset_title">모두 재설정하시겠습니까?</string>
+    <string name="reset_message">서버 URL, API 키, 선택한 앨범 및 모든 슬라이드쇼 설정이 지워집니다. 설정 화면으로 돌아갑니다.</string>
+    <string name="reset">재설정</string>
+    <string name="reset_all">모든 설정 재설정</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">ImmichFrame 설정</string>
+    <string name="setup_subtitle">Immich 서버에 연결</string>
+    <string name="protocol">프로토콜</string>
+    <string name="domain">도메인</string>
+    <string name="domain_placeholder">photos.example.com</string>
+    <string name="full_url_preview">전체 URL</string>
+    <string name="test_connection">연결 테스트</string>
+    <string name="connecting">연결 중…</string>
+    <string name="next">다음</string>
+    <string name="select_albums">앨범 선택</string>
+    <string name="done">완료</string>
+    <string name="no_albums">앨범을 찾을 수 없음</string>
+    <string name="loading_albums">앨범 로드 중…</string>
+    <string name="hide_key">키 숨기기</string>
+    <string name="show_key">키 표시</string>
+    <string name="connected_as">%1$s(으)로 연결됨</string>
+    <string name="connection_failed">연결 실패</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">%1$d개 선택됨</string>
+    <string name="start_slideshow">슬라이드쇼 시작</string>
+    <string name="retry">다시 시도</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">업데이트 사용 가능</string>
+    <string name="update_message">새 빌드가 다운로드되어 설치할 준비가 되었습니다.\n\n버전: %1$s…</string>
+    <string name="install">설치</string>
+    <string name="later">나중에</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">사진 %1$d장</string>
+</resources>

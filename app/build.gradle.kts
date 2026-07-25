@@ -18,18 +18,13 @@ android {
         versionCode = (System.currentTimeMillis() / 1000).toInt()
         versionName = "0.1.0"
 
-        // Git SHA for self-update version comparison
+        // Git SHA for self-update version comparison (config-cache safe)
         buildConfigField(
             "String",
             "GIT_SHA",
-            "\"${run {
-                val proc = ProcessBuilder("git", "rev-parse", "HEAD").redirectErrorStream(true).start()
-                proc.inputStream
-                    .bufferedReader()
-                    .readText()
-                    .trim()
-                    .take(40)
-            }}\"",
+            "\"${providers.exec {
+                commandLine("git", "rev-parse", "HEAD")
+            }.standardOutput.asText.getOrElse("").trim().take(40)}\"",
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -97,6 +92,11 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    lint {
+        // Allow incremental localization — new strings may not be translated yet
+        disable += "MissingTranslation"
     }
 
     packaging {

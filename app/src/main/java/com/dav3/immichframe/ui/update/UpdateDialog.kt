@@ -5,6 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.dav3.immichframe.R
 import com.dav3.immichframe.data.update.UpdateState
 
 @Composable
@@ -15,21 +17,20 @@ fun UpdateDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Update Available") },
+        title = { Text(stringResource(R.string.update_available)) },
         text = {
             Text(
-                "A new build has been downloaded and is ready to install.\n\n" +
-                    "Version: ${state.newVersion.take(14)}…",
+                stringResource(R.string.update_message, state.newVersion.take(14)),
             )
         },
         confirmButton = {
             TextButton(onClick = onInstall) {
-                Text("Install", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.install), color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Later")
+                Text(stringResource(R.string.later))
             }
         },
     )

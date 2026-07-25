@@ -44,6 +44,13 @@ constructor(
         val AUTO_UPDATE = stringPreferencesKey("auto_update")
         val CLOCK_SNAP_TO_GRID = stringPreferencesKey("clock_snap_to_grid")
         val ADAPTIVE_BACKGROUND = stringPreferencesKey("adaptive_background")
+        val PHOTO_ANIMATIONS = stringPreferencesKey("photo_animations")
+        val ANIM_ZOOM_IN = stringPreferencesKey("anim_zoom_in")
+        val ANIM_ZOOM_OUT = stringPreferencesKey("anim_zoom_out")
+        val ANIM_PAN_LEFT = stringPreferencesKey("anim_pan_left")
+        val ANIM_PAN_RIGHT = stringPreferencesKey("anim_pan_right")
+        val ANIM_PAN_UP = stringPreferencesKey("anim_pan_up")
+        val ANIM_PAN_DOWN = stringPreferencesKey("anim_pan_down")
     }
 
     private val masterKey by lazy {
@@ -98,6 +105,13 @@ constructor(
                 autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
                 clockSnapToGrid = prefs[Keys.CLOCK_SNAP_TO_GRID]?.toBoolean() ?: true,
                 adaptiveBackground = prefs[Keys.ADAPTIVE_BACKGROUND]?.toBoolean() ?: false,
+                photoAnimations = prefs[Keys.PHOTO_ANIMATIONS]?.toBoolean() ?: false,
+                animZoomIn = prefs[Keys.ANIM_ZOOM_IN]?.toBoolean() ?: true,
+                animZoomOut = prefs[Keys.ANIM_ZOOM_OUT]?.toBoolean() ?: true,
+                animPanLeft = prefs[Keys.ANIM_PAN_LEFT]?.toBoolean() ?: true,
+                animPanRight = prefs[Keys.ANIM_PAN_RIGHT]?.toBoolean() ?: true,
+                animPanUp = prefs[Keys.ANIM_PAN_UP]?.toBoolean() ?: true,
+                animPanDown = prefs[Keys.ANIM_PAN_DOWN]?.toBoolean() ?: true,
             )
         }
 
@@ -132,6 +146,13 @@ constructor(
             it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
             it[Keys.CLOCK_SNAP_TO_GRID] = settings.clockSnapToGrid.toString()
             it[Keys.ADAPTIVE_BACKGROUND] = settings.adaptiveBackground.toString()
+            it[Keys.PHOTO_ANIMATIONS] = settings.photoAnimations.toString()
+            it[Keys.ANIM_ZOOM_IN] = settings.animZoomIn.toString()
+            it[Keys.ANIM_ZOOM_OUT] = settings.animZoomOut.toString()
+            it[Keys.ANIM_PAN_LEFT] = settings.animPanLeft.toString()
+            it[Keys.ANIM_PAN_RIGHT] = settings.animPanRight.toString()
+            it[Keys.ANIM_PAN_UP] = settings.animPanUp.toString()
+            it[Keys.ANIM_PAN_DOWN] = settings.animPanDown.toString()
         }
     }
 

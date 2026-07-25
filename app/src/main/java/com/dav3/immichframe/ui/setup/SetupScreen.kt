@@ -12,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dav3.immichframe.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +48,12 @@ fun SetupScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                "ImmichFrame",
+                stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Connect to your Immich server",
+                stringResource(R.string.setup_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             )
@@ -71,7 +73,7 @@ fun SetupScreen(
                         value = if (state.useHttps) "https://" else "http://",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Protocol") },
+                        label = { Text(stringResource(R.string.protocol)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(protocolExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -101,8 +103,8 @@ fun SetupScreen(
                 OutlinedTextField(
                     value = state.domain,
                     onValueChange = viewModel::updateDomain,
-                    label = { Text("Domain") },
-                    placeholder = { Text("photos.example.com") },
+                    label = { Text(stringResource(R.string.domain)) },
+                    placeholder = { Text(stringResource(R.string.domain_placeholder)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                     modifier = Modifier.weight(1f),
@@ -122,7 +124,7 @@ fun SetupScreen(
             OutlinedTextField(
                 value = state.apiKey,
                 onValueChange = viewModel::updateApiKey,
-                label = { Text("API Key") },
+                label = { Text(stringResource(R.string.api_key)) },
                 singleLine = true,
                 visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -130,7 +132,7 @@ fun SetupScreen(
                     IconButton(onClick = { showKey = !showKey }) {
                         Icon(
                             if (showKey) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (showKey) "Hide key" else "Show key",
+                            contentDescription = if (showKey) stringResource(R.string.hide_key) else stringResource(R.string.show_key),
                         )
                     }
                 },
@@ -151,12 +153,12 @@ fun SetupScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                 }
-                Text("Test Connection")
+                Text(stringResource(R.string.test_connection))
             }
 
             AnimatedVisibility(state.connectionState == ConnectionState.SUCCESS) {
                 Text(
-                    "Connected as ${state.connectedEmail}",
+                    stringResource(R.string.connected_as, state.connectedEmail ?: ""),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 12.dp),
@@ -164,7 +166,7 @@ fun SetupScreen(
             }
             AnimatedVisibility(state.connectionState == ConnectionState.ERROR) {
                 Text(
-                    state.errorMessage ?: "Connection failed",
+                    state.errorMessage ?: stringResource(R.string.connection_failed),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 12.dp),

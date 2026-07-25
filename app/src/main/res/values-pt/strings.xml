@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">Reprodução</string>
+    <string name="section_display">Ecrã</string>
+    <string name="section_clock">Relógio</string>
+    <string name="section_system">Sistema</string>
+    <string name="section_albums">Álbuns</string>
+    <string name="section_connection">Ligação</string>
+
+    <!-- Playback -->
+    <string name="interval">Intervalo</string>
+    <string name="shuffle">Aleatório</string>
+    <string name="shuffle_desc">Ordem aleatória das imagens</string>
+    <string name="skip_videos">Ignorar vídeos</string>
+    <string name="skip_videos_desc">Mostrar apenas fotos</string>
+    <string name="muted">Sem som</string>
+    <string name="muted_desc">Silenciar o áudio dos vídeos</string>
+    <string name="photo_animations">Animações de foto</string>
+    <string name="photo_animations_desc">Efeitos subtis de zoom e deslocamento nas fotos</string>
+    <string name="photo_animations_hint">É escolhido um efeito aleatório de entre os tipos ativados para cada foto</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">Aproximar</string>
+    <string name="anim_zoom_out">Afastar</string>
+    <string name="anim_pan_left">Deslocar esquerda</string>
+    <string name="anim_pan_right">Deslocar direita</string>
+    <string name="anim_pan_up">Deslocar cima</string>
+    <string name="anim_pan_down">Deslocar baixo</string>
+
+    <!-- Display -->
+    <string name="image_fit">Ajuste de imagem</string>
+    <string name="contain">Conter</string>
+    <string name="cover">Cobrir</string>
+    <string name="adaptive_background">Fundo adaptativo</string>
+    <string name="adaptive_background_desc">Preenche as barras pretas com a cor média de cada foto</string>
+    <string name="fullscreen">Ecrã inteiro</string>
+    <string name="fullscreen_desc">Ocultar barras do sistema</string>
+    <string name="keep_screen_on">Manter ecrã ligado</string>
+    <string name="burn_in_protection">Proteção contra burn-in</string>
+    <string name="burn_in_desc">Deslocamento lento da imagem para evitar burn-in OLED (intervalo ≥ 30s)</string>
+    <string name="burn_in_warning">O seu intervalo é de %1$ds — tempos de visualização longos aumentam o risco de burn-in. Considere ativar esta opção.</string>
+
+    <!-- Clock -->
+    <string name="show_clock">Mostrar relógio</string>
+    <string name="clock_size">Tamanho do relógio</string>
+    <string name="drag_clock_hint">Arraste o relógio no ecrã de apresentação para o reposicionar</string>
+    <string name="snap_to_grid">Ajustar à grelha</string>
+    <string name="snap_to_grid_desc">Alinhar o relógio à grelha conforme o seu tamanho ao soltar</string>
+
+    <!-- System -->
+    <string name="start_on_boot">Iniciar no arranque</string>
+    <string name="start_on_boot_desc">Iniciar a aplicação automaticamente quando o dispositivo arranca</string>
+    <string name="open_autostart">Abrir definições de arranque automático</string>
+    <string name="auto_update">Atualização automática</string>
+    <string name="auto_update_desc">Verificar o GitHub por novas versões e descarregá-las automaticamente</string>
+
+    <!-- Albums -->
+    <string name="change_albums">Alterar seleção de álbuns</string>
+
+    <!-- Connection -->
+    <string name="server">Servidor</string>
+    <string name="server_url">URL do servidor</string>
+    <string name="api_key">Chave API</string>
+    <string name="not_set">Não definido</string>
+    <string name="edit">Editar</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Settings UI -->
+    <string name="settings">Definições</string>
+    <string name="back">Voltar</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">Permissão de arranque automático</string>
+    <string name="autostart_perm_message">Alguns dispositivos impedem as aplicações de iniciarem automaticamente. Para garantir que a aplicação é iniciada no arranque, pode ser necessário conceder permissão de arranque automático nas definições do dispositivo.</string>
+    <string name="open_settings">Abrir definições</string>
+    <string name="skip">Ignorar</string>
+    <string name="reset_title">Repor tudo?</string>
+    <string name="reset_message">Isto limpa o URL do servidor, a chave API, os álbuns selecionados e todas as definições da apresentação. Será reencaminhado para o ecrã de configuração.</string>
+    <string name="reset">Repor</string>
+    <string name="reset_all">Repor todas as definições</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Configuração do ImmichFrame</string>
+    <string name="setup_subtitle">Ligue-se ao seu servidor Immich</string>
+    <string name="protocol">Protocolo</string>
+    <string name="domain">Domínio</string>
+    <string name="domain_placeholder">fotos.exemplo.com</string>
+    <string name="full_url_preview">URL completo</string>
+    <string name="test_connection">Testar ligação</string>
+    <string name="connecting">A ligar…</string>
+    <string name="next">Seguinte</string>
+    <string name="select_albums">Selecionar álbuns</string>
+    <string name="done">Concluído</string>
+    <string name="no_albums">Nenhum álbum encontrado</string>
+    <string name="loading_albums">A carregar álbuns…</string>
+    <string name="hide_key">Ocultar chave</string>
+    <string name="show_key">Mostrar chave</string>
+    <string name="connected_as">Ligado como %1$s</string>
+    <string name="connection_failed">Falha na ligação</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">%1$d selecionados</string>
+    <string name="start_slideshow">Iniciar apresentação</string>
+    <string name="retry">Tentar novamente</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">Atualização disponível</string>
+    <string name="update_message">Foi descarregada uma nova versão e está pronta para ser instalada.\n\nVersão: %1$s…</string>
+    <string name="install">Instalar</string>
+    <string name="later">Mais tarde</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d fotos</string>
+</resources>

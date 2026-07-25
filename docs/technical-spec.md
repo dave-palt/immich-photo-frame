@@ -13,6 +13,7 @@
 | Image Loading | Coil 3 (Compose) | 3.0+ |
 | Video Playback | Media3 ExoPlayer | 1.5.1 |
 | Color Extraction | AndroidX Palette | 1.0+ |
+| Animation | Compose Animation Core | (BOM) |
 | Local Storage | DataStore (Preferences) | 1.1+ |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Dependency Injection | Hilt | 2.52+ |
@@ -163,6 +164,13 @@ Setup → Albums → Slideshow
 | Start on boot | DataStore | `start_on_boot` | String bool |
 | Auto-update | DataStore | `auto_update` | String bool |
 | Adaptive background | DataStore | `adaptive_background` | String bool |
+| Photo animations | DataStore | `photo_animations` | String bool |
+| Anim: Zoom In | DataStore | `anim_zoom_in` | String bool |
+| Anim: Zoom Out | DataStore | `anim_zoom_out` | String bool |
+| Anim: Pan Left | DataStore | `anim_pan_left` | String bool |
+| Anim: Pan Right | DataStore | `anim_pan_right` | String bool |
+| Anim: Pan Up | DataStore | `anim_pan_up` | String bool |
+| Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file
@@ -186,3 +194,27 @@ or Android throws `IllegalStateException`.
 | `ACCESS_NETWORK_STATE` | Network connectivity checks |
 | `RECEIVE_BOOT_COMPLETED` | Start-on-boot feature |
 | `REQUEST_INSTALL_PACKAGES` | Self-update via GitHub releases (APK install) |
+
+## Localization
+
+The app is localized into 13 languages. String resources live in
+`app/src/main/res/values*/strings.xml`.
+
+| Locale | Directory |
+|---|---|
+| English (default) | `values/` |
+| Arabic | `values-ar/` |
+| Chinese (Simplified) | `values-zh-rCN/` |
+| Dutch | `values-nl/` |
+| French | `values-fr/` |
+| German | `values-de/` |
+| Italian | `values-it/` |
+| Japanese | `values-ja/` |
+| Korean | `values-ko/` |
+| Polish | `values-pl/` |
+| Portuguese | `values-pt/` |
+| Russian | `values-ru/` |
+| Spanish | `values-es/` |
+
+`MissingTranslation` lint is disabled to allow incremental localization —
+new strings fall back to English until translated.

@@ -42,6 +42,11 @@
 8. When the last image is reached, the slideshow loops back to the first.
 9. Screen stays on (wake lock) while slideshow is active (toggleable).
 10. A progress bar at the bottom shows time remaining for the current image.
+11. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
+    style animation (zoom/pan). The animation is chosen randomly from the
+    set of individually-enabled animation types. Available types: Zoom In,
+    Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks
+    from the other enabled types and requires at least one other type enabled.
 
 ### F4: In-Slideshow Controls
 
@@ -106,6 +111,10 @@ Options:
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)
+- **Photo Animations** — subtle Ken Burns zoom/pan on each photo (default off).
+  When enabled, reveals individual toggles for: Zoom In, Zoom Out, Pan Left,
+  Pan Right, Pan Up, Pan Down, Random. Random picks from other enabled types
+  and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
 - **Start on Boot** — launch on device boot (default off)

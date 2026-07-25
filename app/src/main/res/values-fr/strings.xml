@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImmichFrame</string>
+
+    <!-- Sections -->
+    <string name="section_playback">Lecture</string>
+    <string name="section_display">Affichage</string>
+    <string name="section_clock">Horloge</string>
+    <string name="section_system">Système</string>
+    <string name="section_albums">Albums</string>
+    <string name="section_connection">Connexion</string>
+
+    <!-- Playback -->
+    <string name="interval">Intervalle</string>
+    <string name="shuffle">Lecture aléatoire</string>
+    <string name="shuffle_desc">Ordre des images aléatoire</string>
+    <string name="skip_videos">Ignorer les vidéos</string>
+    <string name="skip_videos_desc">Afficher uniquement les photos</string>
+    <string name="muted">Muet</string>
+    <string name="muted_desc">Couper l\'audio des vidéos</string>
+    <string name="photo_animations">Animations photo</string>
+    <string name="photo_animations_desc">Effets subtils de zoom et de défilement sur les photos</string>
+    <string name="photo_animations_hint">Un effet aléatoire est choisi parmi les types activés pour chaque photo</string>
+
+    <!-- Animation types -->
+    <string name="anim_zoom_in">Zoom avant</string>
+    <string name="anim_zoom_out">Zoom arrière</string>
+    <string name="anim_pan_left">Défilement gauche</string>
+    <string name="anim_pan_right">Défilement droite</string>
+    <string name="anim_pan_up">Défilement haut</string>
+    <string name="anim_pan_down">Défilement bas</string>
+
+    <!-- Display -->
+    <string name="image_fit">Ajustement de l\'image</string>
+    <string name="contain">Contenir</string>
+    <string name="cover">Couvrir</string>
+    <string name="adaptive_background">Fond adaptatif</string>
+    <string name="adaptive_background_desc">Remplit les bandes noires avec la couleur moyenne de chaque photo</string>
+    <string name="fullscreen">Plein écran</string>
+    <string name="fullscreen_desc">Masquer les barres système</string>
+    <string name="keep_screen_on">Garder l\'écran allumé</string>
+    <string name="burn_in_protection">Protection contre le burn-in</string>
+    <string name="burn_in_desc">Défilement lent de l\'image pour éviter le burn-in OLED (intervalle ≥ 30s)</string>
+    <string name="burn_in_warning">Votre intervalle est de %1$ds — les longs temps d\'affichage augmentent le risque de burn-in. Envisagez d\'activer cette option.</string>
+
+    <!-- Clock -->
+    <string name="show_clock">Afficher l\'horloge</string>
+    <string name="clock_size">Taille de l\'horloge</string>
+    <string name="drag_clock_hint">Faites glisser l\'horloge sur l\'écran du diaporama pour la repositionner</string>
+    <string name="snap_to_grid">Aligner sur la grille</string>
+    <string name="snap_to_grid_desc">Aligner l\'horloge sur la grille selon sa taille lors du relâchement</string>
+
+    <!-- System -->
+    <string name="start_on_boot">Démarrer au démarrage</string>
+    <string name="start_on_boot_desc">Lancer l\'application automatiquement au démarrage de l\'appareil</string>
+    <string name="open_autostart">Ouvrir les paramètres de démarrage automatique</string>
+    <string name="auto_update">Mise à jour automatique</string>
+    <string name="auto_update_desc">Vérifier GitHub pour les nouvelles versions et les télécharger automatiquement</string>
+
+    <!-- Albums -->
+    <string name="change_albums">Modifier la sélection d\'albums</string>
+
+    <!-- Connection -->
+    <string name="server">Serveur</string>
+    <string name="server_url">URL du serveur</string>
+    <string name="api_key">Clé API</string>
+    <string name="not_set">Non défini</string>
+    <string name="edit">Modifier</string>
+    <string name="save">Enregistrer</string>
+    <string name="cancel">Annuler</string>
+
+    <!-- Settings UI -->
+    <string name="settings">Paramètres</string>
+    <string name="back">Retour</string>
+
+    <!-- Dialogs -->
+    <string name="autostart_perm_title">Autorisation de démarrage automatique</string>
+    <string name="autostart_perm_message">Certains appareils empêchent les applications de démarrer automatiquement. Pour garantir le lancement de l\'application au démarrage, vous devrez peut-être accorder l\'autorisation de démarrage automatique dans les paramètres de votre appareil.</string>
+    <string name="open_settings">Ouvrir les paramètres</string>
+    <string name="skip">Ignorer</string>
+    <string name="reset_title">Tout réinitialiser ?</string>
+    <string name="reset_message">Cela efface l\'URL du serveur, la clé API, les albums sélectionnés et tous les paramètres du diaporama. Vous serez renvoyé à l\'écran de configuration.</string>
+    <string name="reset">Réinitialiser</string>
+    <string name="reset_all">Réinitialiser tous les paramètres</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Configuration d\'ImmichFrame</string>
+    <string name="setup_subtitle">Connectez-vous à votre serveur Immich</string>
+    <string name="protocol">Protocole</string>
+    <string name="domain">Domaine</string>
+    <string name="domain_placeholder">photos.exemple.com</string>
+    <string name="full_url_preview">URL complète</string>
+    <string name="test_connection">Tester la connexion</string>
+    <string name="connecting">Connexion en cours…</string>
+    <string name="next">Suivant</string>
+    <string name="select_albums">Sélectionner les albums</string>
+    <string name="done">Terminé</string>
+    <string name="no_albums">Aucun album trouvé</string>
+    <string name="loading_albums">Chargement des albums…</string>
+    <string name="hide_key">Masquer la clé</string>
+    <string name="show_key">Afficher la clé</string>
+    <string name="connected_as">Connecté en tant que %1$s</string>
+    <string name="connection_failed">Échec de la connexion</string>
+
+    <!-- Albums -->
+    <string name="albums_selected">%1$d sélectionnés</string>
+    <string name="start_slideshow">Lancer le diaporama</string>
+    <string name="retry">Réessayer</string>
+
+    <!-- Update dialog -->
+    <string name="update_available">Mise à jour disponible</string>
+    <string name="update_message">Une nouvelle version a été téléchargée et est prête à être installée.\n\nVersion : %1$s…</string>
+    <string name="install">Installer</string>
+    <string name="later">Plus tard</string>
+
+    <!-- Slideshow -->
+    <string name="photos_count">%1$d photos</string>
+</resources>

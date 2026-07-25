@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.remote.ImmichRepositoryImpl
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
@@ -85,6 +86,19 @@ constructor(
     fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
 
     fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }
+
+    fun togglePhotoAnimations() = update { it.copy(photoAnimations = !it.photoAnimations) }
+
+    fun toggleAnimation(anim: PhotoAnimation) = update {
+        when (anim) {
+            PhotoAnimation.ZOOM_IN -> it.copy(animZoomIn = !it.animZoomIn)
+            PhotoAnimation.ZOOM_OUT -> it.copy(animZoomOut = !it.animZoomOut)
+            PhotoAnimation.PAN_LEFT -> it.copy(animPanLeft = !it.animPanLeft)
+            PhotoAnimation.PAN_RIGHT -> it.copy(animPanRight = !it.animPanRight)
+            PhotoAnimation.PAN_UP -> it.copy(animPanUp = !it.animPanUp)
+            PhotoAnimation.PAN_DOWN -> it.copy(animPanDown = !it.animPanDown)
+        }
+    }
 
     fun updateServerUrl(url: String) = viewModelScope.launch {
         settingsRepo.setServerUrl(url.trim().trimEnd('/'))
