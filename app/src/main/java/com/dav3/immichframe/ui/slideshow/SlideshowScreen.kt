@@ -106,15 +106,24 @@ fun SlideshowScreen(
     }
 
     var isPaused by remember { mutableStateOf(false) }
+    var isVideoPaused by remember { mutableStateOf(false) }
 
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
     // Auto-advance with progress tracking
+    // For images: fixed timer. For videos: VideoPlayer drives advancing
+    // (advances when the video ends, not on the interval timer).
+    // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    LaunchedEffect(state.currentIndex, isPaused, s.intervalSeconds) {
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds) {
         progress = 0f
         if (!isPaused && state.assets.isNotEmpty()) {
+            val currentAsset = state.assets[state.currentIndex]
+            if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
+                // Video playing normally — VideoPlayer calls viewModel.next() on end
+                return@LaunchedEffect
+            }
             val total = s.intervalSeconds * 1000L
             val tick = 50L
             var elapsed = 0L
@@ -203,6 +212,9 @@ fun SlideshowScreen(
                                 asset = currentAsset,
                                 viewModel = viewModel,
                                 muted = s.muted,
+                                isSlideshowPaused = isPaused,
+                                isVideoPaused = isVideoPaused,
+                                fillMode = s.fillMode,
                             )
                         } else {
                             KenBurnsImage(
@@ -266,7 +278,7 @@ fun SlideshowScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.photos_count, state.assets.size), color = Color.White)
+                    Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = onChangeAlbums) {
                         Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
@@ -313,7 +325,7 @@ fun SlideshowScreen(
                     IconButton(onClick = { isPaused = !isPaused }) {
                         Icon(
                             if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                            if (isPaused) "Play" else "Pause",
+                            if (isPaused) "Play slideshow" else "Pause slideshow",
                             tint = Color.White,
                             modifier = Modifier.size(36.dp),
                         )
@@ -329,9 +341,57 @@ fun SlideshowScreen(
                     }
                 }
             }
+            // Big centered video play/pause overlay — only for videos
+            if (isVideoPaused) {
+                val currentAsset = state.assets.getOrNull(state.currentIndex)
+                if (currentAsset?.type == AssetType.VIDEO) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .background(Color(0x80000000), shape = androidx.compose.foundation.shape.CircleShape)
+                            .size(96.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onTap = { isVideoPaused = false })
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.PlayArrow,
+                            "Play video",
+                            tint = Color.White,
+                            modifier = Modifier.size(48.dp),
+                        )
+                    }
+                }
+            }
+
+            // Video paused indicator (small, centered) — tap to resume
+            if (!isVideoPaused) {
+                val currentAsset = state.assets.getOrNull(state.currentIndex)
+                if (currentAsset?.type == AssetType.VIDEO && controlsVisible) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(72.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(onTap = { isVideoPaused = true })
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.Pause,
+                            "Pause video",
+                            tint = Color.White.copy(alpha = 0.7f),
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
+private const val TAG_VIDEO = "VideoPlayer"
 
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
@@ -339,20 +399,76 @@ private fun VideoPlayer(
     asset: Asset,
     viewModel: SlideshowViewModel,
     muted: Boolean,
+    isSlideshowPaused: Boolean,
+    isVideoPaused: Boolean,
+    fillMode: FillMode,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_ONE
-        }
+        ExoPlayer.Builder(context).build()
     }
 
     DisposableEffect(asset.id) {
-        exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(viewModel.videoUrl(asset.id))))
+        val url = viewModel.videoUrl(asset.id)
+        android.util.Log.d(TAG_VIDEO, "Loading video: assetId=${asset.id} url=$url")
+        exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(url)))
         exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
         onDispose {
             exoPlayer.release()
+        }
+    }
+
+    // React to pause/play state
+    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused) {
+        when {
+            isSlideshowPaused -> {
+                // Slideshow paused: video loops, no auto-advance
+                exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+                exoPlayer.playWhenReady = true
+            }
+            isVideoPaused -> {
+                // Video manually paused: slideshow timer takes over
+                exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                exoPlayer.playWhenReady = false
+            }
+            else -> {
+                // Normal: play once, advance on end
+                exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                exoPlayer.playWhenReady = true
+            }
+        }
+        onDispose { }
+    }
+
+    // Player listener: logging + advance on end (only when not paused)
+    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused) {
+        val listener = object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                val stateName = when (playbackState) {
+                    Player.STATE_IDLE -> "IDLE"
+                    Player.STATE_BUFFERING -> "BUFFERING"
+                    Player.STATE_READY -> "READY"
+                    Player.STATE_ENDED -> "ENDED"
+                    else -> "UNKNOWN($playbackState)"
+                }
+                android.util.Log.d(TAG_VIDEO, "State changed: $stateName (asset=${asset.id})")
+                if (playbackState == Player.STATE_ENDED && !isSlideshowPaused && !isVideoPaused) {
+                    viewModel.next()
+                }
+            }
+
+            override fun onPlayerErrorChanged(error: androidx.media3.common.PlaybackException?) {
+                if (error != null) {
+                    android.util.Log.e(TAG_VIDEO, "Playback error: ${error.errorCodeName}", error)
+                    android.util.Log.e(TAG_VIDEO, "Cause: ${error.cause?.javaClass?.name}: ${error.cause?.message}")
+                    // Skip to next on error so slideshow isn't stuck
+                    viewModel.next()
+                }
+            }
+        }
+        exoPlayer.addListener(listener)
+        onDispose {
+            exoPlayer.removeListener(listener)
         }
     }
 
@@ -366,7 +482,11 @@ private fun VideoPlayer(
             PlayerView(ctx).apply {
                 player = exoPlayer
                 useController = false
-                resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                resizeMode = if (fillMode == FillMode.COVER) {
+                    androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                } else {
+                    androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+                }
             }
         },
         modifier = Modifier.fillMaxSize(),
