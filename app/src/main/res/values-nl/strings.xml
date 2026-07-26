@@ -66,6 +66,15 @@
     <string name="edit">Bewerken</string>
     <string name="save">Opslaan</string>
     <string name="cancel">Annuleren</string>
+    <string name="reveal">Weergeven</string>
+    <string name="hide">Verbergen</string>
+    <string name="copy">Kopiëren</string>
+    <string name="api_key_copied">API-sleutel gekopieerd naar klembord</string>
+    <string name="biometric_auth_title">Verifiëren</string>
+    <string name="biometric_auth_subtitle_key">Verifieer om uw API-sleutel te bekijken</string>
+    <string name="biometric_auth_subtitle_media">Verifieer om mediaselectie te beheren</string>
+    <string name="biometric_not_setup_title">Schermvergrendeling vereist</string>
+    <string name="biometric_not_setup_message">Deze actie vereist een schermvergrendeling (vingerafdruk, gezicht of PIN). Stel er een in de beveiligingsinstellingen van uw apparaat om deze functie te gebruiken.</string>
 
     <!-- Settings UI -->
     <string name="settings">Instellingen</string>
@@ -122,8 +131,16 @@
     <string name="later">Later</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d foto\'s</string>
+    <string name="photos_count">%1$d / %2$d media</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Mediaselectie</string>
+    <string name="media_selection_count">%1$d van %2$d weergegeven</string>
+    <string name="media_selection_new_items_default">Nieuwe media standaard weergeven</string>
+    <string name="media_selection_select_all">Alles weergeven</string>
+    <string name="media_selection_select_none">Alles verbergen</string>
+    <string name="media_selection_shown">Weergegeven in diavoorstelling</string>
+    <string name="media_selection_hidden">Verborgen uit diavoorstelling</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Volgende</string>
     <string name="tour_got_it">Begrepen</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Gebruik deze pijlen om handmatig naar de vorige of volgende foto te gaan.</string>
     <string name="tour_slideshow_playback_title">Pauze en dempen</string>
     <string name="tour_slideshow_playback_body">Pauzeer de diavoorstelling of demp video-audio met deze bediening.</string>
+    <string name="tour_slideshow_media_selection_title">Kies je media</string>
+    <string name="tour_slideshow_media_selection_body">"Tik hier om te kiezen welke media in de diavoorstelling verschijnen. Je bevestigt eerst met vingerafdruk of schermvergrendeling."</string>
         <string name="tour_slideshow_albums_title">Terug naar Albums</string>
     <string name="tour_slideshow_albums_body">Andere foto\'s kiezen? Tik hier om terug te gaan naar albumselectie.</string>
     <string name="tour_slideshow_update_title">Update-indicator</string>

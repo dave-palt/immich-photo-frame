@@ -66,6 +66,15 @@
     <string name="edit">Modifica</string>
     <string name="save">Salva</string>
     <string name="cancel">Annulla</string>
+    <string name="reveal">Mostra</string>
+    <string name="hide">Nascondi</string>
+    <string name="copy">Copia</string>
+    <string name="api_key_copied">Chiave API copiata negli appunti</string>
+    <string name="biometric_auth_title">Autentica</string>
+    <string name="biometric_auth_subtitle_key">Autenticati per visualizzare la tua chiave API</string>
+    <string name="biometric_auth_subtitle_media">Autenticati per gestire la selezione dei media</string>
+    <string name="biometric_not_setup_title">Blocco schermo richiesto</string>
+    <string name="biometric_not_setup_message">Questa azione richiede un blocco schermo (impronta, volto o PIN). Configurane uno nelle impostazioni di sicurezza del dispositivo per utilizzare questa funzione.</string>
 
     <!-- Settings UI -->
     <string name="settings">Impostazioni</string>
@@ -122,8 +131,16 @@
     <string name="later">Più tardi</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d foto</string>
+    <string name="photos_count">%1$d / %2$d elementi</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Selezione dei media</string>
+    <string name="media_selection_count">%1$d di %2$d mostrati</string>
+    <string name="media_selection_new_items_default">Mostra nuovi media per impostazione predefinita</string>
+    <string name="media_selection_select_all">Mostra tutto</string>
+    <string name="media_selection_select_none">Nascondi tutto</string>
+    <string name="media_selection_shown">Mostrato nella presentazione</string>
+    <string name="media_selection_hidden">Nascosto dalla presentazione</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Avanti</string>
     <string name="tour_got_it">Capito</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Usa queste frecce per passare manualmente alla foto precedente o successiva.</string>
     <string name="tour_slideshow_playback_title">Pausa e muto</string>
     <string name="tour_slideshow_playback_body">Metti in pausa la presentazione o silenzia l\'audio dei video con questi controlli.</string>
+    <string name="tour_slideshow_media_selection_title">Scegli i tuoi media</string>
+    <string name="tour_slideshow_media_selection_body">Tocca qui per scegliere quali media mostrare nella presentazione. Confermerai prima con impronta digitale o blocco schermo.</string>
         <string name="tour_slideshow_albums_title">Torna agli Album</string>
     <string name="tour_slideshow_albums_body">Vuoi scegliere foto diverse? Tocca qui per tornare alla selezione degli album.</string>
     <string name="tour_slideshow_update_title">Indicatore di Aggiornamento</string>

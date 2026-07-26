@@ -120,6 +120,13 @@ object TourSteps {
             targetKey = "slideshow_pause",
         ),
         TourStep(
+            id = "slideshow_media_selection",
+            screen = TourScreen.SLIDESHOW,
+            titleRes = R.string.tour_slideshow_media_selection_title,
+            bodyRes = R.string.tour_slideshow_media_selection_body,
+            targetKey = "slideshow_media_selection",
+        ),
+        TourStep(
             id = "slideshow_albums",
             screen = TourScreen.SLIDESHOW,
             titleRes = R.string.tour_slideshow_albums_title,

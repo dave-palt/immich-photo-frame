@@ -56,7 +56,13 @@
 Tap the screen to reveal controls:
 - Previous / Next arrows
 - Pause / Play
-- Album name (current)
+- Photo count (current position / total)
+- **Media Selection** (grid icon, next to the photo count) — biometric-gated;
+  opens a grid of all album media where the user can tap thumbnails to
+  show/hide them from the slideshow (see F8)
+- Update status icon (checking / downloading / ready)
+- Launcher switch (apps icon, when Launcher Mode is active)
+- Albums (photo library icon)
 - Settings (gear icon)
 - Close slideshow (return to album selection)
 
@@ -200,10 +206,44 @@ Options:
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline
-  - **API Key** — editable inline, masked
+  - **API Key** — editable inline. For security, tapping **Edit** empties
+    the field (the key is never pre-populated); the user must re-type it.
+    When the key is set, two biometric-gated buttons appear:
+    **Reveal** (shows the key in monospace; tap again to hide) and
+    **Copy** (copies to clipboard, then auto-hides). Both require
+    fingerprint / face / device-PIN authentication. If no screen lock
+    is set up, a dialog prompts the user to create one.
   - Test Connection button
 - **Albums** — change album selection (returns to album picker)
 - **Reset All Settings** — clears everything, returns to setup screen
+
+### F8: Media Selection
+
+Accessible from the slideshow top bar (grid icon, next to the photo count).
+Requires biometric / device-credential authentication to open.
+
+1. User taps the grid icon in the slideshow controls.
+2. Biometric prompt appears (fingerprint / face / device PIN). If the user
+   cancels, nothing happens. If no screen lock is set up, a dialog directs
+   them to security settings.
+3. On success, a grid of all album assets loads (cache-first, thumbnails via
+   Coil). Each thumbnail shows:
+   - A checkmark badge (white = shown, dimmed = hidden)
+   - A video badge for video assets
+   - A dim overlay on hidden assets
+4. Tapping a thumbnail toggles its shown/hidden state. Changes persist
+   immediately to DataStore and take effect the next time the slideshow
+   loads.
+5. A **"Show new photos by default"** switch at the top controls the mode:
+   - **ON** (default): all media starts shown; tapping hides individual items.
+     New photos added to the album later appear automatically.
+   - **OFF**: all media starts hidden; tapping shows individual items. New
+     photos added later are hidden until manually shown.
+   Flipping the switch preserves the current visible selection — it only
+   changes the default for future new media.
+6. **Show All** / **Hide All** buttons provide bulk selection.
+7. A counter shows "X of Y shown" in the top bar.
+8. Back arrow returns to the slideshow.
 
 ## Error Handling
 
@@ -249,14 +289,18 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (18 steps across 4 screens):**
+**Step inventory (19 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
 | Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
-| Slideshow (7) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
+| Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
+
+- **`slideshow_media_selection`**: highlights the grid icon next to the photo
+  count. The tooltip explains that this opens the biometric-gated media
+  selection grid where the user can choose which photos and videos appear.
 
 - **`slideshow_albums`**: highlights the back-to-album-selection button.
 - **`slideshow_update`**: highlights the update status icon. Since this icon

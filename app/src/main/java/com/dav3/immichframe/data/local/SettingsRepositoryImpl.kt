@@ -54,6 +54,8 @@ constructor(
         val ANIM_PAN_DOWN = stringPreferencesKey("anim_pan_down")
         val AUTO_SYNC = stringPreferencesKey("auto_sync")
         val SYNC_INTERVAL_MINUTES = intPreferencesKey("sync_interval_minutes")
+        val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
+        val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
         val ONBOARDING_COMPLETED_STEPS = stringSetPreferencesKey("onboarding_completed_steps")
     }
 
@@ -127,6 +129,16 @@ constructor(
             )
         }
 
+    override val mediaSelectionToggledIds: Flow<Set<String>> =
+        context.appDataStore.data.map {
+            it[Keys.MEDIA_SELECTION_TOGGLED] ?: emptySet()
+        }
+
+    override val mediaSelectionNewItemsShown: Flow<Boolean> =
+        context.appDataStore.data.map {
+            it[Keys.MEDIA_SELECTION_NEW_SHOWN]?.toBoolean() ?: true
+        }
+
     override suspend fun setServerUrl(url: String) {
         context.appDataStore.edit { it[Keys.SERVER_URL] = url }
     }
@@ -168,6 +180,18 @@ constructor(
             it[Keys.ANIM_PAN_DOWN] = settings.animPanDown.toString()
             it[Keys.AUTO_SYNC] = settings.autoSync.toString()
             it[Keys.SYNC_INTERVAL_MINUTES] = settings.syncIntervalMinutes
+        }
+    }
+
+    override suspend fun setMediaSelectionToggledIds(ids: Set<String>) {
+        context.appDataStore.edit {
+            it[Keys.MEDIA_SELECTION_TOGGLED] = ids
+        }
+    }
+
+    override suspend fun setMediaSelectionNewItemsShown(shown: Boolean) {
+        context.appDataStore.edit {
+            it[Keys.MEDIA_SELECTION_NEW_SHOWN] = shown.toString()
         }
     }
 

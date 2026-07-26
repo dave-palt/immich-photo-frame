@@ -1,5 +1,8 @@
 package com.dav3.immichframe.ui.settings
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +17,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -27,6 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -38,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -67,6 +77,7 @@ import com.dav3.immichframe.ui.onboarding.TourScreen
 import com.dav3.immichframe.ui.onboarding.TourSteps
 import com.dav3.immichframe.ui.onboarding.rememberTourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.roundToInt
@@ -123,6 +134,16 @@ fun SettingsScreen(
     var urlDraft by remember(state.serverUrl) { mutableStateOf(state.serverUrl) }
     var keyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey) }
 
+    // API key security: reveal + biometric-gated copy
+    var revealedApiKey by remember { mutableStateOf(false) }
+    var showBiometricNotSetupDialog by remember { mutableStateOf(false) }
+    val biometricLauncher = com.dav3.immichframe.ui.components.rememberBiometricLauncher()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val authTitleKey = stringResource(R.string.biometric_auth_title)
+    val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
+    val apiKeyCopiedText = stringResource(R.string.api_key_copied)
+
     val tourState = rememberTourState()
     val completedSteps by viewModel.onboardingSteps.collectAsState()
     val scrollState = rememberScrollState()
@@ -150,6 +171,7 @@ fun SettingsScreen(
         },
     ) {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 TopAppBar(
                     title = {
@@ -518,23 +540,117 @@ fun SettingsScreen(
 
                         HorizontalDivider()
 
-                        EditableFieldRow(
-                            label = stringResource(R.string.api_key),
-                            displayValue = if (state.apiKey.isBlank()) stringResource(R.string.not_set) else "•".repeat(20),
-                            fieldLabel = stringResource(R.string.api_key),
-                            draft = keyDraft,
-                            onDraftChange = { keyDraft = it },
-                            editing = editingKey,
-                            onEdit = { editingKey = true },
-                            onCancel = {
-                                keyDraft = state.apiKey
-                                editingKey = false
-                            },
-                            onSave = {
-                                viewModel.updateApiKey(keyDraft)
-                                editingKey = false
-                            },
-                        )
+                        // API Key — secure row: edit empties field, reveal/copy
+                        // are biometric-gated. Key is never shown in plain text
+                        // in an editable field.
+                        // API Key — label on top, value below (full width so
+                        // the key can wrap naturally), actions in a row below.
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                stringResource(R.string.api_key),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            if (!editingKey) {
+                                if (state.apiKey.isNotBlank()) {
+                                    val displayText = if (revealedApiKey) {
+                                        state.apiKey
+                                    } else {
+                                        "•".repeat(state.apiKey.length.coerceAtMost(20))
+                                    }
+                                    Text(
+                                        displayText,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontFamily = if (revealedApiKey) FontFamily.Monospace else null,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                        IconButton(onClick = {
+                                            biometricLauncher.launch(
+                                                title = authTitleKey,
+                                                subtitle = authSubtitleKey,
+                                                onNotSetup = { showBiometricNotSetupDialog = true },
+                                                onSuccess = { revealedApiKey = !revealedApiKey },
+                                            )
+                                        }) {
+                                            Icon(
+                                                if (revealedApiKey) {
+                                                    Icons.Default.VisibilityOff
+                                                } else {
+                                                    Icons.Default.Visibility
+                                                },
+                                                contentDescription = stringResource(
+                                                    if (revealedApiKey) R.string.hide else R.string.reveal,
+                                                ),
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            biometricLauncher.launch(
+                                                title = authTitleKey,
+                                                subtitle = authSubtitleKey,
+                                                onNotSetup = { showBiometricNotSetupDialog = true },
+                                                onSuccess = {
+                                                    val clipboard = context
+                                                        .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                    clipboard.setPrimaryClip(
+                                                        ClipData.newPlainText("API Key", state.apiKey),
+                                                    )
+                                                    scope.launch {
+                                                        snackbarHostState.showSnackbar(
+                                                            apiKeyCopiedText,
+                                                        )
+                                                    }
+                                                },
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Default.ContentCopy,
+                                                contentDescription = stringResource(R.string.copy),
+                                            )
+                                        }
+                                        TextButton(onClick = {
+                                            keyDraft = ""
+                                            editingKey = true
+                                        }) { Text(stringResource(R.string.edit)) }
+                                    }
+                                } else {
+                                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                        Text(
+                                            stringResource(R.string.not_set),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        TextButton(onClick = {
+                                            keyDraft = ""
+                                            editingKey = true
+                                        }) { Text(stringResource(R.string.edit)) }
+                                    }
+                                }
+                            } else {
+                                OutlinedTextField(
+                                    value = keyDraft,
+                                    onValueChange = { keyDraft = it },
+                                    label = { Text(stringResource(R.string.api_key)) },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                    TextButton(onClick = {
+                                        keyDraft = state.apiKey
+                                        editingKey = false
+                                    }) { Text(stringResource(R.string.cancel)) }
+                                    TextButton(onClick = {
+                                        viewModel.updateApiKey(keyDraft)
+                                        editingKey = false
+                                    }) { Text(stringResource(R.string.save)) }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -605,6 +721,25 @@ fun SettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    if (showBiometricNotSetupDialog) {
+        AlertDialog(
+            onDismissRequest = { showBiometricNotSetupDialog = false },
+            title = { Text(stringResource(R.string.biometric_not_setup_title)) },
+            text = { Text(stringResource(R.string.biometric_not_setup_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBiometricNotSetupDialog = false
+                    com.dav3.immichframe.domain.system.BiometricHelper.openSecuritySettings(context)
+                }) { Text(stringResource(R.string.open_settings)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBiometricNotSetupDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
             },
         )
     }

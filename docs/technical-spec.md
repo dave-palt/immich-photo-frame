@@ -18,6 +18,7 @@
 | Media Cache DB | Room | 2.7.1 |
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
+| Biometric Auth | AndroidX Biometric | 1.1.0 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -60,15 +61,17 @@ immich-android/
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
 │   │   │   ├── repository/      # Repository interfaces
-│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
 │   │   │   ├── setup/           # Setup screen (URL + API key)
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
+│   │   │   ├── media/           # Media selection grid (biometric-gated)
 │   │   │   ├── settings/        # Settings screen
 │   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
+│   │   │   ├── components/      # Reusable composables (BiometricLauncher)
 │   │   │   ├── onboarding/      # Coachmark tour system (TourStep, TourState, CoachmarkOverlay)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
@@ -206,6 +209,7 @@ Setup → Albums → Slideshow
 - `Setup` is the start destination when no credentials are stored.
 - Once credentials + album selection exist, start destination is `Slideshow`.
 - `Settings` is accessible from `Slideshow` and `Albums`.
+- `MediaSelection` is accessible from `Slideshow` (biometric-gated).
 
 ## State Persistence
 
@@ -241,6 +245,8 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
+| Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 | Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
 
 All settings flow through a single shared DataStore instance

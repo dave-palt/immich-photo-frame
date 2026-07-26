@@ -66,6 +66,15 @@
     <string name="edit">編集</string>
     <string name="save">保存</string>
     <string name="cancel">キャンセル</string>
+    <string name="reveal">表示</string>
+    <string name="hide">非表示</string>
+    <string name="copy">コピー</string>
+    <string name="api_key_copied">APIキーをクリップボードにコピーしました</string>
+    <string name="biometric_auth_title">認証</string>
+    <string name="biometric_auth_subtitle_key">APIキーを表示するには認証してください</string>
+    <string name="biometric_auth_subtitle_media">メディア選択を管理するには認証してください</string>
+    <string name="biometric_not_setup_title">画面ロックが必要です</string>
+    <string name="biometric_not_setup_message">この操作には画面ロック（指紋、顔、またはPIN）が必要です。この機能を使用するには、デバイスのセキュリティ設定で設定してください。</string>
 
     <!-- Settings UI -->
     <string name="settings">設定</string>
@@ -122,8 +131,16 @@
     <string name="later">後で</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d枚の写真</string>
+    <string name="photos_count">%1$d / %2$d 件</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">メディア選択</string>
+    <string name="media_selection_count">%2$d件中%1$d件表示</string>
+    <string name="media_selection_new_items_default">新しいメディアをデフォルトで表示</string>
+    <string name="media_selection_select_all">すべて表示</string>
+    <string name="media_selection_select_none">すべて非表示</string>
+    <string name="media_selection_shown">スライドショーに表示</string>
+    <string name="media_selection_hidden">スライドショーから非表示</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">次へ</string>
     <string name="tour_got_it">了解</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">この矢印を使って手動で前または次の写真に移動します。</string>
     <string name="tour_slideshow_playback_title">一時停止とミュート</string>
     <string name="tour_slideshow_playback_body">これらのコントロールでスライドショーを一時停止したり、ビデオの音声をミュートできます。</string>
+    <string name="tour_slideshow_media_selection_title">メディアを選択</string>
+    <string name="tour_slideshow_media_selection_body">ここをタップして、スライドショーに表示するメディアを選択します。まず指紋または画面ロックで認証します。</string>
         <string name="tour_slideshow_albums_title">アルバムに戻る</string>
     <string name="tour_slideshow_albums_body">別の写真を選びたいですか？ここをタップしてアルバム選択に戻ります。</string>
     <string name="tour_slideshow_update_title">更新インジケーター</string>

@@ -66,6 +66,15 @@
     <string name="edit">Edytuj</string>
     <string name="save">Zapisz</string>
     <string name="cancel">Anuluj</string>
+    <string name="reveal">Pokaż</string>
+    <string name="hide">Ukryj</string>
+    <string name="copy">Kopiuj</string>
+    <string name="api_key_copied">Klucz API skopiowany do schowka</string>
+    <string name="biometric_auth_title">Uwierzytelnij</string>
+    <string name="biometric_auth_subtitle_key">Uwierzytelnij się, aby wyświetlić klucz API</string>
+    <string name="biometric_auth_subtitle_media">Uwierzytelnij się, aby zarządzać wyborem mediów</string>
+    <string name="biometric_not_setup_title">Wymagana blokada ekranu</string>
+    <string name="biometric_not_setup_message">To działanie wymaga blokady ekranu (odcisk palca, twarz lub PIN). Skonfiguruj ją w ustawieniach bezpieczeństwa urządzenia, aby korzystać z tej funkcji.</string>
 
     <!-- Settings UI -->
     <string name="settings">Ustawienia</string>
@@ -122,8 +131,16 @@
     <string name="later">Później</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d zdjęć</string>
+    <string name="photos_count">%1$d / %2$d multimediów</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Wybór mediów</string>
+    <string name="media_selection_count">%1$d z %2$d pokazanych</string>
+    <string name="media_selection_new_items_default">Domyślnie pokazuj nowe multimedia</string>
+    <string name="media_selection_select_all">Pokaż wszystko</string>
+    <string name="media_selection_select_none">Ukryj wszystko</string>
+    <string name="media_selection_shown">Pokazywane w pokazie slajdów</string>
+    <string name="media_selection_hidden">Ukryte z pokazu slajdów</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Dalej</string>
     <string name="tour_got_it">Rozumiem</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Użyj tych strzałek, aby ręcznie przejść do poprzedniego lub następnego zdjęcia.</string>
     <string name="tour_slideshow_playback_title">Wstrzymaj i wycisz</string>
     <string name="tour_slideshow_playback_body">Wstrzymaj pokaz slajdów lub wycisz dźwięk wideo za pomocą tych elementów sterowania.</string>
+    <string name="tour_slideshow_media_selection_title">Wybierz multimedia</string>
+    <string name="tour_slideshow_media_selection_body">Dotknij tutaj, aby wybrać multimedia w pokazie slajdów. Najpierw potwierdzisz odciskiem palca lub blokadą ekranu.</string>
         <string name="tour_slideshow_albums_title">Powrót do Albumów</string>
     <string name="tour_slideshow_albums_body">Chcesz wybrać inne zdjęcia? Stuknij tutaj, aby wrócić do wyboru albumów.</string>
     <string name="tour_slideshow_update_title">Wskaźnik Aktualizacji</string>

@@ -66,6 +66,15 @@
     <string name="edit">Modifier</string>
     <string name="save">Enregistrer</string>
     <string name="cancel">Annuler</string>
+    <string name="reveal">Afficher</string>
+    <string name="hide">Masquer</string>
+    <string name="copy">Copier</string>
+    <string name="api_key_copied">Clé API copiée dans le presse-papiers</string>
+    <string name="biometric_auth_title">Authentifier</string>
+    <string name="biometric_auth_subtitle_key">Authentifiez-vous pour afficher votre clé API</string>
+    <string name="biometric_auth_subtitle_media">Authentifiez-vous pour gérer la sélection des médias</string>
+    <string name="biometric_not_setup_title">"Verrouillage d'écran requis"</string>
+    <string name="biometric_not_setup_message">"Cette action nécessite un verrouillage d'écran (empreinte digitale, visage ou code). Configurez-en un dans les paramètres de sécurité de votre appareil pour utiliser cette fonctionnalité."</string>
 
     <!-- Settings UI -->
     <string name="settings">Paramètres</string>
@@ -122,8 +131,16 @@
     <string name="later">Plus tard</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d photos</string>
+    <string name="photos_count">%1$d / %2$d médias</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Sélection des médias</string>
+    <string name="media_selection_count">%1$d sur %2$d affichés</string>
+    <string name="media_selection_new_items_default">Afficher les nouveaux médias par défaut</string>
+    <string name="media_selection_select_all">Tout afficher</string>
+    <string name="media_selection_select_none">Tout masquer</string>
+    <string name="media_selection_shown">Affiché dans le diaporama</string>
+    <string name="media_selection_hidden">Masqué du diaporama</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Suivant</string>
     <string name="tour_got_it">Compris</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Utilisez ces flèches pour passer manuellement à la photo précédente ou suivante.</string>
     <string name="tour_slideshow_playback_title">Pause et muet</string>
     <string name="tour_slideshow_playback_body">Mettez le diaporama en pause ou coupez le son des vidéos avec ces contrôles.</string>
+    <string name="tour_slideshow_media_selection_title">Choisir vos médias</string>
+    <string name="tour_slideshow_media_selection_body">"Touchez ici pour choisir les médias affichés dans le diaporama. Vous confirmerez d'abord avec votre empreinte digitale ou verrouillage d'écran."</string>
         <string name="tour_slideshow_albums_title">Retour aux Albums</string>
     <string name="tour_slideshow_albums_body">Vous voulez choisir d\'autres photos ? Appuyez ici pour revenir à la sélection des albums.</string>
     <string name="tour_slideshow_update_title">Indicateur de Mise à Jour</string>

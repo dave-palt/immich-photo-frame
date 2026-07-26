@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
@@ -91,6 +92,7 @@ fun SlideshowScreen(
     onClose: () -> Unit,
     onSettings: () -> Unit,
     onChangeAlbums: () -> Unit,
+    onMediaSelection: () -> Unit = {},
     viewModel: SlideshowViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -107,6 +109,9 @@ fun SlideshowScreen(
     val updateState by updateVm.updateState.collectAsState()
     val updateDismissed by updateVm.updateDismissed.collectAsState()
     var showUpdateDialog by remember { mutableStateOf(false) }
+
+    val authTitle = stringResource(R.string.biometric_auth_title)
+    val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
 
     LaunchedEffect(Unit) { viewModel.load() }
 
@@ -321,6 +326,42 @@ fun SlideshowScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
+                        // Media selection — biometric-gated grid to pick which
+                        // photos are shown in the slideshow
+                        val biometric = com.dav3.immichframe.ui.components.rememberBiometricLauncher()
+                        var showBioNotSetup by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = {
+                                biometric.launch(
+                                    title = authTitle,
+                                    subtitle = authSubtitleMedia,
+                                    onNotSetup = { showBioNotSetup = true },
+                                    onSuccess = { onMediaSelection() },
+                                )
+                            },
+                            modifier = Modifier.tourTarget("slideshow_media_selection", tourState),
+                        ) {
+                            Icon(Icons.Default.GridView, "Media selection", tint = Color.White)
+                        }
+                        if (showBioNotSetup) {
+                            AlertDialog(
+                                onDismissRequest = { showBioNotSetup = false },
+                                title = { Text(stringResource(R.string.biometric_not_setup_title)) },
+                                text = { Text(stringResource(R.string.biometric_not_setup_message)) },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        showBioNotSetup = false
+                                        com.dav3.immichframe.domain.system.BiometricHelper
+                                            .openSecuritySettings(context)
+                                    }) { Text(stringResource(R.string.open_settings)) }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showBioNotSetup = false }) {
+                                        Text(stringResource(R.string.cancel))
+                                    }
+                                },
+                            )
+                        }
                         Spacer(Modifier.weight(1f))
                         // Update status icon — shows checking/downloading/ready states.
                         // Clicking opens the install dialog (only when download is ready).

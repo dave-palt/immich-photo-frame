@@ -89,6 +89,15 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="reveal">Reveal</string>
+    <string name="hide">Hide</string>
+    <string name="copy">Copy</string>
+    <string name="api_key_copied">API key copied to clipboard</string>
+    <string name="biometric_auth_title">Authenticate</string>
+    <string name="biometric_auth_subtitle_key">Authenticate to view your API key</string>
+    <string name="biometric_auth_subtitle_media">Authenticate to manage media selection</string>
+    <string name="biometric_not_setup_title">Screen Lock Required</string>
+    <string name="biometric_not_setup_message">This action requires a screen lock (fingerprint, face, or PIN). Set one up in your device security settings to use this feature.</string>
 
     <!-- Settings UI -->
     <string name="settings">Settings</string>
@@ -144,8 +153,16 @@
     <string name="update_error">Update check failed</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d photos</string>
+    <string name="photos_count">%1$d / %2$d media</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Media Selection</string>
+    <string name="media_selection_count">%1$d of %2$d shown</string>
+    <string name="media_selection_new_items_default">Show new media by default</string>
+    <string name="media_selection_select_all">Show All</string>
+    <string name="media_selection_select_none">Hide All</string>
+    <string name="media_selection_shown">Shown in slideshow</string>
+    <string name="media_selection_hidden">Hidden from slideshow</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Next</string>
     <string name="tour_got_it">Got it</string>
@@ -179,6 +196,8 @@
     <string name="tour_slideshow_nav_body">Use these arrows to move to the previous or next photo manually.</string>
     <string name="tour_slideshow_playback_title">Pause &amp; Mute</string>
     <string name="tour_slideshow_playback_body">Pause the slideshow or mute video audio with these controls.</string>
+    <string name="tour_slideshow_media_selection_title">Pick Your Media</string>
+    <string name="tour_slideshow_media_selection_body">Tap here to choose which media appear in the slideshow. You\'ll confirm with your fingerprint or screen lock first.</string>
     <string name="tour_slideshow_albums_title">Back to Albums</string>
     <string name="tour_slideshow_albums_body">Want to pick different photos? Tap here to go back to album selection.</string>
     <string name="tour_slideshow_update_title">Update Indicator</string>

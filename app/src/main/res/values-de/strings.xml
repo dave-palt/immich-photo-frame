@@ -66,6 +66,15 @@
     <string name="edit">Bearbeiten</string>
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
+    <string name="reveal">Anzeigen</string>
+    <string name="hide">Verbergen</string>
+    <string name="copy">Kopieren</string>
+    <string name="api_key_copied">API-Schlüssel in die Zwischenablage kopiert</string>
+    <string name="biometric_auth_title">Authentifizieren</string>
+    <string name="biometric_auth_subtitle_key">Authentifizieren Sie sich, um Ihren API-Schlüssel anzuzeigen</string>
+    <string name="biometric_auth_subtitle_media">Authentifizieren Sie sich, um die Medienauswahl zu verwalten</string>
+    <string name="biometric_not_setup_title">Bildschirmsperre erforderlich</string>
+    <string name="biometric_not_setup_message">Diese Aktion erfordert eine Bildschirmsperre (Fingerabdruck, Gesicht oder PIN). Richten Sie eine in den SicherheitsEinstellungen Ihres Geräts ein, um diese Funktion zu nutzen.</string>
 
     <!-- Settings UI -->
     <string name="settings">Einstellungen</string>
@@ -122,8 +131,16 @@
     <string name="later">Später</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d Fotos</string>
+    <string name="photos_count">%1$d / %2$d Medien</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Medienauswahl</string>
+    <string name="media_selection_count">%1$d von %2$d angezeigt</string>
+    <string name="media_selection_new_items_default">Neue Medien standardmäßig anzeigen</string>
+    <string name="media_selection_select_all">Alle anzeigen</string>
+    <string name="media_selection_select_none">Alle ausblenden</string>
+    <string name="media_selection_shown">In Diashow angezeigt</string>
+    <string name="media_selection_hidden">Aus Diashow ausgeblendet</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Weiter</string>
     <string name="tour_got_it">Verstanden</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Verwende diese Pfeile, um manuell zum vorherigen oder nächsten Foto zu wechseln.</string>
     <string name="tour_slideshow_playback_title">Pause &amp; Stumm</string>
     <string name="tour_slideshow_playback_body">Pausiere die Diashow oder schalte Video-Ton stumm mit diesen Steuerelementen.</string>
+    <string name="tour_slideshow_media_selection_title">Medien auswählen</string>
+    <string name="tour_slideshow_media_selection_body">Tippe hier, um auszuwählen, welche Medien in der Diashow angezeigt werden. Du bestätigst zuerst mit Fingerabdruck oder Displaysperre.</string>
         <string name="tour_slideshow_albums_title">Zurück zu Alben</string>
     <string name="tour_slideshow_albums_body">Möchtest du andere Fotos auswählen? Tippe hier, um zur Albumauswahl zurückzukehren.</string>
     <string name="tour_slideshow_update_title">Update-Anzeige</string>

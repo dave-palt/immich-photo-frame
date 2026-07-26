@@ -171,4 +171,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Biometric authentication (fingerprint / face / device credential)
+    implementation(libs.androidx.biometric)
 }

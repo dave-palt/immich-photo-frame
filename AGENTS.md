@@ -98,6 +98,16 @@ The docs live in `docs/`:
 6. **Non-goal becomes a goal (or vice versa)?** → Update:
    - `docs/overview.md` (Goals / Non-Goals)
 
+7. **New feature worth touring?** → Update:
+   - `TourSteps` in `ui/onboarding/TourStep.kt` (add step to the relevant
+     screen's list; pick a stable `id`, `targetKey`, and string resources)
+   - `Modifier.tourTarget("<targetKey>", tourState)` on the UI element the
+     step highlights (omit `targetKey` for centered, no-spotlight tips)
+   - `strings.xml` — add `tour_<screen>_<step>_title` + `_body` (EN + 12 locales)
+   - `docs/functional-spec.md` — update F7 step inventory + step count
+   - `docs/technical-spec.md` — update the `onboarding_completed_steps` count
+     if the total number of steps changed
+
 ### How to update docs
 
 - Read the current doc first (`read_file`), then `patch` or `write_file` the
@@ -132,6 +142,41 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Media Selection feature (PR2 of media-selection feature).
+  New screen `ui/media/MediaSelectionScreen.kt` + `MediaSelectionViewModel`
+  showing a grid of all album assets. Tap thumbnails to show/hide from the
+  slideshow. "Show new photos by default" switch (default ON): ON = all start
+  shown, tap to hide; OFF = all start hidden, tap to show. Flipping preserves
+  current visible selection (recomputes stored toggled set against all assets).
+  Show All / Hide All bulk buttons. Counter "X of Y shown". Accessible from
+  slideshow top bar (GridView icon next to photo count), biometric-gated.
+  New DataStore keys: `media_selection_toggled_ids` (StringSet),
+  `media_selection_new_shown` (String bool, default true).
+  `SlideshowViewModel.load()` now applies media-selection filter via shared
+  `applyMediaSelection()` helper. New nav route `media_selection`. New strings
+  (EN + 12 locales): media_selection_title, media_selection_count,
+  media_selection_new_items_default, media_selection_select_all,
+  media_selection_select_none, media_selection_shown, media_selection_hidden.
+  Updated: functional-spec (F4 controls, new F8 flow), technical-spec
+  (persistence table, package layout, nav routes), README.
+- **2026-07-26** — Biometric auth + API key security (PR1 of media-selection
+  feature). Added `androidx.biometric:biometric:1.1.0` dependency.
+  `MainActivity` changed from `ComponentActivity` to `FragmentActivity`
+  (required by `BiometricPrompt`; `FragmentActivity` extends
+  `ComponentActivity` so all existing APIs still work). New:
+  `domain/system/BiometricHelper.kt` (capability check, prompt with
+  `BIOMETRIC_WEAK | DEVICE_CREDENTIAL` — allows PIN fallback, cancellable
+  with no penalty), `ui/components/BiometricLauncher.kt` (composable
+  wrapper: `rememberBiometricLauncher()`). API key in Settings Connection
+  section: Edit now empties the field (no pre-population); Reveal and Copy
+  buttons appear when key is set, both biometric-gated; copy shows a
+  snackbar. If no screen lock enrolled, a dialog links to security settings.
+  New strings (EN + 12 locales): reveal, hide, copy, api_key_copied,
+  biometric_auth_title, biometric_auth_subtitle_key,
+  biometric_auth_subtitle_media, biometric_not_setup_title,
+  biometric_not_setup_message. Updated: functional-spec (F6 Connection
+  section), technical-spec (tech stack, package layout), ui-spec (mockup +
+  description), README.
 - **2026-07-26** — Launcher icon redesign + app logo. (1) Replaced the old
   5-segment colored frame icon with a new design: colorful frame border +
   sun/moon circle + mountain silhouette (converted from 512-space SVG to

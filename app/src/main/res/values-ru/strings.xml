@@ -66,6 +66,15 @@
     <string name="edit">Изменить</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
+    <string name="reveal">Показать</string>
+    <string name="hide">Скрыть</string>
+    <string name="copy">Копировать</string>
+    <string name="api_key_copied">API-ключ скопирован в буфер обмена</string>
+    <string name="biometric_auth_title">Аутентификация</string>
+    <string name="biometric_auth_subtitle_key">Пройдите аутентификацию, чтобы просмотреть API-ключ</string>
+    <string name="biometric_auth_subtitle_media">Пройдите аутентификацию для управления выбором медиа</string>
+    <string name="biometric_not_setup_title">Требуется блокировка экрана</string>
+    <string name="biometric_not_setup_message">Это действие требует блокировки экрана (отпечаток, лицо или PIN-код). Настройте её в параметрах безопасности устройства, чтобы использовать эту функцию.</string>
 
     <!-- Settings UI -->
     <string name="settings">Настройки</string>
@@ -122,8 +131,16 @@
     <string name="later">Позже</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d фото</string>
+    <string name="photos_count">%1$d / %2$d медиа</string>
 
+    <!-- Media Selection -->
+    <string name="media_selection_title">Выбор медиа</string>
+    <string name="media_selection_count">%1$d из %2$d отображено</string>
+    <string name="media_selection_new_items_default">Показывать новые медиа по умолчанию</string>
+    <string name="media_selection_select_all">Показать все</string>
+    <string name="media_selection_select_none">Скрыть все</string>
+    <string name="media_selection_shown">Отображается в слайд-шоу</string>
+    <string name="media_selection_hidden">Скрыто из слайд-шоу</string>
     <!-- Onboarding Tour -->
     <string name="tour_next">Далее</string>
     <string name="tour_got_it">Понятно</string>
@@ -151,6 +168,8 @@
     <string name="tour_slideshow_nav_body">Используйте эти стрелки для перехода к предыдущему или следующему фото вручную.</string>
     <string name="tour_slideshow_playback_title">Пауза и звук</string>
     <string name="tour_slideshow_playback_body">Приостановите слайд-шоу или выключите звук видео этими кнопками.</string>
+    <string name="tour_slideshow_media_selection_title">Выберите медиа</string>
+    <string name="tour_slideshow_media_selection_body">Нажмите здесь, чтобы выбрать медиа для слайд-шоу. Сначала потребуется подтвердить отпечатком пальца или блокировкой экрана.</string>
         <string name="tour_slideshow_albums_title">Назад к альбомам</string>
     <string name="tour_slideshow_albums_body">Хотите выбрать другие фото? Нажмите здесь, чтобы вернуться к выбору альбомов.</string>
     <string name="tour_slideshow_update_title">Индикатор обновления</string>

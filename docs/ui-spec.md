@@ -194,6 +194,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  ┌──────────────────────┐    │
 │  │ Server URL   [Edit]  │    │
 │  │ API Key      [Edit]  │    │
+│  │ [Reveal] [Copy]      │    │
 │  │ [Test Connection]    │    │
 │  └──────────────────────┘    │
 │                              │
@@ -239,6 +240,9 @@ appears:
 - Editing server URL or API key does not auto-navigate; the change takes
   effect next time the app fetches data (or when user manually restarts
   the slideshow).
+- API key **Edit** empties the field for security (no pre-population);
+  **Reveal** and **Copy** buttons appear when the key is set and require
+  biometric / device-PIN authentication.
 - Changing selected albums navigates back to the album picker.
 - Auto-Update toggle is hidden when installed from Play Store
   (`getInstallSourceInfo() == "com.android.vending"`).
