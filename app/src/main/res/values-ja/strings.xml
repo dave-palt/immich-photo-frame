@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">自動起動の許可</string>
     <string name="autostart_perm_message">一部のデバイスはアプリの自動起動をブロックします。起動時にアプリを確実に起動するには、デバイス設定で自動起動の許可を付与する必要がある場合があります。</string>
+    <string name="overlay_perm_title">他のアプリの上に重ねて表示</string>
+    <string name="overlay_perm_message">再起動後にアプリを自動的に起動するには、Android で「他のアプリの上に重ねて表示」権限が必要です。次に開く設定画面で許可してください。</string>
+    <string name="open_overlay">他のアプリの上に重ねて表示を許可</string>
+        <string name="launcher_mode">ランチャーモード</string>
+        <string name="launcher_mode_desc">デフォルトのホーム画面として設定。起動時に自動起動する最も確実な方法です。オートスタート権限は不要です。写真フレーム専用デバイスに最適です。</string>
+        <string name="open_launcher_settings">ランチャー設定を開く</string>
+        <string name="check_now">今すぐ確認</string>
+        <string name="launcher_lost_title">ランチャーモードが無効です</string>
+        <string name="launcher_lost_message">別のアプリがデフォルトのホーム画面に設定されています。下をタップしてランチャー設定を開き、Immich Media Frameを再選択してください。</string>
+        <string name="set_as_launcher">デフォルトランチャーに設定</string>
     <string name="open_settings">設定を開く</string>
     <string name="skip">スキップ</string>
     <string name="reset_title">すべてリセットしますか？</string>

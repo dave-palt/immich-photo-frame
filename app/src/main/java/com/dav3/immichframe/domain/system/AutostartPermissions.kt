@@ -24,6 +24,46 @@ internal fun needsBootPermission(): Boolean {
     )
 }
 
+/**
+ * Returns true if the app holds the [android.Manifest.permission.SYSTEM_ALERT_WINDOW]
+ * ("Display over other apps") permission.
+ *
+ * Since Android 10 (API 29), starting an Activity from a background component
+ * (such as a BOOT_COMPLETED receiver) is blocked by the Background Activity
+ * Launch (BAL) restriction unless the app holds SAW. See:
+ * https://developer.android.com/guide/components/activities/secure-bal
+ */
+internal fun hasOverlayPermission(context: Context): Boolean = AndroidSettings.canDrawOverlays(context)
+
+/**
+ * Opens the system "Display over other apps" settings screen for this app.
+ * Falls back to the generic app-details page if the intent fails.
+ */
+internal fun openOverlayPermissionSettings(context: Context) {
+    try {
+        val intent = Intent(
+            AndroidSettings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:${context.packageName}"),
+        ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+        context.startActivity(intent)
+    } catch (_: Exception) {
+        try {
+            context.startActivity(
+                Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+            )
+        } catch (_: Exception) {
+            context.startActivity(
+                Intent(AndroidSettings.ACTION_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+            )
+        }
+    }
+}
+
 /** All known autostart-setting components per OEM family. */
 private fun autostartCandidates(manufacturer: String): List<ComponentName> {
     val oplus = listOf(

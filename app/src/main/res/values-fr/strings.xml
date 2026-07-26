@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Autorisation de démarrage automatique</string>
     <string name="autostart_perm_message">Certains appareils empêchent les applications de démarrer automatiquement. Pour garantir le lancement de l\'application au démarrage, vous devrez peut-être accorder l\'autorisation de démarrage automatique dans les paramètres de votre appareil.</string>
+    <string name="overlay_perm_title">Afficher au-dessus des autres apps</string>
+    <string name="overlay_perm_message">Pour lancer l\'application automatiquement après le redémarrage, Android nécessite l\'autorisation « Afficher au-dessus des autres applications ». Accordez-la dans l\'écran de paramètres qui s\'ouvre ensuite.</string>
+    <string name="open_overlay">Accorder Afficher au-dessus des autres apps</string>
+        <string name="launcher_mode">Mode Launcher</string>
+        <string name="launcher_mode_desc">Définir comme écran d’accueil par défaut. Le moyen le plus fiable de lancer au démarrage — aucune autorisation d’autostart requise. Idéal pour les cadres photo dédiés.</string>
+        <string name="open_launcher_settings">Ouvrir les paramètres du launcher</string>
+        <string name="check_now">Vérifier maintenant</string>
+        <string name="launcher_lost_title">Mode launcher inactif</string>
+        <string name="launcher_lost_message">Une autre application est définie comme écran d’accueil par défaut. Appuyez ci-dessous pour ouvrir les paramètres du launcher et re-sélectionner Immich Media Frame.</string>
+        <string name="set_as_launcher">Définir comme launcher par défaut</string>
     <string name="open_settings">Ouvrir les paramètres</string>
     <string name="skip">Ignorer</string>
     <string name="reset_title">Tout réinitialiser ?</string>

@@ -3,6 +3,7 @@ package com.dav3.immichframe
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.dav3.immichframe.data.local.appDataStore
@@ -26,9 +27,18 @@ class BootReceiver : BroadcastReceiver() {
 
                 if (enabled) {
                     context.appDataStore.edit { it[BOOT_VERIFIED_KEY] = "true" }
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                    launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    launchIntent?.let { context.startActivity(it) }
+
+                    // Starting an Activity from a background BroadcastReceiver requires
+                    // SYSTEM_ALERT_WINDOW on Android 10+ (Background Activity Launch
+                    // restriction). If the permission isn't granted the launch is silently
+                    // blocked by the OS, so skip the startActivity call rather than log a
+                    // misleading BAL-denial warning. The Settings screen prompts the user
+                    // to grant the permission when Start on Boot is enabled.
+                    if (Settings.canDrawOverlays(context)) {
+                        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                        launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        launchIntent?.let { context.startActivity(it) }
+                    }
                 } else {
                     context.appDataStore.edit { it[BOOT_VERIFIED_KEY] = "false" }
                 }

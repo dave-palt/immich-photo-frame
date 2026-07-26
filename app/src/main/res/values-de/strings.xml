@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Autostart-Berechtigung</string>
     <string name="autostart_perm_message">Einige Geräte blockieren das automatische Starten von Apps. Um sicherzustellen, dass die App beim Start ausgeführt wird, müssen Sie möglicherweise die Autostart-Berechtigung in Ihren Geräteeinstellungen erteilen.</string>
+    <string name="overlay_perm_title">Über anderen Apps einblenden</string>
+    <string name="overlay_perm_message">Um die App nach dem Neustart automatisch zu starten, benötigt Android die Berechtigung „Über anderen Apps einblenden". Erteilen Sie sie im nächsten Einstellungsbildschirm.</string>
+    <string name="open_overlay">Über anderen Apps einblenden erlauben</string>
+        <string name="launcher_mode">Launcher-Modus</string>
+        <string name="launcher_mode_desc">Als Standard-Startbildschirm festlegen. Die zuverlässigste Methode zum Starten nach dem Booten — keine Autostart-Berechtigung erforderlich. Ideal für dedizierte Bilderrahmen.</string>
+        <string name="open_launcher_settings">Launcher-Einstellungen öffnen</string>
+        <string name="check_now">Jetzt prüfen</string>
+        <string name="launcher_lost_title">Launcher-Modus inaktiv</string>
+        <string name="launcher_lost_message">Eine andere App ist als Standard-Startbildschirm festgelegt. Tippen Sie unten, um die Launcher-Einstellungen zu öffnen und Immich Media Frame erneut auszuwählen.</string>
+        <string name="set_as_launcher">Als Standard-Launcher festlegen</string>
     <string name="open_settings">Einstellungen öffnen</string>
     <string name="skip">Überspringen</string>
     <string name="reset_title">Alles zurücksetzen?</string>

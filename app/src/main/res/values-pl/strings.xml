@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Uprawnienie autostartu</string>
     <string name="autostart_perm_message">Niektóre urządzenia blokują automatyczne uruchamianie aplikacji. Aby zapewnić uruchomienie aplikacji przy starcie, konieczne może być nadanie uprawnienia autostartu w ustawieniach urządzenia.</string>
+    <string name="overlay_perm_title">Wyświetlanie nad innymi aplikacjami</string>
+    <string name="overlay_perm_message">Aby automatycznie uruchomić aplikację po ponownym uruchomieniu, Android wymaga uprawnienia „Wyświetlanie nad innymi aplikacjami". Nadaj je na kolejnym ekranie ustawień.</string>
+    <string name="open_overlay">Nadaj uprawnienie Wyświetlanie nad innymi aplikacjami</string>
+        <string name="launcher_mode">Tryb Launchera</string>
+        <string name="launcher_mode_desc">Ustaw jako domyślny ekran główny. Najbardziej niezawodny sposób uruchamiania przy starcie — nie wymaga uprawnienia autostartu. Idealny dla dedykowanych ramek na zdjęcia.</string>
+        <string name="open_launcher_settings">Otwórz ustawienia launchera</string>
+        <string name="check_now">Sprawdź teraz</string>
+        <string name="launcher_lost_title">Tryb launchera nieaktywny</string>
+        <string name="launcher_lost_message">Inna aplikacja jest ustawiona jako domyślny ekran główny. Stuknij poniżej, aby otworzyć ustawienia launchera i ponownie wybrać Immich Media Frame.</string>
+        <string name="set_as_launcher">Ustaw jako domyślny launcher</string>
     <string name="open_settings">Otwórz ustawienia</string>
     <string name="skip">Pomiń</string>
     <string name="reset_title">Zresetować wszystko?</string>
