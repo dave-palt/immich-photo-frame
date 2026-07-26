@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
@@ -65,6 +66,7 @@ import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
+import com.dav3.immichframe.domain.system.openOtherLauncher
 import com.dav3.immichframe.util.extractDominantColor
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -280,6 +282,12 @@ fun SlideshowScreen(
                 ) {
                     Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
                     Spacer(Modifier.weight(1f))
+                    if (s.launcherMode) {
+                        val context = LocalContext.current
+                        IconButton(onClick = { openOtherLauncher(context) }) {
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, "Switch to another launcher", tint = Color.White)
+                        }
+                    }
                     IconButton(onClick = onChangeAlbums) {
                         Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
                     }

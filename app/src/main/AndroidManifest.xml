@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- SYSTEM_ALERT_WINDOW: required on Android 10+ to start an Activity from
+         a BOOT_COMPLETED BroadcastReceiver (Background Activity Launch exemption). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".ImmichFrameApp"
@@ -28,11 +31,28 @@
             </intent-filter>
         </activity>
 
+        <!-- Launcher mode: when enabled via PackageManager, the system sees
+             this alias as a Home replacement and always launches it on boot.
+             This bypasses BOOT_COMPLETED entirely — the most reliable autostart
+             method, especially on Chinese OEM ROMs (OPPO/Realme/Xiaomi/etc.)
+             that silently block boot broadcasts. -->
+        <activity-alias
+            android:name=".LauncherAlias"
+            android:targetActivity=".MainActivity"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

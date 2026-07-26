@@ -158,8 +158,10 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  Fullscreen             [●]  │ ← toggle
 │  Keep Screen On         [●]  │ ← toggle
-│  Start on Boot          [○]  │ ← toggle (+ OEM autostart prompt)
+│  Start on Boot          [○]  │ ← toggle (+ overlay & OEM autostart prompts)
+│  Launcher Mode          [○]  │ ← toggle (+ Open Launcher Settings button)
 │  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
+│  Check Now                   │ ← button (manual update check)
 │                              │
 │  MEDIA CACHE                 │
 │  Auto Sync              [●]  │ ← toggle
@@ -205,11 +207,23 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 - Changing selected albums navigates back to the album picker.
 - Auto-Update toggle is hidden when installed from Play Store
   (`getInstallSourceInfo() == "com.android.vending"`).
-- Start on Boot shows an "Open Autostart Settings" button when enabled,
+- Start on Boot shows a "Grant Display Over Other Apps" button when enabled
+  if the `SYSTEM_ALERT_WINDOW` permission is not yet granted (required on
+  Android 10+ for the boot receiver to launch the app — Background Activity
+  Launch exemption).
+- Start on Boot also shows an "Open Autostart Settings" button when enabled,
   which deep-links to the OEM-specific autostart permission screen
   (Xiaomi, Oppo, Vivo, Huawei, Honor, Asus, etc.).
-
-## Color Palette
+- Launcher Mode, when enabled, shows an "Open Launcher Settings" button that
+  opens the system Home settings page (`ACTION_HOME_SETTINGS`), allowing
+  the user to switch to another launcher or re-select this app. The same
+  action is available in the slideshow hover UI (apps icon in the top bar)
+  when launcher mode is active.
+- If the app loses its default-launcher status while Launcher Mode is
+  enabled, a dialog appears on resume prompting the user to re-select
+  Immich Media Frame as the default Home.
+- Auto-Update, when visible, shows a "Check Now" button below it that
+  triggers an immediate update check regardless of the toggle state.
 
 Material 3 dynamic colors are NOT used (frame context needs consistent dark background).
 

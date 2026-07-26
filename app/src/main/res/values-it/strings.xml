@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Autorizzazione avvio automatico</string>
     <string name="autostart_perm_message">Alcuni dispositivi impediscono alle app di avviarsi automaticamente. Per assicurarti che l\'app si avvii all\'accensione, potresti dover concedere l\'autorizzazione di avvio automatico nelle impostazioni del dispositivo.</string>
+    <string name="overlay_perm_title">Visualizza sopra altre app</string>
+    <string name="overlay_perm_message">Per avviare automaticamente l\'app dopo il riavvio, Android richiede l\'autorizzazione "Visualizza sopra altre app". Concedila nella schermata delle impostazioni che si apre.</string>
+    <string name="open_overlay">Concedi Visualizza sopra altre app</string>
+        <string name="launcher_mode">Modalità Launcher</string>
+        <string name="launcher_mode_desc">Imposta come schermata Home predefinita. Il modo più affidabile per avviare al boot — nessuna autorizzazione di autostart necessaria. Ideale per cornici digitali dedicate.</string>
+        <string name="open_launcher_settings">Apri impostazioni launcher</string>
+        <string name="check_now">Controlla ora</string>
+        <string name="launcher_lost_title">Modalità launcher inattiva</string>
+        <string name="launcher_lost_message">Un’altra app è impostata come schermata Home predefinita. Tocca sotto per aprire le impostazioni del launcher e selezionare di nuovo Immich Media Frame.</string>
+        <string name="set_as_launcher">Imposta come launcher predefinito</string>
     <string name="open_settings">Apri impostazioni</string>
     <string name="skip">Salta</string>
     <string name="reset_title">Ripristinare tutto?</string>

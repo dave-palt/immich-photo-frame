@@ -31,8 +31,9 @@ lets you pick which album(s) to display, and remembers your choice.
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
-- Start on boot (with OEM autostart permission detection)
-- Self-update via GitHub releases (sideloaded installs only)
+- Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)
+- Launcher mode (Home replacement) — the most reliable boot method for dedicated photo frames; bypasses BOOT_COMPLETED entirely
+- Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
 - Offline media cache with background sync (Room + WorkManager)
 - Auto-resumes last album on launch
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)

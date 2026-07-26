@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">إذن التشغيل التلقائي</string>
     <string name="autostart_perm_message">تمنع بعض الأجهزة التطبيقات من التشغيل تلقائيًا. لضمان تشغيل التطبيق عند الإقلاع، قد تحتاج إلى منح إذن التشغيل التلقائي في إعدادات جهازك.</string>
+    <string name="overlay_perm_title">العرض فوق التطبيقات الأخرى</string>
+    <string name="overlay_perm_message">لبدء التطبيق تلقائيًا بعد إعادة التشغيل، يتطلب Android إذن "العرض فوق التطبيقات الأخرى". امنحه في شاشة الإعدادات التي تفتح بعد ذلك.</string>
+    <string name="open_overlay">منح إذن العرض فوق التطبيقات الأخرى</string>
+        <string name="launcher_mode">وضع المشغّل</string>
+        <string name="launcher_mode_desc">تعيين كالشاشة الرئيسية الافتراضية. أكثر طريقة موثوقة للتشغيل عند الإقلاع — لا حاجة لإذن التشغيل التلقائي. مثالي لإطارات الصور المخصصة.</string>
+        <string name="open_launcher_settings">فتح إعدادات المشغّل</string>
+        <string name="check_now">تحقق الآن</string>
+        <string name="launcher_lost_title">وضع المشغّل غير نشط</string>
+        <string name="launcher_lost_message">تطبيق آخر معيّن كالشاشة الرئيسية الافتراضية. اضغط أدناه لفتح إعدادات المشغّل وإعادة تحديد Immich Media Frame.</string>
+        <string name="set_as_launcher">تعيين كمشغّل افتراضي</string>
     <string name="open_settings">فتح الإعدادات</string>
     <string name="skip">تخطي</string>
     <string name="reset_title">إعادة تعيين كل شيء؟</string>

@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">自动启动权限</string>
     <string name="autostart_perm_message">某些设备会阻止应用自动启动。为确保应用在开机时启动，您可能需要在设备设置中授予自动启动权限。</string>
+    <string name="overlay_perm_title">显示在其他应用上层</string>
+    <string name="overlay_perm_message">要在重启后自动启动应用，Android 需要"显示在其他应用上层"权限。请在接下来打开的设置界面中授予该权限。</string>
+    <string name="open_overlay">授予显示在其他应用上层权限</string>
+        <string name="launcher_mode">启动器模式</string>
+        <string name="launcher_mode_desc">设为默认主屏幕。这是开机自动启动最可靠的方式——无需自动启动权限。适合专用数码相框。</string>
+        <string name="open_launcher_settings">打开启动器设置</string>
+        <string name="check_now">立即检查</string>
+        <string name="launcher_lost_title">启动器模式未激活</string>
+        <string name="launcher_lost_message">其他应用已设为默认主屏幕。点击下方打开启动器设置并重新选择 Immich Media Frame。</string>
+        <string name="set_as_launcher">设为默认启动器</string>
     <string name="open_settings">打开设置</string>
     <string name="skip">跳过</string>
     <string name="reset_title">重置全部？</string>

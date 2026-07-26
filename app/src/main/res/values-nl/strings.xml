@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Autostart-machtiging</string>
     <string name="autostart_perm_message">Sommige apparaten blokkeren het automatisch starten van apps. Om ervoor te zorgen dat de app bij het opstarten wordt gestart, moet u mogelijk autostart-machtiging verlenen in de apparaatinstellingen.</string>
+    <string name="overlay_perm_title">Weergave boven andere apps</string>
+    <string name="overlay_perm_message">Om de app automatisch te starten na opnieuw opstarten, vereist Android de toestemming "Weergave boven andere apps". Verleen deze in het volgende instellingenscherm.</string>
+    <string name="open_overlay">Weergave boven andere apps verlenen</string>
+        <string name="launcher_mode">Launcher-modus</string>
+        <string name="launcher_mode_desc">Instellen als standaard startscherm. De meest betrouwbare manier om op te starten bij het opstarten — geen autostart-toestemming nodig. Ideaal voor exclusieve fotolijsten.</string>
+        <string name="open_launcher_settings">Launcher-instellingen openen</string>
+        <string name="check_now">Nu controleren</string>
+        <string name="launcher_lost_title">Launcher-modus inactief</string>
+        <string name="launcher_lost_message">Een andere app is ingesteld als standaard startscherm. Tik hieronder om de launcher-instellingen te openen en Immich Media Frame opnieuw te selecteren.</string>
+        <string name="set_as_launcher">Als standaard launcher instellen</string>
     <string name="open_settings">Instellingen openen</string>
     <string name="skip">Overslaan</string>
     <string name="reset_title">Alles resetten?</string>

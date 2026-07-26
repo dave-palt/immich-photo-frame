@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Разрешение на автозапуск</string>
     <string name="autostart_perm_message">Некоторые устройства блокируют автоматический запуск приложений. Чтобы приложение запускалось при включении, может потребоваться предоставить разрешение на автозапуск в настройках устройства.</string>
+    <string name="overlay_perm_title">Поверх других приложений</string>
+    <string name="overlay_perm_message">Для автоматического запуска приложения после перезагрузки Android требует разрешение «Поверх других приложений». Предоставьте его в открывшемся экране настроек.</string>
+    <string name="open_overlay">Предоставить Поверх других приложений</string>
+        <string name="launcher_mode">Режим Launcher</string>
+        <string name="launcher_mode_desc">Установить как главный экран по умолчанию. Самый надёжный способ запуска при загрузке — не требует разрешения автозапуска. Идеально для специализированных фоторамок.</string>
+        <string name="open_launcher_settings">Открыть настройки launcher</string>
+        <string name="check_now">Проверить сейчас</string>
+        <string name="launcher_lost_title">Режим launcher неактивен</string>
+        <string name="launcher_lost_message">Другое приложение установлено как главный экран по умолчанию. Нажмите ниже, чтобы открыть настройки launcher и снова выбрать Immich Media Frame.</string>
+        <string name="set_as_launcher">Установить как launcher по умолчанию</string>
     <string name="open_settings">Открыть настройки</string>
     <string name="skip">Пропустить</string>
     <string name="reset_title">Сбросить всё?</string>

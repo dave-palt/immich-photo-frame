@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,11 +50,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
+import com.dav3.immichframe.domain.system.hasOverlayPermission
 import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
+import com.dav3.immichframe.domain.system.openLauncherSettings
+import com.dav3.immichframe.domain.system.openOverlayPermissionSettings
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.roundToInt
@@ -64,6 +71,7 @@ fun SettingsScreen(
     onChangeAlbums: () -> Unit,
     onReset: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
+    updateViewModel: com.dav3.immichframe.ui.update.UpdateViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val s = state.settings
@@ -88,6 +96,22 @@ fun SettingsScreen(
     var editingKey by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
     var showBootPermissionDialog by remember { mutableStateOf(false) }
+    var showOverlayDialog by remember { mutableStateOf(false) }
+
+    // Track SYSTEM_ALERT_WINDOW ("Display over other apps") permission state.
+    // Re-check on every ON_RESUME so the UI refreshes after the user returns
+    // from the system permission settings screen.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var hasOverlay by remember { mutableStateOf(hasOverlayPermission(context)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasOverlay = hasOverlayPermission(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     var urlDraft by remember(state.serverUrl) { mutableStateOf(state.serverUrl) }
     var keyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey) }
@@ -258,17 +282,57 @@ fun SettingsScreen(
                 checked = s.startOnBoot,
                 onToggle = {
                     viewModel.toggleStartOnBoot()
-                    if (!s.startOnBoot && needsBootPermission()) {
-                        showBootPermissionDialog = true
+                    if (!s.startOnBoot) {
+                        // Turning ON: prompt for overlay permission if missing
+                        if (!hasOverlay) {
+                            showOverlayDialog = true
+                        }
+                        if (needsBootPermission()) {
+                            showBootPermissionDialog = true
+                        }
                     }
                 },
             )
+            // Overlay ("Display over other apps") permission button — required on
+            // Android 10+ for the boot receiver to launch the app.
+            if (s.startOnBoot && !hasOverlay) {
+                TextButton(
+                    onClick = { openOverlayPermissionSettings(context) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.open_overlay),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
             if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
                 TextButton(
                     onClick = { openBootPermissionSettings(context) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(stringResource(R.string.open_autostart), style = MaterialTheme.typography.labelLarge)
+                }
+            }
+
+            // ---- Launcher Mode (most reliable boot method) ----
+            // Only visible when Start on Boot is enabled — launcher mode is a
+            // complement to it for devices where BOOT_COMPLETED is unreliable.
+            if (s.startOnBoot) {
+                SwitchItem(
+                    title = stringResource(R.string.launcher_mode),
+                    subtitle = stringResource(R.string.launcher_mode_desc),
+                    checked = s.launcherMode,
+                    onToggle = { viewModel.toggleLauncherMode(context) },
+                )
+                TextButton(
+                    onClick = { openLauncherSettings(context) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.open_launcher_settings),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
 
@@ -279,6 +343,15 @@ fun SettingsScreen(
                     checked = s.autoUpdate,
                     onToggle = { viewModel.toggleAutoUpdate() },
                 )
+                TextButton(
+                    onClick = { updateViewModel.checkForUpdateNow() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.check_now),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
             }
 
             HorizontalDivider()
@@ -410,6 +483,26 @@ fun SettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showBootPermissionDialog = false }) { Text(stringResource(R.string.skip)) }
+            },
+        )
+    }
+
+    // Overlay permission dialog (SYSTEM_ALERT_WINDOW)
+    if (showOverlayDialog) {
+        AlertDialog(
+            onDismissRequest = { showOverlayDialog = false },
+            title = { Text(stringResource(R.string.overlay_perm_title)) },
+            text = {
+                Text(stringResource(R.string.overlay_perm_message))
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showOverlayDialog = false
+                    openOverlayPermissionSettings(context)
+                }) { Text(stringResource(R.string.open_settings)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showOverlayDialog = false }) { Text(stringResource(R.string.skip)) }
             },
         )
     }

@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Permissão de arranque automático</string>
     <string name="autostart_perm_message">Alguns dispositivos impedem as aplicações de iniciarem automaticamente. Para garantir que a aplicação é iniciada no arranque, pode ser necessário conceder permissão de arranque automático nas definições do dispositivo.</string>
+    <string name="overlay_perm_title">Exibir sobre outras apps</string>
+    <string name="overlay_perm_message">Para iniciar a app automaticamente após o reinício, o Android requer a permissão "Exibir sobre outras apps". Conceda-a no ecrã de definições que se abre.</string>
+    <string name="open_overlay">Conceder Exibir sobre outras apps</string>
+        <string name="launcher_mode">Modo Launcher</string>
+        <string name="launcher_mode_desc">Definir como ecrã inicial predefinido. A forma mais fiável de iniciar no arranque — sem permissão de autostart. Ideal para molduras digitais dedicadas.</string>
+        <string name="open_launcher_settings">Abrir definições do launcher</string>
+        <string name="check_now">Verificar agora</string>
+        <string name="launcher_lost_title">Modo launcher inativo</string>
+        <string name="launcher_lost_message">Outra aplicação está definida como ecrã inicial predefinido. Toque abaixo para abrir as definições do launcher e voltar a selecionar Immich Media Frame.</string>
+        <string name="set_as_launcher">Definir como launcher predefinido</string>
     <string name="open_settings">Abrir definições</string>
     <string name="skip">Ignorar</string>
     <string name="reset_title">Repor tudo?</string>

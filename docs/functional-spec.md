@@ -84,9 +84,15 @@ When **Show Clock** is enabled, a clock is displayed on top of the slideshow.
 ### F5b: Start on Boot
 
 When **Start on Boot** is enabled, the app launches automatically when the device
-boots. On certain OEMs (Xiaomi, Oppo, Vivo, Huawei, Honor, etc.) that restrict
-autostart, the app detects the manufacturer and prompts the user to grant the
-autostart permission, deep-linking to the correct system settings screen.
+boots. On Android 10+ (API 29+), the OS blocks starting an Activity from a
+background `BroadcastReceiver` (Background Activity Launch restriction) unless
+the app holds the `SYSTEM_ALERT_WINDOW` ("Display over other apps") permission.
+The app prompts the user to grant this permission when the feature is toggled on,
+and shows a "Grant Display Over Other Apps" button in Settings until it is
+granted. On certain OEMs (Xiaomi, Oppo, Vivo, Huawei, Honor, etc.) that further
+restrict autostart, the app detects the manufacturer and prompts the user to
+grant the autostart permission, deep-linking to the correct system settings
+screen.
 
 The app self-tests whether the BootReceiver actually fired after a reboot by
 tracking a `bootVerified` flag. Toggling **Start on Boot** resets this flag to
@@ -96,7 +102,31 @@ the feature is on, the device is a restricted OEM, and the flag is false — i.e
 the receiver hasn't proven itself yet. Once verified by a successful reboot, the
 button disappears and a normal description is shown.
 
-### F5c: Self-Update via GitHub Releases
+### F5c: Launcher Mode (Home Replacement)
+
+When **Launcher Mode** is enabled, the app registers itself as a Home launcher
+by enabling an `activity-alias` in the manifest via
+`PackageManager.setComponentEnabledSetting()`. The system always launches the
+default Home app on boot and on Home-button press — no BOOT_COMPLETED broadcast,
+no autostart permission, and no Background Activity Launch restriction applies.
+This is the **most reliable autostart method**, especially on Chinese OEM ROMs
+(OPPO/Realme/Xiaomi/etc.) that silently block boot broadcasts to non-whitelisted
+apps, and works around the known Android 15/16 BOOT_COMPLETED delivery bug.
+
+When Launcher Mode is on, the app shows an **"Open Launcher Settings"** button in
+Settings that opens the system Home settings page
+(`ACTION_HOME_SETTINGS`), allowing the user to switch to a different launcher
+or re-select this app. The same button is available in the slideshow hover UI
+(top bar, apps icon) when launcher mode is active, so the user can switch
+launchers without navigating to settings.
+
+If the app loses its default-launcher status while Launcher Mode is enabled
+(e.g., the user selected another launcher), a dialog appears on resume
+prompting the user to re-select Immich Media Frame as the default Home.
+Toggling Launcher Mode off disables the alias and reverts to normal
+behaviour.
+
+### F5d: Self-Update via GitHub Releases
 
 On startup (if **Auto-Update** is enabled and the app was NOT installed from the
 Play Store), the app checks `api.github.com/repos/dave-palt/immich-photo-frame/releases/latest`
@@ -127,9 +157,11 @@ Options:
   and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
-- **Start on Boot** — launch on device boot (default off). On Chinese OEMs, shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
+- **Start on Boot** — launch on device boot (default off). Requires the "Display over other apps" permission (Android 10+ BAL exemption); on Chinese OEMs, also shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
+- **Launcher Mode** — register as a Home launcher (default off; only visible when Start on Boot is enabled). The most reliable autostart method; the system always launches the Home app on boot, bypassing BOOT_COMPLETED and OEM autostart blocks entirely. Shows an "Open Launcher Settings" button to switch launchers or re-select this app; the same action is available in the slideshow hover UI.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play
-  Store installed)
+  Store installed). A **"Check Now"** button below it triggers an immediate
+  update check regardless of the toggle state.
 - **Media Cache** section:
   - **Auto Sync** — automatically download new photos and remove deleted
     ones in the background (default on)

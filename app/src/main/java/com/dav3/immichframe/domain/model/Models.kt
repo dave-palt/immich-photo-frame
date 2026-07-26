@@ -33,6 +33,7 @@ data class SlideshowSettings(
     val skipVideos: Boolean = true,
     val muted: Boolean = true,
     val startOnBoot: Boolean = false,
+    val launcherMode: Boolean = false,
     val bootVerified: Boolean = false,
     val autoUpdate: Boolean = true,
     val clockSnapToGrid: Boolean = true,
