@@ -141,10 +141,17 @@ Play Store), the app checks GitHub for a new release:
 
 The downloaded APK is stored in the app's cache directory. An update status
 icon appears in the slideshow top bar (visible when controls are toggled on):
-spinner while **checking**, download icon while **downloading**, red icon on
-**error**, and a highlighted icon when **ready to install**. Tapping the icon
-when ready opens the install dialog (**Install** / **Later**), which can be
-re-triggered at any time.
+spinner while **checking**, a circular progress ring with live percentage while
+**downloading** (tap for a tooltip with ETA), red icon on **error**, and a
+highlighted icon when **ready to install**. The icon is hidden entirely when no
+update is available and nothing is in progress. Tapping the icon when ready
+opens the install dialog (**Install** / **Later**), which can be re-triggered at
+any time.
+
+Downloads support HTTP Range-based resume: if a partial APK of the same version
+already exists in cache, the download resumes from where it left off rather than
+restarting. Old APKs from different versions are deleted before each new
+download.
 
 On the first install attempt, the app checks for the
 **"Install unknown apps"** permission (`REQUEST_INSTALL_PACKAGES`). If not

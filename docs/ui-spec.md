@@ -123,9 +123,10 @@ Fullscreen, immersive mode (status bar + nav bar hidden).
 - Previous/Next arrows on left/right edges.
 - Pause/Play button at bottom center.
 - Album name top-left, Settings + Close top-right.
-- **Update status icon** (left of Settings): spinner while checking,
-  download icon while downloading, red on error, highlighted when ready to
-  install. Tap when ready opens the install dialog.
+- **Update status icon** (left of Settings): hidden when idle; spinner while
+  checking, circular progress ring with percentage while downloading (tap →
+  tooltip with ETA), red on error, highlighted when ready to install. Tap
+  when ready opens the install dialog.
 - Controls are semi-transparent overlay, do not push image.
 - Controls auto-hide after 5 seconds.
 - Immersive flag re-engages when controls hide.
