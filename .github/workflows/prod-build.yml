@@ -14,6 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Read version from build.gradle.kts
+        id: version
+        run: |
+          version=$(grep 'versionName =' app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "Version: $version"
+          echo "name=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -77,22 +85,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v${{ github.run_number }}
-          name: "v0.1.0"
-          body: |
-            ## ImmichFrame v0.1.0
-
-            First release of ImmichFrame — a native Android photo frame app for Immich.
-
-            ### Features
-            - Direct Immich server connection (REST API)
-            - Album selection and slideshow
-            - Fullscreen immersive mode
-            - Clock overlay
-            - Settings: interval, fill mode, keep screen on
-            - Scoped API key (4 permissions only)
-
-            **SHA:** ${{ github.sha }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: .github/release-notes.md
           prerelease: false
           files: |
             app/build/outputs/apk/release/*.apk

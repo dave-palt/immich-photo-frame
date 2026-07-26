@@ -1,9 +1,3 @@
-# CI/CD Setup
-
-## Branching Strategy
-
-- `develop` — active development branch. Push/PR triggers a debug APK build.
-- `main` — production branch. Merges trigger a signed release AAB + APK build.
 ## CI/CD Setup
 
 ### Branching Strategy
@@ -11,6 +5,31 @@
 - `develop` — active development branch. Push/PR triggers a debug APK build.
 - `main` — production branch. Merges trigger a signed release AAB + APK build.
 - Feature branches off `develop`: `feat/<description>`, `fix/<description>`.
+- Release branches: `release/v<x.y.z>` off `develop`, PR target `main`.
+
+#### Release PR flow & merge-back (MANDATORY)
+
+Every production release touches two files: `app/build.gradle.kts`
+(`versionName`) and `.github/release-notes.md` (the GitHub Release body).
+The workflow file `prod-build.yml` is **never edited for a release** — it
+parses the tag/name from `versionName` and reads the body from
+`release-notes.md` at build time. This keeps `main` and `develop` from
+conflicting on the workflow file (which is what happened after v0.2.0).
+
+Flow:
+
+1. Branch `release/v<x.y.z>` off the current `develop` HEAD.
+2. Bump `versionName` in `app/build.gradle.kts`, edit
+   `.github/release-notes.md` with the new What's New section.
+3. Open PR **`release/v<x.y.z>` → `main`** (the release PR).
+4. Immediately after merge (or in parallel), open a **backport PR
+   `release/v<x.y.z>` → `develop`** that bumps `versionName` to the **next
+   dev version** (`v<x.y.z+1>`, rendered as `<x.y.z+1>-dev` via the debug
+   `versionNameSuffix`). This carries `main`'s release-specific commits
+   back into `develop` so the branches stay aligned.
+5. Never skip the merge-back — forgetting it (as happened after v0.2.0)
+   leaves `develop` pinned to a stale `versionName` and guarantees
+   conflicts on the next release PR.
 
 ### Dev Build (develop branch)
 
@@ -58,7 +77,23 @@ Triggers on push to `main` or manual `workflow_dispatch` (workflow: `.github/wor
 - Builds signed release **APK** (`assembleRelease`)
 - Uploads both as artifacts (90-day retention)
 - Creates a GitHub Release with `softprops/action-gh-release@v3`
-- Release assets include: APK, AAB, keymgr binaries for all platforms, and all key management scripts
+
+#### Version + release notes (single source of truth)
+
+The release tag, name, and body are **derived**, never hardcoded in the
+workflow:
+
+- **Tag + name**: parsed from `versionName` in `app/build.gradle.kts` by a
+  `Read version` step (`grep` + `sed`). Output: `v0.3.0`. The workflow file
+  itself never changes between releases.
+- **Release notes body**: read from `.github/release-notes.md`. Edit this
+  file in the release branch/PR (not the workflow).
+
+This avoids the conflict-prone pattern of hardcoding the version/tag/body
+inline in `prod-build.yml`, which required editing the workflow on every
+release and caused merge conflicts between `main` and `develop`.
+
+Release assets include: APK, AAB, keymgr binaries for all platforms, and all key management scripts
 
 #### Required GitHub Secrets (prod)
 
