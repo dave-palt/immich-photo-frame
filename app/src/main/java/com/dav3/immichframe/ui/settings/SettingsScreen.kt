@@ -1,19 +1,27 @@
 package com.dav3.immichframe.ui.settings
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -26,6 +34,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -37,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +56,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -60,6 +72,8 @@ import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.openOverlayPermissionSettings
+import com.dav3.immichframe.ui.components.rememberBiometricLauncher
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.roundToInt
@@ -97,6 +111,16 @@ fun SettingsScreen(
     var showResetDialog by remember { mutableStateOf(false) }
     var showBootPermissionDialog by remember { mutableStateOf(false) }
     var showOverlayDialog by remember { mutableStateOf(false) }
+    var apiKeyRevealed by remember { mutableStateOf(false) }
+    var showBiometricNotSetupDialog by remember { mutableStateOf(false) }
+
+    val biometric = rememberBiometricLauncher()
+    val snackbarHost = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val copySuccessMsg = stringResource(R.string.api_key_copied)
+    val authTitle = stringResource(R.string.biometric_auth_title)
+    val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
+    val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
 
     // Track SYSTEM_ALERT_WINDOW ("Display over other apps") permission state.
     // Re-check on every ON_RESUME so the UI refreshes after the user returns
@@ -127,6 +151,7 @@ fun SettingsScreen(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHost) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -445,12 +470,24 @@ fun SettingsScreen(
 
                     EditableFieldRow(
                         label = stringResource(R.string.api_key),
-                        displayValue = if (state.apiKey.isBlank()) stringResource(R.string.not_set) else "•".repeat(20),
+                        displayValue = when {
+                            state.apiKey.isBlank() -> stringResource(R.string.not_set)
+                            apiKeyRevealed -> state.apiKey
+                            else -> "•".repeat(20)
+                        },
+                        displayFontFamily = if (apiKeyRevealed) FontFamily.Monospace else null,
                         fieldLabel = stringResource(R.string.api_key),
                         draft = keyDraft,
                         onDraftChange = { keyDraft = it },
                         editing = editingKey,
-                        onEdit = { editingKey = true },
+                        onEdit = {
+                            // Security: empty the field on edit so the key is
+                            // never pre-populated in an editable text field.
+                            // The user must re-type it.
+                            keyDraft = ""
+                            apiKeyRevealed = false
+                            editingKey = true
+                        },
                         onCancel = {
                             keyDraft = state.apiKey
                             editingKey = false
@@ -460,6 +497,69 @@ fun SettingsScreen(
                             editingKey = false
                         },
                     )
+
+                    // Reveal / Copy buttons — only when the key is set and
+                    // not being edited. Both require biometric / device
+                    // credential authentication.
+                    if (state.apiKey.isNotBlank() && !editingKey) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    if (apiKeyRevealed) {
+                                        apiKeyRevealed = false
+                                    } else {
+                                        biometric.launch(
+                                            title = authTitle,
+                                            subtitle = authSubtitleKey,
+                                            onNotSetup = { showBiometricNotSetupDialog = true },
+                                            onSuccess = { apiKeyRevealed = true },
+                                        )
+                                    }
+                                },
+                            ) {
+                                Icon(
+                                    if (apiKeyRevealed) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = null,
+                                    modifier = Modifier.width(18.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    if (apiKeyRevealed) stringResource(R.string.hide) else stringResource(R.string.reveal),
+                                )
+                            }
+                            TextButton(
+                                onClick = {
+                                    biometric.launch(
+                                        title = authTitle,
+                                        subtitle = authSubtitleKey,
+                                        onNotSetup = { showBiometricNotSetupDialog = true },
+                                        onSuccess = {
+                                            val clipboard = context
+                                                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            clipboard.setPrimaryClip(
+                                                ClipData.newPlainText("API Key", state.apiKey),
+                                            )
+                                            apiKeyRevealed = false
+                                            scope.launch {
+                                                snackbarHost.showSnackbar(copySuccessMsg)
+                                            }
+                                        },
+                                    )
+                                },
+                            ) {
+                                Icon(
+                                    Icons.Default.ContentCopy,
+                                    contentDescription = null,
+                                    modifier = Modifier.width(18.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(stringResource(R.string.copy))
+                            }
+                        }
+                    }
                 }
             }
 
@@ -532,6 +632,28 @@ fun SettingsScreen(
             },
         )
     }
+
+    // Biometric / screen-lock not set up dialog — shown when the user taps
+    // Reveal/Copy but the device has no biometric or device credential enrolled.
+    if (showBiometricNotSetupDialog) {
+        AlertDialog(
+            onDismissRequest = { showBiometricNotSetupDialog = false },
+            title = { Text(stringResource(R.string.biometric_not_setup_title)) },
+            text = { Text(stringResource(R.string.biometric_not_setup_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBiometricNotSetupDialog = false
+                    com.dav3.immichframe.domain.system.BiometricHelper
+                        .openSecuritySettings(context)
+                }) { Text(stringResource(R.string.open_settings)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBiometricNotSetupDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
 }
 
 // --- Helper composables ---
@@ -570,10 +692,15 @@ private fun EditableFieldRow(
     onCancel: () -> Unit,
     onSave: () -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
+    displayFontFamily: FontFamily? = null,
 ) {
     if (!editing) {
         Text(label, style = MaterialTheme.typography.labelSmall)
-        Text(displayValue, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            displayValue,
+            style = MaterialTheme.typography.bodyMedium,
+            fontFamily = displayFontFamily,
+        )
     } else {
         OutlinedTextField(
             value = draft,

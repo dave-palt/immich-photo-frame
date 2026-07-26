@@ -66,6 +66,15 @@
     <string name="edit">편집</string>
     <string name="save">저장</string>
     <string name="cancel">취소</string>
+    <string name="reveal">표시</string>
+    <string name="hide">숨기기</string>
+    <string name="copy">복사</string>
+    <string name="api_key_copied">API 키가 클립보드에 복사되었습니다</string>
+    <string name="biometric_auth_title">인증</string>
+    <string name="biometric_auth_subtitle_key">API 키를 보려면 인증하세요</string>
+    <string name="biometric_auth_subtitle_media">미디어 선택을 관리하려면 인증하세요</string>
+    <string name="biometric_not_setup_title">화면 잠금 필요</string>
+    <string name="biometric_not_setup_message">이 작업을 수행하려면 화면 잠금(지문, 얼굴 또는 PIN)이 필요합니다. 이 기능을 사용하려면 기기 보안 설정에서 설정하세요.</string>
 
     <!-- Settings UI -->
     <string name="settings">설정</string>

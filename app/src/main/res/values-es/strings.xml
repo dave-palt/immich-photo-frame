@@ -66,6 +66,15 @@
     <string name="edit">Editar</string>
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
+    <string name="reveal">Mostrar</string>
+    <string name="hide">Ocultar</string>
+    <string name="copy">Copiar</string>
+    <string name="api_key_copied">Clave API copiada al portapapeles</string>
+    <string name="biometric_auth_title">Autenticar</string>
+    <string name="biometric_auth_subtitle_key">Autentíquese para ver su clave API</string>
+    <string name="biometric_auth_subtitle_media">Autentíquese para gestionar la selección de medios</string>
+    <string name="biometric_not_setup_title">Bloqueo de pantalla requerido</string>
+    <string name="biometric_not_setup_message">Esta acción requiere un bloqueo de pantalla (huella, rostro o PIN). Configúrelo en los ajustes de seguridad de su dispositivo para usar esta función.</string>
 
     <!-- Settings UI -->
     <string name="settings">Ajustes</string>

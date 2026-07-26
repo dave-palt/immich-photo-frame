@@ -89,6 +89,15 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="reveal">Reveal</string>
+    <string name="hide">Hide</string>
+    <string name="copy">Copy</string>
+    <string name="api_key_copied">API key copied to clipboard</string>
+    <string name="biometric_auth_title">Authenticate</string>
+    <string name="biometric_auth_subtitle_key">Authenticate to view your API key</string>
+    <string name="biometric_auth_subtitle_media">Authenticate to manage media selection</string>
+    <string name="biometric_not_setup_title">Screen Lock Required</string>
+    <string name="biometric_not_setup_message">This action requires a screen lock (fingerprint, face, or PIN). Set one up in your device security settings to use this feature.</string>
 
     <!-- Settings UI -->
     <string name="settings">Settings</string>

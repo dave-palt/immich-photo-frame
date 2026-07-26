@@ -66,6 +66,15 @@
     <string name="edit">Editar</string>
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
+    <string name="reveal">Revelar</string>
+    <string name="hide">Ocultar</string>
+    <string name="copy">Copiar</string>
+    <string name="api_key_copied">Chave da API copiada para a área de transferência</string>
+    <string name="biometric_auth_title">Autenticar</string>
+    <string name="biometric_auth_subtitle_key">Autentique-se para ver sua chave da API</string>
+    <string name="biometric_auth_subtitle_media">Autentique-se para gerenciar a seleção de mídia</string>
+    <string name="biometric_not_setup_title">Bloqueio de tela necessário</string>
+    <string name="biometric_not_setup_message">Esta ação requer um bloqueio de tela (impressão digital, rosto ou PIN). Configure um nas configurações de segurança do seu dispositivo para usar este recurso.</string>
 
     <!-- Settings UI -->
     <string name="settings">Definições</string>

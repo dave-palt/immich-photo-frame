@@ -66,6 +66,15 @@
     <string name="edit">Bearbeiten</string>
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
+    <string name="reveal">Anzeigen</string>
+    <string name="hide">Verbergen</string>
+    <string name="copy">Kopieren</string>
+    <string name="api_key_copied">API-Schlüssel in die Zwischenablage kopiert</string>
+    <string name="biometric_auth_title">Authentifizieren</string>
+    <string name="biometric_auth_subtitle_key">Authentifizieren Sie sich, um Ihren API-Schlüssel anzuzeigen</string>
+    <string name="biometric_auth_subtitle_media">Authentifizieren Sie sich, um die Medienauswahl zu verwalten</string>
+    <string name="biometric_not_setup_title">Bildschirmsperre erforderlich</string>
+    <string name="biometric_not_setup_message">Diese Aktion erfordert eine Bildschirmsperre (Fingerabdruck, Gesicht oder PIN). Richten Sie eine in den SicherheitsEinstellungen Ihres Geräts ein, um diese Funktion zu nutzen.</string>
 
     <!-- Settings UI -->
     <string name="settings">Einstellungen</string>

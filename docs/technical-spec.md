@@ -18,6 +18,7 @@
 | Media Cache DB | Room | 2.7.1 |
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
+| Biometric Auth | AndroidX Biometric | 1.1.0 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -60,7 +61,7 @@ immich-android/
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
 │   │   │   ├── repository/      # Repository interfaces
-│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
@@ -69,6 +70,7 @@ immich-android/
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
 │   │   │   ├── settings/        # Settings screen
 │   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
+│   │   │   ├── components/      # Reusable composables (BiometricLauncher)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
 │   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)

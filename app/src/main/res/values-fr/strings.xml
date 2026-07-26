@@ -66,6 +66,15 @@
     <string name="edit">Modifier</string>
     <string name="save">Enregistrer</string>
     <string name="cancel">Annuler</string>
+    <string name="reveal">Afficher</string>
+    <string name="hide">Masquer</string>
+    <string name="copy">Copier</string>
+    <string name="api_key_copied">Clé API copiée dans le presse-papiers</string>
+    <string name="biometric_auth_title">Authentifier</string>
+    <string name="biometric_auth_subtitle_key">Authentifiez-vous pour afficher votre clé API</string>
+    <string name="biometric_auth_subtitle_media">Authentifiez-vous pour gérer la sélection des médias</string>
+    <string name="biometric_not_setup_title">"Verrouillage d'écran requis"</string>
+    <string name="biometric_not_setup_message">"Cette action nécessite un verrouillage d'écran (empreinte digitale, visage ou code). Configurez-en un dans les paramètres de sécurité de votre appareil pour utiliser cette fonctionnalité."</string>
 
     <!-- Settings UI -->
     <string name="settings">Paramètres</string>

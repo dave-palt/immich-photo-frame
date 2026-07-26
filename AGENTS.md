@@ -132,6 +132,24 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Biometric auth + API key security (PR1 of media-selection
+  feature). Added `androidx.biometric:biometric:1.1.0` dependency.
+  `MainActivity` changed from `ComponentActivity` to `FragmentActivity`
+  (required by `BiometricPrompt`; `FragmentActivity` extends
+  `ComponentActivity` so all existing APIs still work). New:
+  `domain/system/BiometricHelper.kt` (capability check, prompt with
+  `BIOMETRIC_WEAK | DEVICE_CREDENTIAL` — allows PIN fallback, cancellable
+  with no penalty), `ui/components/BiometricLauncher.kt` (composable
+  wrapper: `rememberBiometricLauncher()`). API key in Settings Connection
+  section: Edit now empties the field (no pre-population); Reveal and Copy
+  buttons appear when key is set, both biometric-gated; copy shows a
+  snackbar. If no screen lock enrolled, a dialog links to security settings.
+  New strings (EN + 12 locales): reveal, hide, copy, api_key_copied,
+  biometric_auth_title, biometric_auth_subtitle_key,
+  biometric_auth_subtitle_media, biometric_not_setup_title,
+  biometric_not_setup_message. Updated: functional-spec (F6 Connection
+  section), technical-spec (tech stack, package layout), ui-spec (mockup +
+  description), README.
 - **2026-07-26** — Launcher Mode feature. After real-hardware testing on a
   Realme PKH110 (ColorOS 16 / Android 16), BOOT_COMPLETED was confirmed to
   never fire (boot_verified stayed false across 2 reboots) — this is both

@@ -193,7 +193,13 @@ Options:
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline
-  - **API Key** — editable inline, masked
+  - **API Key** — editable inline. For security, tapping **Edit** empties
+    the field (the key is never pre-populated); the user must re-type it.
+    When the key is set, two biometric-gated buttons appear:
+    **Reveal** (shows the key in monospace; tap again to hide) and
+    **Copy** (copies to clipboard, then auto-hides). Both require
+    fingerprint / face / device-PIN authentication. If no screen lock
+    is set up, a dialog prompts the user to create one.
   - Test Connection button
 - **Albums** — change album selection (returns to album picker)
 - **Reset All Settings** — clears everything, returns to setup screen

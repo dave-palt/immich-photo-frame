@@ -66,6 +66,15 @@
     <string name="edit">تحرير</string>
     <string name="save">حفظ</string>
     <string name="cancel">إلغاء</string>
+    <string name="reveal">إظهار</string>
+    <string name="hide">إخفاء</string>
+    <string name="copy">نسخ</string>
+    <string name="api_key_copied">تم نسخ مفتاح API إلى الحافظة</string>
+    <string name="biometric_auth_title">المصادقة</string>
+    <string name="biometric_auth_subtitle_key">المصادقة لعرض مفتاح API الخاص بك</string>
+    <string name="biometric_auth_subtitle_media">المصادقة لإدارة اختيار الوسائط</string>
+    <string name="biometric_not_setup_title">مطلوب قفل الشاشة</string>
+    <string name="biometric_not_setup_message">يتطلب هذا الإجراء قفل شاشة (بصمة أو وجه أو رمز PIN). قم بإعداد واحد في إعدادات أمان جهازك لاستخدام هذه الميزة.</string>
 
     <!-- Settings UI -->
     <string name="settings">الإعدادات</string>

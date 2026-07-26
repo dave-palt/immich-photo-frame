@@ -66,6 +66,15 @@
     <string name="edit">Bewerken</string>
     <string name="save">Opslaan</string>
     <string name="cancel">Annuleren</string>
+    <string name="reveal">Weergeven</string>
+    <string name="hide">Verbergen</string>
+    <string name="copy">Kopiëren</string>
+    <string name="api_key_copied">API-sleutel gekopieerd naar klembord</string>
+    <string name="biometric_auth_title">Verifiëren</string>
+    <string name="biometric_auth_subtitle_key">Verifieer om uw API-sleutel te bekijken</string>
+    <string name="biometric_auth_subtitle_media">Verifieer om mediaselectie te beheren</string>
+    <string name="biometric_not_setup_title">Schermvergrendeling vereist</string>
+    <string name="biometric_not_setup_message">Deze actie vereist een schermvergrendeling (vingerafdruk, gezicht of PIN). Stel er een in de beveiligingsinstellingen van uw apparaat om deze functie te gebruiken.</string>
 
     <!-- Settings UI -->
     <string name="settings">Instellingen</string>

@@ -39,6 +39,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
 - Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
+- Biometric-protected API key reveal & copy (fingerprint / face / PIN)
 
 ## Setup
 
