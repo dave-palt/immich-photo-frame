@@ -68,7 +68,7 @@ immich-android/
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
 │   │   │   ├── settings/        # Settings screen
-│   │   │   ├── update/          # Update dialog + ViewModel
+│   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
 │   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)

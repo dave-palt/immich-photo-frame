@@ -48,5 +48,12 @@ constructor(
         _updateDismissed.value = true
     }
 
+    /** Reset dismissed state so the dialog can be shown again. */
+    fun resetDismissed() {
+        _updateDismissed.value = false
+    }
+
     fun isInstalledFromPlayStore(): Boolean = updateManager.isInstalledFromPlayStore()
+
+    fun canRequestInstalls(): Boolean = updateManager.canRequestInstalls()
 }

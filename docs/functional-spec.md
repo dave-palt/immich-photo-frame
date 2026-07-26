@@ -134,13 +134,22 @@ Play Store), the app checks GitHub for a new release:
 - **Release builds** (the primary auto-update target) fetch
   `/releases/latest` and compare the tag (`vX.Y.Z`) against the installed
   `versionName` using semantic version comparison. If the remote version is
-  newer, the APK is downloaded and the system installer is invoked.
-- **Debug builds** (dev channel) list recent releases and pick the newest
-  `dev-{sha}` tag, comparing its SHA against `BuildConfig.GIT_SHA`.
+  newer, the APK is downloaded.
+- **Debug builds** (dev channel) list recent releases, filter to `dev-{sha}`
+  tags, sort by `created_at` descending, and compare the newest tag's SHA
+  against `BuildConfig.GIT_SHA`.
 
-The downloaded APK is stored in the app's cache directory. The user sees the
-update dialog (with **Install** / **Later**) and then the standard Android
-package installer.
+The downloaded APK is stored in the app's cache directory. An update status
+icon appears in the slideshow top bar (visible when controls are toggled on):
+spinner while **checking**, download icon while **downloading**, red icon on
+**error**, and a highlighted icon when **ready to install**. Tapping the icon
+when ready opens the install dialog (**Install** / **Later**), which can be
+re-triggered at any time.
+
+On the first install attempt, the app checks for the
+**"Install unknown apps"** permission (`REQUEST_INSTALL_PACKAGES`). If not
+granted, it opens the system settings page for the user to enable it before
+launching the package installer.
 
 The **Auto-Update** toggle and **Check Now** button are hidden when the app
 is installed from the Play Store — Play Store installs receive updates through

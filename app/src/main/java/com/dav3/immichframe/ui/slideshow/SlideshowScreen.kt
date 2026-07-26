@@ -23,18 +23,23 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -67,6 +72,7 @@ import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.system.openOtherLauncher
+import com.dav3.immichframe.ui.update.UpdateViewModel
 import com.dav3.immichframe.util.extractDominantColor
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -83,6 +89,11 @@ fun SlideshowScreen(
     val state by viewModel.uiState.collectAsState()
     val settings by viewModel.settings.collectAsState(initial = SlideshowSettings())
     val s = settings
+
+    val updateVm: UpdateViewModel = hiltViewModel()
+    val updateState by updateVm.updateState.collectAsState()
+    val updateDismissed by updateVm.updateDismissed.collectAsState()
+    var showUpdateDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.load() }
 
@@ -282,6 +293,17 @@ fun SlideshowScreen(
                 ) {
                     Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
                     Spacer(Modifier.weight(1f))
+                    // Update status icon — shows checking/downloading/ready states.
+                    // Clicking opens the install dialog (only when download is ready).
+                    UpdateStatusIcon(
+                        state = updateState,
+                        onClick = {
+                            if (updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
+                                updateVm.resetDismissed()
+                                showUpdateDialog = true
+                            }
+                        },
+                    )
                     if (s.launcherMode) {
                         val context = LocalContext.current
                         IconButton(onClick = { openOtherLauncher(context) }) {
@@ -371,6 +393,36 @@ fun SlideshowScreen(
                         )
                     }
                 }
+            }
+
+            // Update install dialog — triggered by the update status icon.
+            if (showUpdateDialog && updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showUpdateDialog = false
+                        updateVm.dismissUpdate()
+                    },
+                    title = { Text(stringResource(R.string.update_available)) },
+                    text = {
+                        Text(stringResource(R.string.update_message, updateState.newVersion.take(14)))
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showUpdateDialog = false
+                            updateVm.installUpdate()
+                        }) {
+                            Text(stringResource(R.string.install), color = MaterialTheme.colorScheme.primary)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showUpdateDialog = false
+                            updateVm.dismissUpdate()
+                        }) {
+                            Text(stringResource(R.string.later))
+                        }
+                    },
+                )
             }
 
             // Video paused indicator (small, centered) — tap to resume
@@ -499,4 +551,61 @@ private fun VideoPlayer(
         },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+/**
+ * Update status icon for the slideshow top bar.
+ * Shows different states:
+ * - checking: spinner (SystemUpdate icon with progress)
+ * - downloading: Download icon with progress animation
+ * - ready (downloaded): SystemUpdate icon with accent color (clickable → opens dialog)
+ * - error: SystemUpdate icon with red tint
+ * - idle: not shown
+ */
+@Composable
+private fun UpdateStatusIcon(
+    state: com.dav3.immichframe.data.update.UpdateState,
+    onClick: () -> Unit,
+) {
+    when {
+        state.checking -> {
+            IconButton(onClick = {}) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Color.White,
+                )
+            }
+        }
+        state.downloading -> {
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Default.Download,
+                    "Downloading update…",
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+        state.error != null -> {
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update check failed",
+                    tint = Color.Red,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+        state.available && state.downloadedApkPath != null -> {
+            IconButton(onClick = onClick) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update ready — tap to install",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
 }

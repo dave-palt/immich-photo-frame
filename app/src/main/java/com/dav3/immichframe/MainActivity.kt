@@ -22,7 +22,6 @@ import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.ui.nav.ImmichNavHost
 import com.dav3.immichframe.ui.settings.SettingsViewModel
 import com.dav3.immichframe.ui.theme.ImmichFrameTheme
-import com.dav3.immichframe.ui.update.UpdateDialog
 import com.dav3.immichframe.ui.update.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,8 +33,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ImmichFrameTheme {
                 val updateVm: UpdateViewModel = hiltViewModel()
-                val updateState by updateVm.updateState.collectAsState()
-                val dismissed by updateVm.updateDismissed.collectAsState()
 
                 val settingsVm: SettingsViewModel = hiltViewModel()
                 val settingsState by settingsVm.uiState.collectAsState()
@@ -62,15 +59,6 @@ class MainActivity : ComponentActivity() {
                 // Update check on startup (non-blocking, background download)
                 androidx.compose.runtime.LaunchedEffect(Unit) {
                     updateVm.checkForUpdate()
-                }
-
-                // Show update dialog when download is ready
-                if (updateState.available && !updateState.downloading && updateState.downloadedApkPath != null && !dismissed) {
-                    UpdateDialog(
-                        state = updateState,
-                        onInstall = { updateVm.installUpdate() },
-                        onDismiss = { updateVm.dismissUpdate() },
-                    )
                 }
 
                 // Launcher-lost dialog: another app is the default Home while
