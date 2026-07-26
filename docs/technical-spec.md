@@ -76,12 +76,18 @@ immich-android/
 │   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp)
 │   │   └── MainActivity.kt      # Single activity (also target of LauncherAlias)
 │   ├── src/main/res/
-│   │   ├── drawable/ic_launcher_foreground.xml  # Vector (day: white bg, colored frame)
+│   │   ├── drawable/app_logo.xml             # In-app logo (no bg fill): frame + sun + mountain
+│   │   ├── drawable/ic_launcher_foreground.xml  # Launcher foreground (day: white bg + icon at 75%)
 │   │   ├── drawable/ic_launcher_monochrome.xml  # Android 13+ themed icon silhouette
-│   │   ├── drawable-night/ic_launcher_foreground.xml  # Dark variant
+│   │   ├── drawable-night/ic_launcher_foreground.xml  # Dark variant (gradient bg #1A1A2E→#16213E)
 │   │   ├── values/colors.xml          # ic_launcher_background = #FFFFFF (day)
 │   │   ├── values-night/colors.xml    # ic_launcher_background = #1A1A2E (night)
+│   │   ├── mipmap-anydpi-v26/ic_launcher.xml   # Adaptive icon (background + foreground + monochrome)
+│   │   ├── mipmap-anydpi-v26/ic_launcher_round.xml
 │   │   └── xml/file_paths.xml   # FileProvider config for APK install
+│   ├── src/debug/res/
+│   │   ├── drawable/ic_launcher_foreground.xml  # Debug variant (amber bg #FFB400, navy replaces orange)
+│   │   └── values/colors.xml                    # ic_launcher_background = #FFB400 (debug)
 │   └── build.gradle.kts
 ├── docs/                        # This documentation
 ├── .github/workflows/           # dev-build.yml, prod-build.yml

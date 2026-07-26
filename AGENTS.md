@@ -132,6 +132,22 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Launcher icon redesign + app logo. (1) Replaced the old
+  5-segment colored frame icon with a new design: colorful frame border +
+  sun/moon circle + mountain silhouette (converted from 512-space SVG to
+  108dp Android VectorDrawable). (2) Foreground content wrapped in `<group
+  scaleX/Y=0.75>` to add ~12% padding (opaque square was showing under
+  launcher mask). (3) Removed legacy PNG fallbacks in mipmap-hdpi/mdpi/
+  xhdpi/xxhdpi/xxxhdpi — unreachable since minSdk=26 uses adaptive icons.
+  (4) Created dedicated `app_logo.xml` drawable (no background fill, full
+  viewport, no scaling) for the Setup screen; updated from 72dp foreground
+  to 120dp logo. (5) Debug variant keeps amber bg (#FFB400) with navy
+  replacing the orange segment. Variants: day (drawable/), night
+  (drawable-night/), monochrome (drawable/), debug (debug/drawable/).
+  Updated: technical-spec (resource layout), ui-spec (setup logo),
+  README (icon feature list).
+
+
 - **2026-07-26** — Onboarding tour post-PR fixes. (1) Added two new slideshow
   tour steps: `slideshow_albums` (back-to-album-selection button) and
   `slideshow_update` (update status icon, force-shown as dimmed placeholder

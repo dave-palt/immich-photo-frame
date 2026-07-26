@@ -12,7 +12,7 @@ Shown on first launch or when credentials are missing/invalid.
 ```
 ┌──────────────────────────────┐
 │                              │
-│         [App Logo]           │ ← launcher foreground vector (72dp)
+│         [App Logo]           │ ← app logo vector (120dp, no background fill)
 │                              │
 │   Immich Server URL          │
 │   ┌────────────────────────┐ │
