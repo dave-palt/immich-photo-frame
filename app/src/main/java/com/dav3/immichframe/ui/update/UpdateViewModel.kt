@@ -33,6 +33,13 @@ constructor(
         }
     }
 
+    /** Manual check — ignores the autoUpdate setting. */
+    fun checkForUpdateNow() {
+        viewModelScope.launch {
+            updateManager.checkForUpdate()
+        }
+    }
+
     fun installUpdate() {
         updateManager.installUpdate()
     }

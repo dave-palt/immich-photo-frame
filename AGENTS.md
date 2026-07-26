@@ -132,6 +132,43 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Launcher Mode feature. After real-hardware testing on a
+  Realme PKH110 (ColorOS 16 / Android 16), BOOT_COMPLETED was confirmed to
+  never fire (boot_verified stayed false across 2 reboots) — this is both
+  the known Android 15/16 platform bug (issuetracker #471573182) and the
+  Chinese OEM autostart restriction. Fix: added **Launcher Mode** as a
+  third autostart option. The app declares an `activity-alias` (`.LauncherAlias`)
+  in the manifest with `HOME`+`DEFAULT` categories, `enabled="false"`. Toggling
+  Launcher Mode on calls `PackageManager.setComponentEnabledSetting()` to
+  enable the alias, making the app appear as a Home launcher — the system
+  always launches the default Home on boot, no BOOT_COMPLETED needed. This is
+  the most reliable method, especially for dedicated photo frames. A new
+  `LauncherHelper.kt` (`domain/system/`) provides `setLauncherModeEnabled()`,
+  `isLauncherModeEnabled()`, `isDefaultLauncher()`, and
+  `openOtherLauncher()` (opens `ACTION_HOME_SETTINGS` so the user can switch
+  launchers to access other apps). New setting: `launcher_mode` (bool, default
+  false). New strings: `launcher_mode`, `launcher_mode_desc`,
+  `open_other_launcher` (EN + 12 locales). Updated: functional-spec (F5c
+  renamed from Self-Update to Launcher Mode; Self-Update is now F5d; F6
+  settings list), technical-spec (persistence table, package layout,
+  MainActivity description), ui-spec (mockup + description), README.
+  Note: the SAW permission and BootReceiver code from the earlier change are
+  retained — Start on Boot and Launcher Mode are complementary; the user can
+  use either or both.
+- **2026-07-26** — Start on Boot fix. Root cause: on Android 10+ (API 29+),
+  calling `startActivity()` from a `BOOT_COMPLETED` `BroadcastReceiver` is
+  blocked by the Background Activity Launch (BAL) restriction — the OS silently
+  refuses to bring a background app to the foreground. Fix: added
+  `SYSTEM_ALERT_WINDOW` permission ("Display over other apps"), which is a
+  documented BAL exemption. BootReceiver now guards the `startActivity` call
+  with `Settings.canDrawOverlays()`. The manifest receiver also changed to
+  `exported="true"` (dropped the misleading `permission` attribute). Settings
+  UI adds a "Grant Display Over Other Apps" button (with dialog + lifecycle-
+  aware re-check via `DisposableEffect`/`ON_RESUME`) shown when Start on Boot
+  is on but SAW is missing. Added 3 strings (`overlay_perm_title`,
+  `overlay_perm_message`, `open_overlay`) in EN + 12 locales. Updated:
+  functional-spec (F5b, F6), technical-spec (permissions table, package
+  layout), ui-spec, README.
 - **2026-07-25** — Added Media Cache feature (Room + WorkManager). New
   packages: `data/local/` (Room DB, DAOs, entities, cache repo impl,
   converters) and `data/sync/` (MediaCacheWorker, SyncScheduler). New

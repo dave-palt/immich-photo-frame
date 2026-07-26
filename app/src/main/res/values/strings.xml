@@ -52,6 +52,13 @@
         <string name="start_on_boot">Start on Boot</string>
         <string name="start_on_boot_desc">Launch the app automatically after device reboot</string>
         <string name="boot_not_verified_desc">Autostart permission may not be granted \u2014 reboot to verify. If it doesn\u2019t launch, use the button below to open your device\u2019s autostart settings.</string>
+        <string name="launcher_mode">Launcher Mode</string>
+        <string name="launcher_mode_desc">Set as the default Home screen. The most reliable way to launch on boot — no autostart permission needed. Ideal for dedicated photo frames.</string>
+        <string name="open_launcher_settings">Open Launcher Settings</string>
+        <string name="check_now">Check Now</string>
+        <string name="launcher_lost_title">Launcher Mode Inactive</string>
+        <string name="launcher_lost_message">Another app is set as the default Home. Tap below to open launcher settings and re-select Immich Media Frame.</string>
+        <string name="set_as_launcher">Set as Default Launcher</string>
         <string name="open_autostart">Open Autostart Settings</string>
         <string name="auto_update">Auto-Update</string>
         <string name="auto_update_desc">Check GitHub for new builds and download them automatically</string>
@@ -90,6 +97,9 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Autostart Permission</string>
     <string name="autostart_perm_message">Some devices block apps from starting automatically. To ensure the app launches on boot, you may need to grant autostart permission in your device settings.</string>
+    <string name="overlay_perm_title">Display Over Other Apps</string>
+    <string name="overlay_perm_message">To launch the app automatically after reboot, Android requires the \"Display over other apps\" permission. Grant it in the system settings screen that opens next.</string>
+    <string name="open_overlay">Grant Display Over Other Apps</string>
     <string name="open_settings">Open Settings</string>
     <string name="skip">Skip</string>
     <string name="reset_title">Reset Everything?</string>

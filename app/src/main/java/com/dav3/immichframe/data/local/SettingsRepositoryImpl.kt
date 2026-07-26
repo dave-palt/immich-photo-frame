@@ -40,6 +40,7 @@ constructor(
         val SKIP_VIDEOS = stringPreferencesKey("skip_videos")
         val MUTED = stringPreferencesKey("muted")
         val START_ON_BOOT = stringPreferencesKey("start_on_boot")
+        val LAUNCHER_MODE = stringPreferencesKey("launcher_mode")
         val BOOT_VERIFIED = stringPreferencesKey("boot_verified")
         val AUTO_UPDATE = stringPreferencesKey("auto_update")
         val CLOCK_SNAP_TO_GRID = stringPreferencesKey("clock_snap_to_grid")
@@ -103,6 +104,7 @@ constructor(
                 skipVideos = prefs[Keys.SKIP_VIDEOS]?.toBoolean() ?: true,
                 muted = prefs[Keys.MUTED]?.toBoolean() ?: true,
                 startOnBoot = prefs[Keys.START_ON_BOOT]?.toBoolean() ?: false,
+                launcherMode = prefs[Keys.LAUNCHER_MODE]?.toBoolean() ?: false,
                 bootVerified = prefs[Keys.BOOT_VERIFIED]?.toBoolean() ?: false,
                 autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
                 clockSnapToGrid = prefs[Keys.CLOCK_SNAP_TO_GRID]?.toBoolean() ?: true,
@@ -146,6 +148,7 @@ constructor(
             it[Keys.SKIP_VIDEOS] = settings.skipVideos.toString()
             it[Keys.MUTED] = settings.muted.toString()
             it[Keys.START_ON_BOOT] = settings.startOnBoot.toString()
+            it[Keys.LAUNCHER_MODE] = settings.launcherMode.toString()
             it[Keys.BOOT_VERIFIED] = settings.bootVerified.toString()
             it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
             it[Keys.CLOCK_SNAP_TO_GRID] = settings.clockSnapToGrid.toString()

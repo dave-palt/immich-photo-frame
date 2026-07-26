@@ -1,5 +1,6 @@
 package com.dav3.immichframe.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.sync.SyncScheduler
@@ -9,6 +10,8 @@ import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
+import com.dav3.immichframe.domain.system.openLauncherSettings
+import com.dav3.immichframe.domain.system.setLauncherModeEnabled
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -90,6 +93,17 @@ constructor(
 
     fun toggleStartOnBoot() = update {
         it.copy(startOnBoot = !it.startOnBoot, bootVerified = false)
+    }
+
+    fun toggleLauncherMode(context: Context) {
+        val newEnabled = !uiState.value.settings.launcherMode
+        setLauncherModeEnabled(context, newEnabled)
+        update { it.copy(launcherMode = newEnabled) }
+        // When enabling, show the home-chooser so the user can pick this app
+        // as the default launcher.
+        if (newEnabled) {
+            openLauncherSettings(context)
+        }
     }
 
     fun toggleAutoUpdate() = update { it.copy(autoUpdate = !it.autoUpdate) }

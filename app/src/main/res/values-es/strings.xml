@@ -74,6 +74,16 @@
     <!-- Dialogs -->
     <string name="autostart_perm_title">Permiso de inicio automático</string>
     <string name="autostart_perm_message">Algunos dispositivos bloquean el inicio automático de aplicaciones. Para asegurar que la aplicación se inicie al arrancar, es posible que debas conceder el permiso de inicio automático en los ajustes del dispositivo.</string>
+    <string name="overlay_perm_title">Mostrar sobre otras apps</string>
+    <string name="overlay_perm_message">Para iniciar la app automáticamente tras el reinicio, Android requiere el permiso "Mostrar sobre otras apps". Concédelo en la pantalla de ajustes que se abre a continuación.</string>
+    <string name="open_overlay">Conceder Mostrar sobre otras apps</string>
+        <string name="launcher_mode">Modo Launcher</string>
+        <string name="launcher_mode_desc">Establecer como pantalla de inicio predeterminada. La forma más fiable de iniciar en el arranque — sin permiso de autostart. Ideal para marcos de fotos dedicados.</string>
+        <string name="open_launcher_settings">Abrir ajustes de launcher</string>
+        <string name="check_now">Comprobar ahora</string>
+        <string name="launcher_lost_title">Modo launcher inactivo</string>
+        <string name="launcher_lost_message">Otra app es la pantalla de inicio predeterminada. Toca abajo para abrir los ajustes de launcher y volver a seleccionar Immich Media Frame.</string>
+        <string name="set_as_launcher">Establecer como launcher predeterminado</string>
     <string name="open_settings">Abrir ajustes</string>
     <string name="skip">Omitir</string>
     <string name="reset_title">¿Restablecer todo?</string>

@@ -59,7 +59,9 @@ immich-android/
 │   │   │   └── (repository/ is in di/)
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
-│   │   │   └── repository/      # Repository interfaces
+│   │   │   ├── repository/      # Repository interfaces
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt
+│   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
 │   │   │   ├── setup/           # Setup screen (URL + API key)
@@ -69,9 +71,9 @@ immich-android/
 │   │   │   ├── update/          # Update dialog + ViewModel
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
-│   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow
+│   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)
 │   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp)
-│   │   └── MainActivity.kt      # Single activity
+│   │   └── MainActivity.kt      # Single activity (also target of LauncherAlias)
 │   ├── src/main/res/
 │   │   └── xml/file_paths.xml   # FileProvider config for APK install
 │   └── build.gradle.kts
@@ -214,6 +216,7 @@ Setup → Albums → Slideshow
 | Skip videos | DataStore | `skip_videos` | String bool |
 | Muted | DataStore | `muted` | String bool |
 | Start on boot | DataStore | `start_on_boot` | String bool |
+| Launcher mode | DataStore | `launcher_mode` | String bool (enables the Home activity-alias) |
 | Boot verified | DataStore | `boot_verified` | String bool (self-test: BootReceiver sets true on successful fire) |
 | Auto-update | DataStore | `auto_update` | String bool |
 | Adaptive background | DataStore | `adaptive_background` | String bool |
@@ -249,6 +252,7 @@ or Android throws `IllegalStateException`.
 | `ACCESS_NETWORK_STATE` | Network connectivity checks |
 | `RECEIVE_BOOT_COMPLETED` | Start-on-boot feature |
 | `REQUEST_INSTALL_PACKAGES` | Self-update via GitHub releases (APK install) |
+| `SYSTEM_ALERT_WINDOW` | Background Activity Launch exemption — required on Android 10+ (API 29+) for `BootReceiver` to call `startActivity()` from a `BOOT_COMPLETED` broadcast. Without it the OS silently blocks the launch. |
 
 ## Localization
 
