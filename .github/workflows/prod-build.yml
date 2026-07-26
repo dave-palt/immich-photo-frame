@@ -52,21 +52,13 @@ jobs:
         run: |
           echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > app/release.jks
 
-      - name: Build release AAB
+      - name: Build release AAB + APK
         env:
           SIGNING_STORE_FILE: release.jks
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: ./gradlew bundleRelease --no-daemon
-
-      - name: Build release APK
-        env:
-          SIGNING_STORE_FILE: release.jks
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew bundleRelease assembleRelease --no-daemon
 
       - name: Upload AAB
         uses: actions/upload-artifact@v7
