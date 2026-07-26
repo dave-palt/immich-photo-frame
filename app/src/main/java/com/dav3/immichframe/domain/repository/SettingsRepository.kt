@@ -8,6 +8,7 @@ interface SettingsRepository {
     val apiKey: Flow<String>
     val selectedAlbumIds: Flow<List<String>>
     val slideshowSettings: Flow<SlideshowSettings>
+    val onboardingCompletedSteps: Flow<Set<String>>
 
     /** Asset IDs the user has manually toggled in the media-selection grid. */
     val mediaSelectionToggledIds: Flow<Set<String>>
@@ -29,6 +30,12 @@ interface SettingsRepository {
     suspend fun setMediaSelectionToggledIds(ids: Set<String>)
 
     suspend fun setMediaSelectionNewItemsShown(shown: Boolean)
+
+    suspend fun markOnboardingStepCompleted(stepId: String)
+
+    suspend fun resetOnboarding()
+
+    suspend fun resetOnboardingForScreen(stepIds: Collection<String>)
 
     suspend fun clearAll()
 }

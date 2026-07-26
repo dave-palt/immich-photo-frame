@@ -7,8 +7,10 @@ import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +30,20 @@ constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AlbumSelectionUiState())
     val uiState: StateFlow<AlbumSelectionUiState> = _uiState
+
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
 
     init {
         loadAlbums()

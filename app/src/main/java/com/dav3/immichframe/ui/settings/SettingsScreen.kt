@@ -5,13 +5,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
@@ -72,7 +72,11 @@ import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.openOverlayPermissionSettings
-import com.dav3.immichframe.ui.components.rememberBiometricLauncher
+import com.dav3.immichframe.ui.onboarding.TourHost
+import com.dav3.immichframe.ui.onboarding.TourScreen
+import com.dav3.immichframe.ui.onboarding.TourSteps
+import com.dav3.immichframe.ui.onboarding.rememberTourState
+import com.dav3.immichframe.ui.onboarding.tourTarget
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -111,16 +115,6 @@ fun SettingsScreen(
     var showResetDialog by remember { mutableStateOf(false) }
     var showBootPermissionDialog by remember { mutableStateOf(false) }
     var showOverlayDialog by remember { mutableStateOf(false) }
-    var apiKeyRevealed by remember { mutableStateOf(false) }
-    var showBiometricNotSetupDialog by remember { mutableStateOf(false) }
-
-    val biometric = rememberBiometricLauncher()
-    val snackbarHost = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val copySuccessMsg = stringResource(R.string.api_key_copied)
-    val authTitle = stringResource(R.string.biometric_auth_title)
-    val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
-    val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
 
     // Track SYSTEM_ALERT_WINDOW ("Display over other apps") permission state.
     // Re-check on every ON_RESUME so the UI refreshes after the user returns
@@ -140,437 +134,523 @@ fun SettingsScreen(
     var urlDraft by remember(state.serverUrl) { mutableStateOf(state.serverUrl) }
     var keyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
-            )
+    // API key security: reveal + biometric-gated copy
+    var revealedApiKey by remember { mutableStateOf(false) }
+    var showBiometricNotSetupDialog by remember { mutableStateOf(false) }
+    val biometricLauncher = com.dav3.immichframe.ui.components.rememberBiometricLauncher()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val authTitleKey = stringResource(R.string.biometric_auth_title)
+    val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
+    val apiKeyCopiedText = stringResource(R.string.api_key_copied)
+
+    val tourState = rememberTourState()
+    val completedSteps by viewModel.onboardingSteps.collectAsState()
+    val scrollState = rememberScrollState()
+
+    TourHost(
+        screen = TourScreen.SETTINGS,
+        completedSteps = completedSteps,
+        onStepCompleted = viewModel::markStepCompleted,
+        onSkipped = { },
+        tourState = tourState,
+        onScrollToTarget = { targetKey ->
+            // Scroll the target section header into view
+            val step = TourSteps.SETTINGS.find { it.targetKey == targetKey }
+            if (step != null) {
+                // Approximate scroll positions for each section.
+                // These are best-effort; the overlay will still work if slightly off.
+                val targetY = when (step.id) {
+                    "settings_system" -> 1200
+                    "settings_cache" -> 2400
+                    "settings_connection" -> 3200
+                    else -> 0
+                }
+                scrollState.animateScrollTo(targetY)
+            }
         },
-        snackbarHost = { SnackbarHost(snackbarHost) },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // ============================= PLAYBACK =============================
-            SectionHeader(stringResource(R.string.section_playback))
-
-            Text("${stringResource(R.string.interval)}: ${s.intervalSeconds}s")
-            Slider(
-                value = s.intervalSeconds.toFloat(),
-                onValueChange = { viewModel.updateInterval(it.toInt()) },
-                valueRange = 5f..120f,
-                steps = 22,
-            )
-
-            SwitchItem(
-                title = stringResource(R.string.shuffle),
-                subtitle = stringResource(R.string.shuffle_desc),
-                checked = s.shuffle,
-                onToggle = { viewModel.toggleShuffle() },
-            )
-            SwitchItem(
-                title = stringResource(R.string.skip_videos),
-                subtitle = stringResource(R.string.skip_videos_desc),
-                checked = s.skipVideos,
-                onToggle = { viewModel.toggleSkipVideos() },
-            )
-            SwitchItem(
-                title = stringResource(R.string.muted),
-                subtitle = stringResource(R.string.muted_desc),
-                checked = s.muted,
-                onToggle = { viewModel.toggleMuted() },
-            )
-
-            // Photo Animations
-            SwitchItem(
-                title = stringResource(R.string.photo_animations),
-                subtitle = stringResource(R.string.photo_animations_desc),
-                checked = s.photoAnimations,
-                onToggle = { viewModel.togglePhotoAnimations() },
-            )
-            if (s.photoAnimations) {
-                Text(
-                    stringResource(R.string.photo_animations_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                PhotoAnimation.entries.forEach { anim ->
-                    val checked = when (anim) {
-                        PhotoAnimation.ZOOM_IN -> s.animZoomIn
-                        PhotoAnimation.ZOOM_OUT -> s.animZoomOut
-                        PhotoAnimation.PAN_LEFT -> s.animPanLeft
-                        PhotoAnimation.PAN_RIGHT -> s.animPanRight
-                        PhotoAnimation.PAN_UP -> s.animPanUp
-                        PhotoAnimation.PAN_DOWN -> s.animPanDown
-                    }
-                    SwitchItem(
-                        title = anim.displayName(),
-                        checked = checked,
-                        onToggle = { viewModel.toggleAnimation(anim) },
-                    )
-                }
-            }
-
-            HorizontalDivider()
-
-            // ============================= DISPLAY =============================
-            SectionHeader(stringResource(R.string.section_display))
-
-            Text(stringResource(R.string.image_fit), style = MaterialTheme.typography.labelMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(s.fillMode == FillMode.CONTAIN, stringResource(R.string.contain)) { viewModel.updateFillMode(FillMode.CONTAIN) }
-                FilterChip(s.fillMode == FillMode.COVER, stringResource(R.string.cover)) { viewModel.updateFillMode(FillMode.COVER) }
-            }
-            SwitchItem(
-                title = stringResource(R.string.adaptive_background),
-                subtitle = stringResource(R.string.adaptive_background_desc),
-                checked = s.adaptiveBackground,
-                onToggle = { viewModel.toggleAdaptiveBackground() },
-            )
-            SwitchItem(
-                title = stringResource(R.string.fullscreen),
-                subtitle = stringResource(R.string.fullscreen_desc),
-                checked = s.fullscreen,
-                onToggle = { viewModel.toggleFullscreen() },
-            )
-            SwitchItem(
-                title = stringResource(R.string.keep_screen_on),
-                checked = s.keepScreenOn,
-                onToggle = { viewModel.toggleKeepScreenOn() },
-            )
-
-            HorizontalDivider()
-
-            // ============================= CLOCK =============================
-            SectionHeader(stringResource(R.string.section_clock))
-
-            SwitchItem(
-                title = stringResource(R.string.show_clock),
-                checked = s.showClock,
-                onToggle = { viewModel.toggleClock() },
-            )
-            if (s.showClock) {
-                Surface(
-                    color = Color(0x80000000),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                ) {
-                    Text(
-                        SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date()),
-                        color = Color.White,
-                        fontSize = s.clockSize.sp,
-                        fontWeight = FontWeight.Light,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                    )
-                }
-                Text("${stringResource(R.string.clock_size)}: ${s.clockSize.toInt()}sp")
-                Slider(
-                    value = s.clockSize,
-                    onValueChange = { viewModel.updateClockSize(it) },
-                    valueRange = 24f..96f,
-                )
-                Text(
-                    stringResource(R.string.drag_clock_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                SwitchItem(
-                    title = stringResource(R.string.snap_to_grid),
-                    subtitle = stringResource(R.string.snap_to_grid_desc),
-                    checked = s.clockSnapToGrid,
-                    onToggle = { viewModel.toggleClockSnapToGrid() },
-                )
-            }
-
-            HorizontalDivider()
-
-            // ============================= SYSTEM =============================
-            SectionHeader(stringResource(R.string.section_system))
-
-            SwitchItem(
-                title = stringResource(R.string.start_on_boot),
-                subtitle = if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
-                    stringResource(R.string.boot_not_verified_desc)
-                } else {
-                    stringResource(R.string.start_on_boot_desc)
-                },
-                checked = s.startOnBoot,
-                onToggle = {
-                    viewModel.toggleStartOnBoot()
-                    if (!s.startOnBoot) {
-                        // Turning ON: prompt for overlay permission if missing
-                        if (!hasOverlay) {
-                            showOverlayDialog = true
-                        }
-                        if (needsBootPermission()) {
-                            showBootPermissionDialog = true
-                        }
-                    }
-                },
-            )
-            // Overlay ("Display over other apps") permission button — required on
-            // Android 10+ for the boot receiver to launch the app.
-            if (s.startOnBoot && !hasOverlay) {
-                TextButton(
-                    onClick = { openOverlayPermissionSettings(context) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        stringResource(R.string.open_overlay),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-            if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
-                TextButton(
-                    onClick = { openBootPermissionSettings(context) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.open_autostart), style = MaterialTheme.typography.labelLarge)
-                }
-            }
-
-            // ---- Launcher Mode (most reliable boot method) ----
-            // Only visible when Start on Boot is enabled — launcher mode is a
-            // complement to it for devices where BOOT_COMPLETED is unreliable.
-            if (s.startOnBoot) {
-                SwitchItem(
-                    title = stringResource(R.string.launcher_mode),
-                    subtitle = stringResource(R.string.launcher_mode_desc),
-                    checked = s.launcherMode,
-                    onToggle = { viewModel.toggleLauncherMode(context) },
-                )
-                TextButton(
-                    onClick = { openLauncherSettings(context) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        stringResource(R.string.open_launcher_settings),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-
-            if (!installedFromPlayStore) {
-                SwitchItem(
-                    title = stringResource(R.string.auto_update),
-                    subtitle = stringResource(R.string.auto_update_desc),
-                    checked = s.autoUpdate,
-                    onToggle = { viewModel.toggleAutoUpdate() },
-                )
-                val updateState by updateViewModel.updateState.collectAsState()
-                TextButton(
-                    onClick = { updateViewModel.checkForUpdateNow() },
-                    enabled = !updateState.checking && !updateState.downloading,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    val label = when {
-                        updateState.checking -> stringResource(R.string.update_checking)
-                        updateState.downloading -> stringResource(R.string.update_downloading)
-                        updateState.error != null -> stringResource(R.string.update_error)
-                        else -> stringResource(R.string.check_now)
-                    }
-                    Text(
-                        label,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-
-            HorizontalDivider()
-
-            // ============================= MEDIA CACHE =============================
-            SectionHeader(stringResource(R.string.section_media_cache))
-
-            val intervalValues = remember {
-                buildList {
-                    add(1)
-                    var v = 5
-                    while (v <= 480) {
-                        add(v)
-                        v += 5
-                    }
-                }
-            }
-            val currentIntervalIndex = intervalValues.indexOf(s.syncIntervalMinutes).coerceAtLeast(0)
-
-            SwitchItem(
-                title = stringResource(R.string.auto_sync),
-                subtitle = stringResource(R.string.auto_sync_desc),
-                checked = s.autoSync,
-                onToggle = { viewModel.toggleAutoSync() },
-            )
-            Text("${stringResource(R.string.sync_interval)}: ${s.syncIntervalMinutes} min")
-            Slider(
-                value = currentIntervalIndex.toFloat(),
-                onValueChange = {
-                    val newIndex = it.roundToInt().coerceIn(0, intervalValues.lastIndex)
-                    viewModel.updateSyncInterval(intervalValues[newIndex])
-                },
-                valueRange = 0f..intervalValues.lastIndex.toFloat(),
-                steps = intervalValues.lastIndex - 1,
-            )
-            TextButton(
-                onClick = { viewModel.syncNow() },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.sync_now))
-            }
-
-            HorizontalDivider()
-
-            // ============================= ALBUMS =============================
-            SectionHeader(stringResource(R.string.section_albums))
-
-            Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.PhotoLibrary, contentDescription = null)
-                Text(stringResource(R.string.change_albums))
-            }
-
-            HorizontalDivider()
-
-            // ============================= CONNECTION =============================
-            SectionHeader(stringResource(R.string.section_connection))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            ) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    EditableFieldRow(
-                        label = stringResource(R.string.server),
-                        displayValue = state.serverUrl.ifBlank { stringResource(R.string.not_set) },
-                        fieldLabel = stringResource(R.string.server_url),
-                        draft = urlDraft,
-                        onDraftChange = { urlDraft = it },
-                        editing = editingUrl,
-                        onEdit = { editingUrl = true },
-                        onCancel = {
-                            urlDraft = state.serverUrl
-                            editingUrl = false
-                        },
-                        onSave = {
-                            viewModel.updateServerUrl(urlDraft)
-                            editingUrl = false
-                        },
-                        keyboardType = KeyboardType.Uri,
-                    )
-
-                    HorizontalDivider()
-
-                    EditableFieldRow(
-                        label = stringResource(R.string.api_key),
-                        displayValue = when {
-                            state.apiKey.isBlank() -> stringResource(R.string.not_set)
-                            apiKeyRevealed -> state.apiKey
-                            else -> "•".repeat(20)
-                        },
-                        displayFontFamily = if (apiKeyRevealed) FontFamily.Monospace else null,
-                        fieldLabel = stringResource(R.string.api_key),
-                        draft = keyDraft,
-                        onDraftChange = { keyDraft = it },
-                        editing = editingKey,
-                        onEdit = {
-                            // Security: empty the field on edit so the key is
-                            // never pre-populated in an editable text field.
-                            // The user must re-type it.
-                            keyDraft = ""
-                            apiKeyRevealed = false
-                            editingKey = true
-                        },
-                        onCancel = {
-                            keyDraft = state.apiKey
-                            editingKey = false
-                        },
-                        onSave = {
-                            viewModel.updateApiKey(keyDraft)
-                            editingKey = false
-                        },
-                    )
-
-                    // Reveal / Copy buttons — only when the key is set and
-                    // not being edited. Both require biometric / device
-                    // credential authentication.
-                    if (state.apiKey.isNotBlank() && !editingKey) {
+    ) {
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                TopAppBar(
+                    title = {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            TextButton(
-                                onClick = {
-                                    if (apiKeyRevealed) {
-                                        apiKeyRevealed = false
+                            Text(stringResource(R.string.settings))
+                            Text(
+                                text = "v${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        }
+                    },
+                )
+            },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // ============================= PLAYBACK =============================
+                SectionHeader(stringResource(R.string.section_playback))
+
+                Text("${stringResource(R.string.interval)}: ${s.intervalSeconds}s")
+                Slider(
+                    value = s.intervalSeconds.toFloat(),
+                    onValueChange = { viewModel.updateInterval(it.toInt()) },
+                    valueRange = 5f..120f,
+                    steps = 22,
+                )
+
+                SwitchItem(
+                    title = stringResource(R.string.shuffle),
+                    subtitle = stringResource(R.string.shuffle_desc),
+                    checked = s.shuffle,
+                    onToggle = { viewModel.toggleShuffle() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.skip_videos),
+                    subtitle = stringResource(R.string.skip_videos_desc),
+                    checked = s.skipVideos,
+                    onToggle = { viewModel.toggleSkipVideos() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.muted),
+                    subtitle = stringResource(R.string.muted_desc),
+                    checked = s.muted,
+                    onToggle = { viewModel.toggleMuted() },
+                )
+
+                // Photo Animations
+                SwitchItem(
+                    title = stringResource(R.string.photo_animations),
+                    subtitle = stringResource(R.string.photo_animations_desc),
+                    checked = s.photoAnimations,
+                    onToggle = { viewModel.togglePhotoAnimations() },
+                )
+                if (s.photoAnimations) {
+                    Text(
+                        stringResource(R.string.photo_animations_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    PhotoAnimation.entries.forEach { anim ->
+                        val checked = when (anim) {
+                            PhotoAnimation.ZOOM_IN -> s.animZoomIn
+                            PhotoAnimation.ZOOM_OUT -> s.animZoomOut
+                            PhotoAnimation.PAN_LEFT -> s.animPanLeft
+                            PhotoAnimation.PAN_RIGHT -> s.animPanRight
+                            PhotoAnimation.PAN_UP -> s.animPanUp
+                            PhotoAnimation.PAN_DOWN -> s.animPanDown
+                        }
+                        SwitchItem(
+                            title = anim.displayName(),
+                            checked = checked,
+                            onToggle = { viewModel.toggleAnimation(anim) },
+                        )
+                    }
+                }
+
+                HorizontalDivider()
+
+                // ============================= DISPLAY =============================
+                SectionHeader(stringResource(R.string.section_display))
+
+                Text(stringResource(R.string.image_fit), style = MaterialTheme.typography.labelMedium)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(s.fillMode == FillMode.CONTAIN, stringResource(R.string.contain)) { viewModel.updateFillMode(FillMode.CONTAIN) }
+                    FilterChip(s.fillMode == FillMode.COVER, stringResource(R.string.cover)) { viewModel.updateFillMode(FillMode.COVER) }
+                }
+                SwitchItem(
+                    title = stringResource(R.string.adaptive_background),
+                    subtitle = stringResource(R.string.adaptive_background_desc),
+                    checked = s.adaptiveBackground,
+                    onToggle = { viewModel.toggleAdaptiveBackground() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.fullscreen),
+                    subtitle = stringResource(R.string.fullscreen_desc),
+                    checked = s.fullscreen,
+                    onToggle = { viewModel.toggleFullscreen() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.keep_screen_on),
+                    checked = s.keepScreenOn,
+                    onToggle = { viewModel.toggleKeepScreenOn() },
+                )
+
+                HorizontalDivider()
+
+                // ============================= CLOCK =============================
+                SectionHeader(stringResource(R.string.section_clock))
+
+                SwitchItem(
+                    title = stringResource(R.string.show_clock),
+                    checked = s.showClock,
+                    onToggle = { viewModel.toggleClock() },
+                )
+                if (s.showClock) {
+                    Surface(
+                        color = Color(0x80000000),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                    ) {
+                        Text(
+                            SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date()),
+                            color = Color.White,
+                            fontSize = s.clockSize.sp,
+                            fontWeight = FontWeight.Light,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+                        )
+                    }
+                    Text("${stringResource(R.string.clock_size)}: ${s.clockSize.toInt()}sp")
+                    Slider(
+                        value = s.clockSize,
+                        onValueChange = { viewModel.updateClockSize(it) },
+                        valueRange = 24f..96f,
+                    )
+                    Text(
+                        stringResource(R.string.drag_clock_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    SwitchItem(
+                        title = stringResource(R.string.snap_to_grid),
+                        subtitle = stringResource(R.string.snap_to_grid_desc),
+                        checked = s.clockSnapToGrid,
+                        onToggle = { viewModel.toggleClockSnapToGrid() },
+                    )
+                }
+
+                HorizontalDivider()
+
+                // ============================= SYSTEM =============================
+                Box(modifier = Modifier.tourTarget("settings_system_section", tourState)) {
+                    SectionHeader(stringResource(R.string.section_system))
+                }
+
+                SwitchItem(
+                    title = stringResource(R.string.start_on_boot),
+                    subtitle = if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
+                        stringResource(R.string.boot_not_verified_desc)
+                    } else {
+                        stringResource(R.string.start_on_boot_desc)
+                    },
+                    checked = s.startOnBoot,
+                    onToggle = {
+                        viewModel.toggleStartOnBoot()
+                        if (!s.startOnBoot) {
+                            // Turning ON: prompt for overlay permission if missing
+                            if (!hasOverlay) {
+                                showOverlayDialog = true
+                            }
+                            if (needsBootPermission()) {
+                                showBootPermissionDialog = true
+                            }
+                        }
+                    },
+                )
+                // Overlay ("Display over other apps") permission button — required on
+                // Android 10+ for the boot receiver to launch the app.
+                if (s.startOnBoot && !hasOverlay) {
+                    TextButton(
+                        onClick = { openOverlayPermissionSettings(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            stringResource(R.string.open_overlay),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+                if (s.startOnBoot && needsBootPermission() && !s.bootVerified) {
+                    TextButton(
+                        onClick = { openBootPermissionSettings(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(R.string.open_autostart), style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+
+                // ---- Launcher Mode (most reliable boot method) ----
+                // Only visible when Start on Boot is enabled — launcher mode is a
+                // complement to it for devices where BOOT_COMPLETED is unreliable.
+                if (s.startOnBoot) {
+                    SwitchItem(
+                        title = stringResource(R.string.launcher_mode),
+                        subtitle = stringResource(R.string.launcher_mode_desc),
+                        checked = s.launcherMode,
+                        onToggle = { viewModel.toggleLauncherMode(context) },
+                    )
+                    TextButton(
+                        onClick = { openLauncherSettings(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            stringResource(R.string.open_launcher_settings),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+
+                if (!installedFromPlayStore) {
+                    SwitchItem(
+                        title = stringResource(R.string.auto_update),
+                        subtitle = stringResource(R.string.auto_update_desc),
+                        checked = s.autoUpdate,
+                        onToggle = { viewModel.toggleAutoUpdate() },
+                    )
+                    val updateState by updateViewModel.updateState.collectAsState()
+                    TextButton(
+                        onClick = { updateViewModel.checkForUpdateNow() },
+                        enabled = !updateState.checking && !updateState.downloading,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        val label = when {
+                            updateState.checking -> stringResource(R.string.update_checking)
+                            updateState.downloading -> stringResource(R.string.update_downloading)
+                            updateState.error != null -> stringResource(R.string.update_error)
+                            else -> stringResource(R.string.check_now)
+                        }
+                        Text(
+                            label,
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+
+                // ---- Show Tour Again ----
+                TextButton(
+                    onClick = {
+                        viewModel.resetOnboardingForSettings()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.show_tour),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+
+                TextButton(
+                    onClick = { viewModel.resetOnboarding() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.reset_all_tours),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                HorizontalDivider()
+
+                // ============================= MEDIA CACHE =============================
+                Box(modifier = Modifier.tourTarget("settings_cache_section", tourState)) {
+                    SectionHeader(stringResource(R.string.section_media_cache))
+                }
+
+                val intervalValues = remember {
+                    buildList {
+                        add(1)
+                        var v = 5
+                        while (v <= 480) {
+                            add(v)
+                            v += 5
+                        }
+                    }
+                }
+                val currentIntervalIndex = intervalValues.indexOf(s.syncIntervalMinutes).coerceAtLeast(0)
+
+                SwitchItem(
+                    title = stringResource(R.string.auto_sync),
+                    subtitle = stringResource(R.string.auto_sync_desc),
+                    checked = s.autoSync,
+                    onToggle = { viewModel.toggleAutoSync() },
+                )
+                Text("${stringResource(R.string.sync_interval)}: ${s.syncIntervalMinutes} min")
+                Slider(
+                    value = currentIntervalIndex.toFloat(),
+                    onValueChange = {
+                        val newIndex = it.roundToInt().coerceIn(0, intervalValues.lastIndex)
+                        viewModel.updateSyncInterval(intervalValues[newIndex])
+                    },
+                    valueRange = 0f..intervalValues.lastIndex.toFloat(),
+                    steps = intervalValues.lastIndex - 1,
+                )
+                TextButton(
+                    onClick = { viewModel.syncNow() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.sync_now))
+                }
+
+                HorizontalDivider()
+
+                // ============================= ALBUMS =============================
+                SectionHeader(stringResource(R.string.section_albums))
+
+                Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                    Text(stringResource(R.string.change_albums))
+                }
+
+                HorizontalDivider()
+
+                // ============================= CONNECTION =============================
+                Box(modifier = Modifier.tourTarget("settings_connection_section", tourState)) {
+                    SectionHeader(stringResource(R.string.section_connection))
+                }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                ) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        EditableFieldRow(
+                            label = stringResource(R.string.server),
+                            displayValue = state.serverUrl.ifBlank { stringResource(R.string.not_set) },
+                            fieldLabel = stringResource(R.string.server_url),
+                            draft = urlDraft,
+                            onDraftChange = { urlDraft = it },
+                            editing = editingUrl,
+                            onEdit = { editingUrl = true },
+                            onCancel = {
+                                urlDraft = state.serverUrl
+                                editingUrl = false
+                            },
+                            onSave = {
+                                viewModel.updateServerUrl(urlDraft)
+                                editingUrl = false
+                            },
+                            keyboardType = KeyboardType.Uri,
+                        )
+
+                        HorizontalDivider()
+
+                        // API Key — secure row: edit empties field, reveal/copy
+                        // are biometric-gated. Key is never shown in plain text
+                        // in an editable field.
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                stringResource(R.string.api_key),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f),
+                            )
+                            if (!editingKey) {
+                                if (state.apiKey.isNotBlank()) {
+                                    val displayText = if (revealedApiKey) {
+                                        state.apiKey
                                     } else {
-                                        biometric.launch(
-                                            title = authTitle,
+                                        "•".repeat(state.apiKey.length.coerceAtMost(20))
+                                    }
+                                    Text(
+                                        displayText,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontFamily = if (revealedApiKey) FontFamily.Monospace else null,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    IconButton(onClick = {
+                                        biometricLauncher.launch(
+                                            title = authTitleKey,
                                             subtitle = authSubtitleKey,
                                             onNotSetup = { showBiometricNotSetupDialog = true },
-                                            onSuccess = { apiKeyRevealed = true },
+                                            onSuccess = { revealedApiKey = !revealedApiKey },
+                                        )
+                                    }) {
+                                        Icon(
+                                            if (revealedApiKey) {
+                                                Icons.Default.VisibilityOff
+                                            } else {
+                                                Icons.Default.Visibility
+                                            },
+                                            contentDescription = stringResource(
+                                                if (revealedApiKey) R.string.hide else R.string.reveal,
+                                            ),
                                         )
                                     }
-                                },
-                            ) {
-                                Icon(
-                                    if (apiKeyRevealed) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = null,
-                                    modifier = Modifier.width(18.dp),
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(
-                                    if (apiKeyRevealed) stringResource(R.string.hide) else stringResource(R.string.reveal),
-                                )
-                            }
-                            TextButton(
-                                onClick = {
-                                    biometric.launch(
-                                        title = authTitle,
-                                        subtitle = authSubtitleKey,
-                                        onNotSetup = { showBiometricNotSetupDialog = true },
-                                        onSuccess = {
-                                            val clipboard = context
-                                                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                            clipboard.setPrimaryClip(
-                                                ClipData.newPlainText("API Key", state.apiKey),
-                                            )
-                                            apiKeyRevealed = false
-                                            scope.launch {
-                                                snackbarHost.showSnackbar(copySuccessMsg)
-                                            }
-                                        },
+                                    IconButton(onClick = {
+                                        biometricLauncher.launch(
+                                            title = authTitleKey,
+                                            subtitle = authSubtitleKey,
+                                            onNotSetup = { showBiometricNotSetupDialog = true },
+                                            onSuccess = {
+                                                val clipboard = context
+                                                    .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                clipboard.setPrimaryClip(
+                                                    ClipData.newPlainText("API Key", state.apiKey),
+                                                )
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        apiKeyCopiedText,
+                                                    )
+                                                }
+                                            },
+                                        )
+                                    }) {
+                                        Icon(
+                                            Icons.Default.ContentCopy,
+                                            contentDescription = stringResource(R.string.copy),
+                                        )
+                                    }
+                                } else {
+                                    Text(
+                                        stringResource(R.string.not_set),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
-                                },
-                            ) {
-                                Icon(
-                                    Icons.Default.ContentCopy,
-                                    contentDescription = null,
-                                    modifier = Modifier.width(18.dp),
+                                }
+                                TextButton(onClick = {
+                                    keyDraft = ""
+                                    editingKey = true
+                                }) { Text(stringResource(R.string.edit)) }
+                            } else {
+                                OutlinedTextField(
+                                    value = keyDraft,
+                                    onValueChange = { keyDraft = it },
+                                    label = { Text(stringResource(R.string.api_key)) },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f),
                                 )
-                                Spacer(Modifier.width(4.dp))
-                                Text(stringResource(R.string.copy))
+                                TextButton(onClick = {
+                                    keyDraft = state.apiKey
+                                    editingKey = false
+                                }) { Text(stringResource(R.string.cancel)) }
+                                TextButton(onClick = {
+                                    viewModel.updateApiKey(keyDraft)
+                                    editingKey = false
+                                }) { Text(stringResource(R.string.save)) }
                             }
                         }
                     }
                 }
-            }
 
-            HorizontalDivider()
+                HorizontalDivider()
 
-            // ============================= DANGER ZONE =============================
-            TextButton(
-                onClick = { showResetDialog = true },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.reset_all), color = MaterialTheme.colorScheme.error)
+                // ============================= DANGER ZONE =============================
+                TextButton(
+                    onClick = { showResetDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.reset_all), color = MaterialTheme.colorScheme.error)
+                }
             }
         }
     }
@@ -633,8 +713,6 @@ fun SettingsScreen(
         )
     }
 
-    // Biometric / screen-lock not set up dialog — shown when the user taps
-    // Reveal/Copy but the device has no biometric or device credential enrolled.
     if (showBiometricNotSetupDialog) {
         AlertDialog(
             onDismissRequest = { showBiometricNotSetupDialog = false },
@@ -643,8 +721,7 @@ fun SettingsScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showBiometricNotSetupDialog = false
-                    com.dav3.immichframe.domain.system.BiometricHelper
-                        .openSecuritySettings(context)
+                    com.dav3.immichframe.domain.system.BiometricHelper.openSecuritySettings(context)
                 }) { Text(stringResource(R.string.open_settings)) }
             },
             dismissButton = {
@@ -692,15 +769,10 @@ private fun EditableFieldRow(
     onCancel: () -> Unit,
     onSave: () -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
-    displayFontFamily: FontFamily? = null,
 ) {
     if (!editing) {
         Text(label, style = MaterialTheme.typography.labelSmall)
-        Text(
-            displayValue,
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = displayFontFamily,
-        )
+        Text(displayValue, style = MaterialTheme.typography.bodyMedium)
     } else {
         OutlinedTextField(
             value = draft,

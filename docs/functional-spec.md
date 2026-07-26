@@ -248,3 +248,56 @@ Requires biometric / device-credential authentication to open.
 | Image fails to load | Skip to next image, log error |
 | Update download fails | Show "Update check failed" on Check Now button, allow retry |
 | Network timeout | Retry up to 3 times with backoff, then skip |
+
+### F7: Onboarding Tour
+
+The app includes a **modular, per-step onboarding tour** that teaches users
+the available settings and controls. The tour is triggered automatically when
+a user lands on a screen — only steps not yet completed are shown.
+
+**How it works:**
+
+- Each screen (Setup, Albums, Slideshow, Settings) declares an ordered list
+  of tour steps. Each step has an ID, a tooltip title/body, and an optional
+  target element (a control or section to spotlight).
+- When the user navigates to a screen, the tour checks which of that screen's
+  step IDs are NOT yet in the persisted `onboarding_completed_steps` set. If
+  any remain, the tour auto-starts for those steps.
+- The overlay shows a semi-transparent scrim over the screen with a
+  rounded-rect spotlight cutout around the target element (if any). A tooltip
+  card displays the step title, body, step counter ("Step X of Y"), and
+  **Next/Got it** + **Skip** buttons.
+- Completing a step (Next/Got it) marks its ID as completed. Skipping marks
+  all remaining steps on that screen as completed.
+- **Slideshow-specific behavior**: during the tour, the on-tap controls are
+  force-shown and the 5-second auto-hide is suppressed, so the tour can
+  spotlight the prev/next, pause/mute, settings, and close buttons.
+- **Settings-specific behavior**: the tour scrolls the target section into
+  view before showing its spotlight (System → Media Cache → Connection).
+- **Two replay buttons** in Settings → System section:
+  - **"Show Tour Again"** clears only the Settings screen's step IDs, so
+    only the Settings tour re-runs.
+  - **"Reset All Tours"** clears the entire completed-steps set, so the
+    tour re-runs on every screen next visit.
+- A **"Show Tour Again"** button is also available on the Setup screen.
+- Resetting all settings also clears the onboarding set (DataStore is wiped).
+
+**Step inventory (19 steps across 4 screens):**
+
+| Screen | Steps |
+|---|---|
+| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
+| Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
+| Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
+
+- **`slideshow_media_selection`**: highlights the grid icon next to the photo
+  count. The tooltip explains that this opens the biometric-gated media
+  selection grid where the user can choose which photos and videos appear.
+
+- **`slideshow_albums`**: highlights the back-to-album-selection button.
+- **`slideshow_update`**: highlights the update status icon. Since this icon
+  normally only appears when an update is available, the tour force-shows a
+  dimmed placeholder icon so the coachmark always has a visible target on the
+  first run. The tooltip explains that the icon's presence means an update is
+  available.

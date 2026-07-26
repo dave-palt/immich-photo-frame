@@ -56,6 +56,7 @@ constructor(
         val SYNC_INTERVAL_MINUTES = intPreferencesKey("sync_interval_minutes")
         val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
+        val ONBOARDING_COMPLETED_STEPS = stringSetPreferencesKey("onboarding_completed_steps")
     }
 
     private val masterKey by lazy {
@@ -86,6 +87,11 @@ constructor(
     override val selectedAlbumIds: Flow<List<String>> =
         context.appDataStore.data.map {
             (it[Keys.SELECTED_ALBUMS] ?: emptySet()).toList()
+        }
+
+    override val onboardingCompletedSteps: Flow<Set<String>> =
+        context.appDataStore.data.map {
+            it[Keys.ONBOARDING_COMPLETED_STEPS] ?: emptySet()
         }
 
     override val slideshowSettings: Flow<SlideshowSettings> =
@@ -186,6 +192,26 @@ constructor(
     override suspend fun setMediaSelectionNewItemsShown(shown: Boolean) {
         context.appDataStore.edit {
             it[Keys.MEDIA_SELECTION_NEW_SHOWN] = shown.toString()
+        }
+    }
+
+    override suspend fun markOnboardingStepCompleted(stepId: String) {
+        context.appDataStore.edit { prefs ->
+            val current = prefs[Keys.ONBOARDING_COMPLETED_STEPS] ?: emptySet()
+            prefs[Keys.ONBOARDING_COMPLETED_STEPS] = current + stepId
+        }
+    }
+
+    override suspend fun resetOnboarding() {
+        context.appDataStore.edit { prefs ->
+            prefs.remove(Keys.ONBOARDING_COMPLETED_STEPS)
+        }
+    }
+
+    override suspend fun resetOnboardingForScreen(stepIds: Collection<String>) {
+        context.appDataStore.edit { prefs ->
+            val current = prefs[Keys.ONBOARDING_COMPLETED_STEPS] ?: emptySet()
+            prefs[Keys.ONBOARDING_COMPLETED_STEPS] = current - stepIds
         }
     }
 

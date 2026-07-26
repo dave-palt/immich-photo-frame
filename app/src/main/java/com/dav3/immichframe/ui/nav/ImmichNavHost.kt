@@ -107,7 +107,21 @@ fun ImmichNavHost() {
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    // Navigate to the screen matching the current auth/album
+                    // status instead of popBackStack(), which is a no-op (and
+                    // leaves the user stuck on Settings) when the back stack
+                    // is empty — e.g. after onReset cleared it, or after a
+                    // process-death/restore.
+                    val destination = startRoute
+                    if (destination != null && destination != Routes.SETTINGS) {
+                        navController.navigate(destination) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
                 onChangeAlbums = {
                     navController.navigate(Routes.ALBUMS) {
                         popUpTo(Routes.SETTINGS) { inclusive = true }

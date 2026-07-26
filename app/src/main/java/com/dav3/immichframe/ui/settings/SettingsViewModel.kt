@@ -12,6 +12,7 @@ import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
+import com.dav3.immichframe.ui.onboarding.TourSteps
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +46,30 @@ constructor(
         ) { slideshow, url, key ->
             SettingsUiState(slideshow, url, key)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
+
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
+
+    fun resetOnboarding() {
+        viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
+    fun resetOnboardingForSettings() {
+        viewModelScope.launch {
+            settingsRepo.resetOnboardingForScreen(TourSteps.SETTINGS.map { it.id })
+        }
+    }
 
     private val updateMutex = Mutex()
 

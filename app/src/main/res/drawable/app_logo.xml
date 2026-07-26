@@ -1,0 +1,65 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- App logo for in-app display (Setup screen).
+         No background fill — just the colorful frame + sun + mountain. -->
+
+    <!-- Red: top edge -->
+    <path
+        android:strokeColor="#FA2921"
+        android:strokeWidth="7.17"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 32.91,23.62 L 75.09,23.62" />
+
+    <!-- Orange: top-right corner + right edge -->
+    <path
+        android:strokeColor="#FFB400"
+        android:strokeWidth="7.17"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 75.09,23.62 Q 84.38,23.62 84.38,32.91 L 84.38,62.44" />
+
+    <!-- Green: right edge lower + bottom-right corner + bottom edge (right half) -->
+    <path
+        android:strokeColor="#18C249"
+        android:strokeWidth="7.17"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 84.38,62.44 L 84.38,75.09 Q 84.38,84.38 75.09,84.38 L 47.25,84.38" />
+
+    <!-- Blue: bottom edge (left half) + bottom-left corner + left edge lower -->
+    <path
+        android:strokeColor="#1E83F7"
+        android:strokeWidth="7.17"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 47.25,84.38 L 32.91,84.38 Q 23.62,84.38 23.62,75.09 L 23.62,52.31" />
+
+    <!-- Purple: left edge upper + top-left corner -->
+    <path
+        android:strokeColor="#ED79B5"
+        android:strokeWidth="7.17"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 23.62,52.31 L 23.62,32.91 Q 23.62,23.62 32.91,23.62" />
+
+    <!-- Sun/moon (amber, semi-transparent) -->
+    <path
+        android:fillColor="#FFB400"
+        android:fillAlpha="0.7"
+        android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
+
+    <!-- Mountain silhouette (light gray, semi-transparent) -->
+    <path
+        android:fillColor="#E8E8E8"
+        android:fillAlpha="0.2"
+        android:strokeColor="#E8E8E8"
+        android:strokeWidth="0.53"
+        android:strokeAlpha="0.5"
+        android:strokeLineJoin="round"
+        android:pathData="M 37.97,67.5 L 50.62,49.78 L 57.38,58.22 L 64.12,51.47 L 71.72,67.5 Z" />
+</vector>
