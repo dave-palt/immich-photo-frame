@@ -113,6 +113,8 @@
     <string name="select_albums">Wybierz albumy</string>
     <string name="done">Gotowe</string>
     <string name="no_albums">Nie znaleziono albumów</string>
+    <string name="no_albums_available">Brak dostępnych albumów</string>
+    <string name="no_albums_available_desc">Twoje konto Immich nie ma jeszcze albumów. Utwórz jeden w Immich, a następnie dotknij ponów.</string>
     <string name="loading_albums">Ładowanie albumów…</string>
     <string name="hide_key">Ukryj klucz</string>
     <string name="show_key">Pokaż klucz</string>

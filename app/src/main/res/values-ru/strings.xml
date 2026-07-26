@@ -113,6 +113,8 @@
     <string name="select_albums">Выбрать альбомы</string>
     <string name="done">Готово</string>
     <string name="no_albums">Альбомы не найдены</string>
+    <string name="no_albums_available">Нет доступных альбомов</string>
+    <string name="no_albums_available_desc">В вашей учетной записи Immich еще нет альбомов. Создайте альбом в Immich, затем нажмите «Повторить».</string>
     <string name="loading_albums">Загрузка альбомов…</string>
     <string name="hide_key">Скрыть ключ</string>
     <string name="show_key">Показать ключ</string>

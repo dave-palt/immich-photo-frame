@@ -113,6 +113,8 @@
     <string name="select_albums">Albums selecteren</string>
     <string name="done">Gereed</string>
     <string name="no_albums">Geen albums gevonden</string>
+    <string name="no_albums_available">Geen albums beschikbaar</string>
+    <string name="no_albums_available_desc">Je Immich-account heeft nog geen albums. Maak er een in Immich en tik op opnieuw.</string>
     <string name="loading_albums">Albums laden…</string>
     <string name="hide_key">Sleutel verbergen</string>
     <string name="show_key">Sleutel tonen</string>

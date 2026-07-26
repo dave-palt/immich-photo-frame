@@ -54,6 +54,11 @@ class MediaCacheWorker @AssistedInject constructor(
             ),
         )
 
+        // Track which albums no longer exist on the server. If all selected
+        // albums are gone, clear the selection so the user is sent back to
+        // album selection instead of silently running an empty slideshow.
+        val goneAlbums = mutableListOf<String>()
+
         for (albumId in albumIds) {
             mediaCacheRepository.updateSyncProgress(
                 SyncProgress(
@@ -70,8 +75,21 @@ class MediaCacheWorker @AssistedInject constructor(
                 onSuccess = { remoteAssets ->
                     downloadAndReconcile(albumId, albumIds, remoteAssets)
                 },
-                onFailure = { /* skip this album, continue others */ },
+                onFailure = { e ->
+                    if (isAlbumGone(e)) {
+                        // Album deleted on server — purge its cache and note it
+                        mediaCacheRepository.clearAlbum(albumId)
+                        goneAlbums.add(albumId)
+                    }
+                    // Transient network errors: skip, keep existing cache.
+                },
             )
+        }
+
+        // If every selected album is gone, clear the selection so NavViewModel
+        // routes the user back to album selection on next foreground.
+        if (goneAlbums.isNotEmpty() && goneAlbums.size == albumIds.size) {
+            settingsRepository.setSelectedAlbumIds(emptyList())
         }
 
         mediaCacheRepository.clearSyncProgress()
@@ -100,10 +118,16 @@ class MediaCacheWorker @AssistedInject constructor(
         val cachedIds = cachedAssets.map { it.id }.toSet()
         val remoteIds = remoteAssets.map { it.id }.toSet()
 
-        // Remove assets that are in cache but no longer in the album
-        val toRemove = cachedAssets.filter { it.id !in remoteIds }
-        if (toRemove.isNotEmpty()) {
-            mediaCacheRepository.removeAssets(toRemove.map { it.id })
+        // Remove assets that are in cache but no longer in the album.
+        // Guard: only reconcile when we actually got a non-empty remote list —
+        // an empty response could be a transient server issue (e.g. search
+        // service restarting), and wiping the cache on that would leave the
+        // user with nothing to display offline.
+        if (remoteAssets.isNotEmpty()) {
+            val toRemove = cachedAssets.filter { it.id !in remoteIds }
+            if (toRemove.isNotEmpty()) {
+                mediaCacheRepository.removeAssets(toRemove.map { it.id })
+            }
         }
 
         var processed = 0
@@ -204,4 +228,13 @@ class MediaCacheWorker @AssistedInject constructor(
         const val KEY_ALBUM_IDS = "albumIds"
         const val KEY_INCREMENTAL = "incremental"
     }
+}
+
+/**
+ * Returns true if the exception indicates the album no longer exists on the
+ * server (HTTP 404), as opposed to a transient network/server error.
+ */
+private fun isAlbumGone(throwable: Throwable): Boolean {
+    val msg = throwable.message.orEmpty()
+    return msg.contains("404") || msg.contains("Not Found", ignoreCase = true)
 }

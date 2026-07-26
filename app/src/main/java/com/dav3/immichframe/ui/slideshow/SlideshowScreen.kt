@@ -115,6 +115,12 @@ fun SlideshowScreen(
 
     LaunchedEffect(Unit) { viewModel.load() }
 
+    // Album deleted on server — bounce back to album selection so the user
+    // can pick again. Only fires once per load() that sets the flag.
+    LaunchedEffect(state.albumGone) {
+        if (state.albumGone) onChangeAlbums()
+    }
+
     // Immersive fullscreen
     val view = LocalView.current
     DisposableEffect(s.fullscreen) {

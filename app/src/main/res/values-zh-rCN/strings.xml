@@ -113,6 +113,8 @@
     <string name="select_albums">选择相册</string>
     <string name="done">完成</string>
     <string name="no_albums">未找到相册</string>
+    <string name="no_albums_available">没有可用的相册</string>
+    <string name="no_albums_available_desc">您的 Immich 账户还没有任何相册。请在 Immich 中创建一个，然后点击重试。</string>
     <string name="loading_albums">正在加载相册…</string>
     <string name="hide_key">隐藏密钥</string>
     <string name="show_key">显示密钥</string>

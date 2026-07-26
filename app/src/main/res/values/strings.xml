@@ -129,6 +129,8 @@
     <string name="select_albums">Select Albums</string>
     <string name="done">Done</string>
     <string name="no_albums">No albums found</string>
+    <string name="no_albums_available">No albums available</string>
+    <string name="no_albums_available_desc">Your Immich account doesn\'t have any albums yet. Create one in Immich, then tap retry.</string>
     <string name="loading_albums">Loading albums…</string>
     <string name="hide_key">Hide key</string>
     <string name="show_key">Show key</string>

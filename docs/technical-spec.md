@@ -130,6 +130,13 @@ Configuration:
 - **Memory cache**: 25% of available app memory (Coil default)
 - **Disk cache**: 500 MB (configurable), stores preview-quality images
 - **Prefetch**: Slideshow prefetches the next 3 images ahead of the current one
+
+**Offline display**: `SlideshowViewModel.imageUrl()` / `videoUrl()` resolve
+the asset's local cached file first (`file://<path>`) and only fall back to
+the network URL (`.../api/assets/{id}/...?apiKey=...`) on a cache miss. This
+makes the slideshow fully offline-capable once assets are synced. The same
+pattern applies to `MediaSelectionViewModel.thumbnailUrl()` for the
+media-selection grid.
 - **Image size**: Request preview thumbnails (`size=preview` in Immich API)
   for slideshow display, not full originals — saves bandwidth and disk
 
@@ -163,7 +170,11 @@ loading.
 ### Sync lifecycle
 
 1. **On slideshow load**: the ViewModel first checks the cache. If cached
-   assets exist, they're displayed immediately (offline-capable). If
+   assets exist, they're displayed immediately. The ViewModel resolves
+   each asset's local `file_path` up front (batch query via
+   `MediaCacheRepository.getAssetFilePaths`) and serves `file://` URIs
+   to Coil/ExoPlayer — so the slideshow is fully **offline-capable**,
+   reading image and video bytes from disk with no network access. If
    `autoSync` is on, a one-time `MediaCacheWorker` is enqueued to
    reconcile the cache against the server.
 2. **Periodic sync**: `SyncScheduler` enqueues a periodic
@@ -172,10 +183,20 @@ loading.
    removes deleted ones.
 3. **Worker logic** (`MediaCacheWorker.performFullSync`):
    - Fetches remote asset list for each album via `POST /search/metadata`
-   - Deletes cached assets no longer in the remote album
+   - **Album deletion detection**: if the fetch returns 404, the album is
+     treated as permanently deleted — its cache is purged and it's flagged
+     as gone. Transient errors (network, 5xx) are skipped; cache preserved.
+   - **Empty-response guard**: the reconcile step only prunes cached assets
+     when the remote list is non-empty. An empty response (possible
+     search-service transient issue) does not wipe the cache.
+   - Deletes cached assets no longer in the remote album (only when remote
+     list is non-empty)
    - Downloads new/updated assets (original + thumbnail) via OkHttp
    - Updates `AlbumSyncState` with sync timestamp + asset count
    - Reports progress via `SyncProgress` StateFlow
+   - If **all** selected albums were deleted (404), clears
+     `selected_album_ids` in DataStore so `NavViewModel` routes the user
+     back to album selection on next foreground.
 
 Cache files are stored in `getExternalFilesDir("media_cache")`.
 

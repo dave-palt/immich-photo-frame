@@ -113,6 +113,8 @@
     <string name="select_albums">アルバムを選択</string>
     <string name="done">完了</string>
     <string name="no_albums">アルバムが見つかりません</string>
+    <string name="no_albums_available">利用可能なアルバムがありません</string>
+    <string name="no_albums_available_desc">Immichアカウントにはまだアルバムがありません。Immichで作成してから、再試行をタップしてください。</string>
     <string name="loading_albums">アルバムを読み込み中…</string>
     <string name="hide_key">キーを非表示</string>
     <string name="show_key">キーを表示</string>

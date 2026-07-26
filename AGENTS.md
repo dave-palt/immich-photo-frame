@@ -159,6 +159,29 @@ Format:
   media_selection_select_none, media_selection_shown, media_selection_hidden.
   Updated: functional-spec (F4 controls, new F8 flow), technical-spec
   (persistence table, package layout, nav routes), README.
+- **2026-07-27** — Offline cache display + album lifecycle fix. (1) Root
+  cause: cached files were downloaded to disk by MediaCacheWorker but never
+  used for display — `imageUrl`/`videoUrl` always returned network URLs, so
+  the slideshow showed a black screen when the server was offline despite
+  having a populated cache. Fix: `SlideshowViewModel` now resolves local
+  `file://` URIs from `MediaCacheRepository.getAssetFilePaths()` (new batch
+  lookup method) on `load()`, falling back to network on cache miss. Same
+  pattern applied to `MediaSelectionViewModel.thumbnailUrl()`. (2) Album
+  deletion detection: `MediaCacheWorker` now distinguishes 404 (album
+  permanently gone) from transient errors. On 404, the album's cache is
+  purged; if all selected albums are gone, `selected_album_ids` is cleared
+  → `NavViewModel` routes back to album selection. `SlideshowViewModel`
+  also detects 404 on cold-start fetch and sets `albumGone` flag →
+  `SlideshowScreen` navigates to album selection via `LaunchedEffect`.
+  (3) Empty-response guard: reconcile step only prunes cached assets when
+  the remote list is non-empty (prevents wiping cache on transient
+  search-service hiccups). (4) "No albums available" empty state on
+  AlbumSelectionScreen (distinct from server-unreachable error state).
+  New `SlideshowUiState.albumGone` field. New strings (EN + 12 locales):
+  `no_albums_available`, `no_albums_available_desc`. Updated: functional-
+  spec (F2 empty states, F3 offline/album lifecycle, Error Handling
+  table), technical-spec (sync lifecycle, image caching strategy), ui-spec
+  (album selection empty states), README.
 - **2026-07-26** — Biometric auth + API key security (PR1 of media-selection
   feature). Added `androidx.biometric:biometric:1.1.0` dependency.
   `MainActivity` changed from `ComponentActivity` to `FragmentActivity`

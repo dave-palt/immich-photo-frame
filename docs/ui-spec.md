@@ -79,6 +79,10 @@ Shown on first launch or when credentials are missing/invalid.
 - Start button disabled if no albums selected.
 - Settings gear in top app bar.
 - Loading state: shimmer placeholders while album list loads.
+- **Empty states**:
+  - Server reachable but zero albums: centered photo-library icon,
+    "No albums available" title, explanation text, Retry button.
+  - Server unreachable: centered error text + Retry button.
 
 ### 3. Slideshow Screen
 
