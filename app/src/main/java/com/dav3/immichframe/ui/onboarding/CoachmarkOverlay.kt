@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,8 +37,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -47,6 +50,7 @@ import com.dav3.immichframe.R
 private const val SCRIM_ALPHA = 0.78f
 private const val SPOTLIGHT_PADDING_DP = 8
 private const val SPOTLIGHT_RADIUS_DP = 12
+private const val TOOLTIP_GAP_DP = 16
 private val TOOLTIP_MAX_WIDTH = 320.dp
 
 /**
@@ -82,21 +86,35 @@ fun TourHost(
     content: @Composable () -> Unit,
 ) {
     val allSteps = remember(screen) { TourSteps.forScreen(screen) }
+
+    // Steps not yet completed, in declaration order.
     val pendingSteps = remember(allSteps, completedSteps) {
         allSteps.filter { it.id !in completedSteps }
     }
-    val hasTour = pendingSteps.isNotEmpty()
-    var currentIndex by remember(pendingSteps) { mutableIntStateOf(0) }
+
+    // Keys of targets currently composed on screen. Reading this snapshot
+    // makes this composable re-evaluate whenever a target appears/disappears.
+    val presentKeySnapshot = tourState.presentKeys.toMap()
+
+    // From the pending steps, keep only those whose target is currently
+    // visible (or which are centered — no target). A step whose target isn't
+    // on screen yet (e.g. album grid still loading, or the start-slideshow
+    // bottom bar hidden until an album is selected) is deferred — it will
+    // join the ready list the moment its target appears.
+    val readySteps = remember(pendingSteps, presentKeySnapshot) {
+        pendingSteps.filter { step ->
+            step.targetKey == null || step.targetKey in presentKeySnapshot
+        }
+    }
+    val hasTour = readySteps.isNotEmpty()
+    var currentIndex by remember(readySteps) { mutableIntStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         content()
 
-        if (hasTour) {
-            val step = pendingSteps[currentIndex]
+        if (hasTour && currentIndex < readySteps.size) {
+            val step = readySteps[currentIndex]
 
-            // Scroll the target into view before showing it (if the screen
-            // needs to). We wait one frame after scroll for layout to update
-            // the targetRects.
             LaunchedEffect(step.id) {
                 if (step.targetKey != null && onScrollToTarget != null) {
                     onScrollToTarget(step.targetKey)
@@ -107,21 +125,20 @@ fun TourHost(
             CoachmarkOverlay(
                 step = step,
                 stepNumber = currentIndex + 1,
-                totalSteps = pendingSteps.size,
+                totalSteps = readySteps.size,
                 tourState = tourState,
                 onNext = {
                     onStepCompleted(step.id)
-                    if (currentIndex < pendingSteps.lastIndex) {
+                    if (currentIndex < readySteps.lastIndex) {
                         currentIndex++
                     } else {
                         tourState.deactivate()
                     }
                 },
                 onSkip = {
-                    // Mark all remaining as completed so they don't re-trigger
-                    pendingSteps.subList(currentIndex, pendingSteps.size).forEach {
-                        onStepCompleted(it.id)
-                    }
+                    // Mark all remaining pending steps as completed so they
+                    // don't re-trigger, even if they weren't ready/visible.
+                    pendingSteps.forEach { onStepCompleted(it.id) }
                     tourState.deactivate()
                     onSkipped()
                 },
@@ -133,6 +150,13 @@ fun TourHost(
 /**
  * The full-screen overlay: scrim with a rounded-rect spotlight cutout over the
  * active target (or plain scrim for centered steps), plus a tooltip card.
+ *
+ * Tooltip placement rules:
+ * - Centered steps (no target): tooltip is centered on screen.
+ * - Targeted steps: measure space above and below the spotlight; place the
+ *   tooltip in whichever half has more room. A Box is sized to fill only the
+ *   available space (excluding the spotlight), so the tooltip can never
+ *   overlap the highlighted element.
  */
 @Composable
 private fun CoachmarkOverlay(
@@ -146,6 +170,7 @@ private fun CoachmarkOverlay(
     val density = LocalDensity.current
     val paddingPx = with(density) { SPOTLIGHT_PADDING_DP.dp.toPx() }
     val radiusPx = with(density) { SPOTLIGHT_RADIUS_DP.dp.toPx() }
+    val gapPx = with(density) { TOOLTIP_GAP_DP.dp.toPx() }
 
     // Target bounds — may be null for centered (no-target) steps
     val targetRect = tourState.activeRect
@@ -153,16 +178,19 @@ private fun CoachmarkOverlay(
 
     val config = LocalConfiguration.current
     val screenHeightPx = with(density) { config.screenHeightDp.dp.toPx() }
-    val screenWidthPx = with(density) { config.screenWidthDp.dp.toPx() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent),
-        contentAlignment = if (isTargeted) Alignment.TopStart else Alignment.Center,
+        contentAlignment = Alignment.Center,
     ) {
-        // Scrim + spotlight cutout
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        // ── Scrim + spotlight cutout ──────────────────────────────────────
+        // Offscreen compositing is required so BlendMode.Clear actually
+        // punches a transparent hole — otherwise the cleared pixels resolve
+        // to the window background (black on Android) and the spotlight
+        // renders as a solid black box instead of a see-through window.
+        Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }) {
             val scrimColor = Color.Black.copy(alpha = SCRIM_ALPHA)
             if (isTargeted && targetRect != null) {
                 val padded = Rect(
@@ -171,7 +199,6 @@ private fun CoachmarkOverlay(
                     right = targetRect.right + paddingPx,
                     bottom = targetRect.bottom + paddingPx,
                 )
-                // Fill everything with scrim, then cut out the rounded rect
                 drawRect(color = scrimColor)
                 val path = Path().apply {
                     addRoundRect(
@@ -185,7 +212,6 @@ private fun CoachmarkOverlay(
                     )
                 }
                 drawPath(path = path, color = Color.Transparent, blendMode = BlendMode.Clear)
-                // Spotlight border (subtle white ring)
                 drawRoundRect(
                     color = Color.White.copy(alpha = 0.6f),
                     topLeft = Offset(padded.left, padded.top),
@@ -198,18 +224,9 @@ private fun CoachmarkOverlay(
             }
         }
 
-        // Tooltip card
-        val tooltipAlignment = when {
-            !isTargeted || targetRect == null -> Alignment.Center
-            // Place below if room, else above
-            targetRect.bottom < screenHeightPx * 0.6f -> {
-                // below — align horizontally with target center
-                null // custom positioned below
-            }
-            else -> null
-        }
-
-        if (tooltipAlignment != null) {
+        // ── Tooltip card ──────────────────────────────────────────────────
+        if (!isTargeted || targetRect == null) {
+            // Centered step — tooltip in the middle of the screen
             TooltipCard(
                 step = step,
                 stepNumber = stepNumber,
@@ -220,32 +237,58 @@ private fun CoachmarkOverlay(
                     .padding(24.dp)
                     .widthIn(max = TOOLTIP_MAX_WIDTH),
             )
-        } else if (targetRect != null) {
-            // Position tooltip above or below the spotlight based on available space
-            val placeBelow = targetRect.bottom < screenHeightPx * 0.6f
-            val anchorY = if (placeBelow) targetRect.bottom + paddingPx else targetRect.top - paddingPx
+        } else {
+            // Targeted step — place tooltip above or below the spotlight
+            val availableBelow = screenHeightPx - targetRect.bottom - paddingPx - gapPx
+            val availableAbove = targetRect.top - paddingPx - gapPx
+            val placeBelow = availableBelow >= availableAbove
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = if (placeBelow) Alignment.BottomStart else Alignment.TopStart,
-            ) {
-                TooltipCard(
-                    step = step,
-                    stepNumber = stepNumber,
-                    totalSteps = totalSteps,
-                    onNext = onNext,
-                    onSkip = onSkip,
+            if (placeBelow) {
+                // Box fills from just below the spotlight to the bottom of screen.
+                // Tooltip is top-aligned → sits right under the spotlight.
+                Box(
                     modifier = Modifier
+                        .fillMaxSize()
                         .padding(
-                            start = 24.dp,
-                            end = 24.dp,
-                            // offset from the spotlight edge
-                            bottom = with(density) { (screenHeightPx - anchorY).toDp() - 16.dp },
-                            // for above placement, top is measured from top
-                        )
-                        .widthIn(max = TOOLTIP_MAX_WIDTH),
-                )
+                            top = with(density) { (targetRect.bottom + paddingPx + gapPx).toDp() },
+                        ),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
+                    TooltipCard(
+                        step = step,
+                        stepNumber = stepNumber,
+                        totalSteps = totalSteps,
+                        onNext = onNext,
+                        onSkip = onSkip,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .widthIn(max = TOOLTIP_MAX_WIDTH)
+                            .heightIn(max = with(density) { availableBelow.toDp() }),
+                    )
+                }
+            } else {
+                // Box fills from the top of the screen to just above the spotlight.
+                // Tooltip is bottom-aligned → sits right over the spotlight.
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            bottom = with(density) { (screenHeightPx - targetRect.top + paddingPx + gapPx).toDp() },
+                        ),
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    TooltipCard(
+                        step = step,
+                        stepNumber = stepNumber,
+                        totalSteps = totalSteps,
+                        onNext = onNext,
+                        onSkip = onSkip,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                            .widthIn(max = TOOLTIP_MAX_WIDTH)
+                            .heightIn(max = with(density) { availableAbove.toDp() }),
+                    )
+                }
             }
         }
     }

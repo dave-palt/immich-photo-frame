@@ -1,11 +1,16 @@
 package com.dav3.immichframe.ui.onboarding
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -19,7 +24,9 @@ import androidx.compose.ui.unit.IntSize
  * - [targetRects]: pixel-space bounds of each `Modifier.tourTarget(key)` on the
  *   screen, keyed by logical target key (e.g. "slideshow_pause"). Populated
  *   as elements get positioned.
- * - [rootSize]: size of the screen root, used to clamp tooltip positions.
+ * - [presentKeys]: which target keys are currently composed (visible). A key
+ *   is added when its element enters composition and removed when it leaves.
+ *   This lets [TourHost] defer steps whose targets aren't on screen yet.
  *
  * The overlay composable ([CoachmarkOverlay]) reads from this to decide where
  * to draw the spotlight cutout and tooltip.
@@ -28,14 +35,17 @@ import androidx.compose.ui.unit.IntSize
 class TourState {
     val targetRects = mutableStateMapOf<String, Rect>()
 
+    /** Keys of targets currently present in the composition. */
+    internal val presentKeys = mutableStateMapOf<String, Unit>()
+
     var rootSize: IntSize = IntSize.Zero
         internal set
 
     /** The current target key the overlay should spotlight, or null if idle. */
-    internal var activeTargetKey: String? = null
+    internal var activeTargetKey: String? by mutableStateOf(null)
         private set
 
-    internal var isActive: Boolean = false
+    internal var isActive: Boolean by mutableStateOf(false)
         private set
 
     internal fun activate(targetKey: String?) {
@@ -77,6 +87,10 @@ fun rememberTourState(): TourState = remember { TourState() }
  * in [TourState.targetRects] under [key] and will be highlighted when the
  * tour step with `targetKey == key` is active.
  *
+ * Uses [DisposableEffect] so the key is removed from [TourState.presentKeys]
+ * and [TourState.targetRects] when the element leaves the composition. This
+ * lets [TourHost] know the target is no longer visible and defer its step.
+ *
  * Usage:
  * ```
  * Modifier.tourTarget("slideshow_pause", tourState)
@@ -85,13 +99,22 @@ fun rememberTourState(): TourState = remember { TourState() }
 fun Modifier.tourTarget(
     key: String,
     state: TourState,
-): Modifier = this.onGloballyPositioned { coords: LayoutCoordinates ->
-    val pos = coords.positionInRoot()
-    val size = coords.size
-    state.targetRects[key] = Rect(
-        left = pos.x,
-        top = pos.y,
-        right = pos.x + size.width,
-        bottom = pos.y + size.height,
-    )
+): Modifier = composed {
+    DisposableEffect(key) {
+        state.presentKeys[key] = Unit
+        onDispose {
+            state.presentKeys.remove(key)
+            state.targetRects.remove(key)
+        }
+    }
+    this.onGloballyPositioned { coords: LayoutCoordinates ->
+        val pos = coords.positionInRoot()
+        val size = coords.size
+        state.targetRects[key] = Rect(
+            left = pos.x,
+            top = pos.y,
+            right = pos.x + size.width,
+            bottom = pos.y + size.height,
+        )
+    }
 }
