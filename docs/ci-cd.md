@@ -1,9 +1,3 @@
-# CI/CD Setup
-
-## Branching Strategy
-
-- `develop` — active development branch. Push/PR triggers a debug APK build.
-- `main` — production branch. Merges trigger a signed release AAB + APK build.
 ## CI/CD Setup
 
 ### Branching Strategy
@@ -11,6 +5,27 @@
 - `develop` — active development branch. Push/PR triggers a debug APK build.
 - `main` — production branch. Merges trigger a signed release AAB + APK build.
 - Feature branches off `develop`: `feat/<description>`, `fix/<description>`.
+- Release branches: `release/v<x.y.z>` off `develop`, PR target `main`.
+
+#### Release PR flow & merge-back (MANDATORY)
+
+Every production release touches `app/build.gradle.kts` (`versionName`) and
+`.github/workflows/prod-build.yml` (release tag/name/body) — the same two
+files on both `develop` and `main`. To keep the two branches from diverging
+on these files and causing merge conflicts on the *next* release:
+
+1. Branch `release/v<x.y.z>` off the current `develop` HEAD.
+2. Bump `versionName`, update `prod-build.yml` release metadata.
+3. Open PR **`release/v<x.y.z>` → `main`** (the release PR).
+4. Immediately after merge (or in parallel), open a **backport PR
+   `release/v<x.y.z>` → `develop`** that bumps `versionName` to the **next
+   dev version** (`v<x.y.z+1>`, rendered as `<x.y.z+1>-dev` via the debug
+   `versionNameSuffix`). This carries `main`'s release-specific commits
+   (version bump, CI fixes, release-notes text) back into `develop` so the
+   branches stay aligned.
+5. Never skip the merge-back — forgetting it (as happened after v0.2.0)
+   leaves `develop` pinned to a stale `versionName` and guarantees
+   conflicts on the next release PR.
 
 ### Dev Build (develop branch)
 
