@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.ui.albums.AlbumSelectionScreen
+import com.dav3.immichframe.ui.media.MediaSelectionScreen
 import com.dav3.immichframe.ui.settings.SettingsScreen
 import com.dav3.immichframe.ui.setup.SetupScreen
 import com.dav3.immichframe.ui.slideshow.SlideshowScreen
@@ -29,6 +30,7 @@ object Routes {
     const val ALBUMS = "albums"
     const val SLIDESHOW = "slideshow"
     const val SETTINGS = "settings"
+    const val MEDIA_SELECTION = "media_selection"
 }
 
 @HiltViewModel
@@ -95,11 +97,31 @@ fun ImmichNavHost() {
                         popUpTo(Routes.SLIDESHOW) { inclusive = true }
                     }
                 },
+                onMediaSelection = { navController.navigate(Routes.MEDIA_SELECTION) },
+            )
+        }
+        composable(Routes.MEDIA_SELECTION) {
+            MediaSelectionScreen(
+                onBack = { navController.popBackStack() },
             )
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    // Navigate to the screen matching the current auth/album
+                    // status instead of popBackStack(), which is a no-op (and
+                    // leaves the user stuck on Settings) when the back stack
+                    // is empty — e.g. after onReset cleared it, or after a
+                    // process-death/restore.
+                    val destination = startRoute
+                    if (destination != null && destination != Routes.SETTINGS) {
+                        navController.navigate(destination) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
                 onChangeAlbums = {
                     navController.navigate(Routes.ALBUMS) {
                         popUpTo(Routes.SETTINGS) { inclusive = true }

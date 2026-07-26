@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 data class SlideshowUiState(
@@ -23,6 +24,11 @@ data class SlideshowUiState(
     val currentIndex: Int = 0,
     val isLoading: Boolean = false,
     val error: String? = null,
+    /**
+     * Set when the selected album(s) no longer exist on the server. The UI
+     * should navigate back to album selection so the user can pick again.
+     */
+    val albumGone: Boolean = false,
 )
 
 @HiltViewModel
@@ -37,6 +43,13 @@ constructor(
     private val _uiState = MutableStateFlow(SlideshowUiState())
     val uiState: StateFlow<SlideshowUiState> = _uiState
 
+    /**
+     * Asset ID → local cached file path. Populated in [load] so that
+     * [imageUrl] / [videoUrl] can return a `file://` URI for offline display
+     * instead of a network URL. Falls back to network for cache misses.
+     */
+    private val localFilePaths = mutableMapOf<String, String>()
+
     val settings =
         settingsRepo.slideshowSettings
             .stateIn(
@@ -46,15 +59,32 @@ constructor(
                     .SlideshowSettings(),
             )
 
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
+
     fun load() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, albumGone = false)
             val s = settingsRepo.slideshowSettings.first()
             val albumIds = settingsRepo.selectedAlbumIds.first()
             if (albumIds.isEmpty()) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = "No albums selected")
                 return@launch
             }
+
+            val toggledIds = settingsRepo.mediaSelectionToggledIds.first()
+            val newItemsShown = settingsRepo.mediaSelectionNewItemsShown.first()
 
             // First, try to load from cache (offline-capable fast path)
             val cachedAssets = mutableListOf<Asset>()
@@ -66,11 +96,19 @@ constructor(
             }
 
             if (cachedAssets.isNotEmpty()) {
+                // Resolve local file paths up front so imageUrl/videoUrl can
+                // serve offline `file://` URIs without per-frame DB lookups.
+                localFilePaths.clear()
+                localFilePaths.putAll(
+                    cacheRepo.getAssetFilePaths(cachedAssets.map { it.id }),
+                )
+
                 // Show cached assets immediately
                 val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
                 val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
                 android.util.Log.d("SlideshowLoad", "Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
-                val filteredAssets = if (s.skipVideos) cachedAssets.filter { it.type == AssetType.IMAGE } else cachedAssets
+                val filteredAssets = applyMediaSelection(cachedAssets, toggledIds, newItemsShown)
+                    .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
                 _uiState.value = if (ordered.isNotEmpty()) {
                     SlideshowUiState(assets = ordered, currentIndex = 0, isLoading = false)
@@ -86,14 +124,28 @@ constructor(
                 // Cold start: no cache yet — fetch metadata from network for immediate display
                 val allAssets = mutableListOf<Asset>()
                 val errors = mutableListOf<String>()
+                var albumGone = false
                 for (id in albumIds) {
                     immichRepo.getAlbumAssets(id).fold(
                         onSuccess = { allAssets.addAll(it) },
-                        onFailure = { errors.add("${id.take(8)}: ${it.message ?: "unknown"}") },
+                        onFailure = {
+                            // Immich returns 404 for a deleted album. Treat that
+                            // as permanent — we'll bounce back to album selection.
+                            if (isAlbumGone(it)) albumGone = true
+                            errors.add("${id.take(8)}: ${it.message ?: "unknown"}")
+                        },
                     )
                 }
 
-                val filteredAssets = if (s.skipVideos) allAssets.filter { it.type == AssetType.IMAGE } else allAssets
+                if (albumGone) {
+                    // Album deleted on server — clear selection and signal UI
+                    settingsRepo.setSelectedAlbumIds(emptyList())
+                    _uiState.value = SlideshowUiState(isLoading = false, albumGone = true)
+                    return@launch
+                }
+
+                val filteredAssets = applyMediaSelection(allAssets, toggledIds, newItemsShown)
+                    .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 android.util.Log.d("SlideshowLoad", "Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
 
@@ -143,9 +195,35 @@ constructor(
         }
     }
 
-    fun imageUrl(assetId: String): String = immichRepo.imageUrl(assetId)
+    /**
+     * Returns a display URL for an image asset. If the asset is cached
+     * locally on disk, returns a `file://` URI (works offline). Otherwise
+     * returns the network URL (requires server connectivity).
+     */
+    fun imageUrl(assetId: String): String {
+        localFilePaths[assetId]?.let { path ->
+            if (File(path).exists()) return "file://$path"
+        }
+        return immichRepo.imageUrl(assetId)
+    }
 
-    fun videoUrl(assetId: String): String = immichRepo.videoUrl(assetId)
+    fun videoUrl(assetId: String): String {
+        localFilePaths[assetId]?.let { path ->
+            if (File(path).exists()) return "file://$path"
+        }
+        return immichRepo.videoUrl(assetId)
+    }
+}
+
+/**
+ * Returns true if the exception indicates the album no longer exists on the
+ * server (HTTP 404), as opposed to a transient network/server error.
+ */
+private fun isAlbumGone(throwable: Throwable): Boolean {
+    val msg = throwable.message.orEmpty()
+    // Retrofit/OkHttp surfaces HTTP status in the message for HttpException;
+    // for an IOException (server unreachable) the message won't contain a code.
+    return msg.contains("404") || msg.contains("Not Found", ignoreCase = true)
 }
 
 fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(
@@ -153,3 +231,24 @@ fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(
     type = type,
     lastModified = lastModified,
 )
+
+/**
+ * Computes which assets are visible based on the media-selection state.
+ *
+ * - [newItemsShown] = true (default): all assets start **shown**. IDs in
+ *   [toggledIds] are the ones the user tapped to **hide**.
+ * - [newItemsShown] = false: all assets start **hidden**. IDs in
+ *   [toggledIds] are the ones the user tapped to **show**.
+ *
+ * This is used by both the slideshow playback and the media-selection grid
+ * so the two views stay consistent.
+ */
+fun applyMediaSelection(
+    assets: List<Asset>,
+    toggledIds: Set<String>,
+    newItemsShown: Boolean,
+): List<Asset> = if (newItemsShown) {
+    assets.filter { it.id !in toggledIds }
+} else {
+    assets.filter { it.id in toggledIds }
+}

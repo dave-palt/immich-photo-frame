@@ -22,6 +22,14 @@ interface MediaCacheRepository {
     // File management
     suspend fun getAssetFilePath(assetId: String): String?
     suspend fun getAssetThumbnailPath(assetId: String): String?
+
+    /**
+     * Batch-resolve local file paths for a set of asset IDs. Returns only
+     * entries whose file still exists on disk. Used by the slideshow to
+     * display cached media offline instead of hitting the network.
+     */
+    suspend fun getAssetFilePaths(assetIds: List<String>): Map<String, String>
+
     suspend fun deleteAssetFiles(assetId: String)
 
     // Cache directory

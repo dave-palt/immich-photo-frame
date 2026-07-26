@@ -98,6 +98,16 @@ The docs live in `docs/`:
 6. **Non-goal becomes a goal (or vice versa)?** → Update:
    - `docs/overview.md` (Goals / Non-Goals)
 
+7. **New feature worth touring?** → Update:
+   - `TourSteps` in `ui/onboarding/TourStep.kt` (add step to the relevant
+     screen's list; pick a stable `id`, `targetKey`, and string resources)
+   - `Modifier.tourTarget("<targetKey>", tourState)` on the UI element the
+     step highlights (omit `targetKey` for centered, no-spotlight tips)
+   - `strings.xml` — add `tour_<screen>_<step>_title` + `_body` (EN + 12 locales)
+   - `docs/functional-spec.md` — update F7 step inventory + step count
+   - `docs/technical-spec.md` — update the `onboarding_completed_steps` count
+     if the total number of steps changed
+
 ### How to update docs
 
 - Read the current doc first (`read_file`), then `patch` or `write_file` the
@@ -132,6 +142,119 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Media Selection feature (PR2 of media-selection feature).
+  New screen `ui/media/MediaSelectionScreen.kt` + `MediaSelectionViewModel`
+  showing a grid of all album assets. Tap thumbnails to show/hide from the
+  slideshow. "Show new photos by default" switch (default ON): ON = all start
+  shown, tap to hide; OFF = all start hidden, tap to show. Flipping preserves
+  current visible selection (recomputes stored toggled set against all assets).
+  Show All / Hide All bulk buttons. Counter "X of Y shown". Accessible from
+  slideshow top bar (GridView icon next to photo count), biometric-gated.
+  New DataStore keys: `media_selection_toggled_ids` (StringSet),
+  `media_selection_new_shown` (String bool, default true).
+  `SlideshowViewModel.load()` now applies media-selection filter via shared
+  `applyMediaSelection()` helper. New nav route `media_selection`. New strings
+  (EN + 12 locales): media_selection_title, media_selection_count,
+  media_selection_new_items_default, media_selection_select_all,
+  media_selection_select_none, media_selection_shown, media_selection_hidden.
+  Updated: functional-spec (F4 controls, new F8 flow), technical-spec
+  (persistence table, package layout, nav routes), README.
+- **2026-07-27** — Offline cache display + album lifecycle fix. (1) Root
+  cause: cached files were downloaded to disk by MediaCacheWorker but never
+  used for display — `imageUrl`/`videoUrl` always returned network URLs, so
+  the slideshow showed a black screen when the server was offline despite
+  having a populated cache. Fix: `SlideshowViewModel` now resolves local
+  `file://` URIs from `MediaCacheRepository.getAssetFilePaths()` (new batch
+  lookup method) on `load()`, falling back to network on cache miss. Same
+  pattern applied to `MediaSelectionViewModel.thumbnailUrl()`. (2) Album
+  deletion detection: `MediaCacheWorker` now distinguishes 404 (album
+  permanently gone) from transient errors. On 404, the album's cache is
+  purged; if all selected albums are gone, `selected_album_ids` is cleared
+  → `NavViewModel` routes back to album selection. `SlideshowViewModel`
+  also detects 404 on cold-start fetch and sets `albumGone` flag →
+  `SlideshowScreen` navigates to album selection via `LaunchedEffect`.
+  (3) Empty-response guard: reconcile step only prunes cached assets when
+  the remote list is non-empty (prevents wiping cache on transient
+  search-service hiccups). (4) "No albums available" empty state on
+  AlbumSelectionScreen (distinct from server-unreachable error state).
+  New `SlideshowUiState.albumGone` field. New strings (EN + 12 locales):
+  `no_albums_available`, `no_albums_available_desc`. Updated: functional-
+  spec (F2 empty states, F3 offline/album lifecycle, Error Handling
+  table), technical-spec (sync lifecycle, image caching strategy), ui-spec
+  (album selection empty states), README.
+- **2026-07-26** — Biometric auth + API key security (PR1 of media-selection
+  feature). Added `androidx.biometric:biometric:1.1.0` dependency.
+  `MainActivity` changed from `ComponentActivity` to `FragmentActivity`
+  (required by `BiometricPrompt`; `FragmentActivity` extends
+  `ComponentActivity` so all existing APIs still work). New:
+  `domain/system/BiometricHelper.kt` (capability check, prompt with
+  `BIOMETRIC_WEAK | DEVICE_CREDENTIAL` — allows PIN fallback, cancellable
+  with no penalty), `ui/components/BiometricLauncher.kt` (composable
+  wrapper: `rememberBiometricLauncher()`). API key in Settings Connection
+  section: Edit now empties the field (no pre-population); Reveal and Copy
+  buttons appear when key is set, both biometric-gated; copy shows a
+  snackbar. If no screen lock enrolled, a dialog links to security settings.
+  New strings (EN + 12 locales): reveal, hide, copy, api_key_copied,
+  biometric_auth_title, biometric_auth_subtitle_key,
+  biometric_auth_subtitle_media, biometric_not_setup_title,
+  biometric_not_setup_message. Updated: functional-spec (F6 Connection
+  section), technical-spec (tech stack, package layout), ui-spec (mockup +
+  description), README.
+- **2026-07-26** — Launcher icon redesign + app logo. (1) Replaced the old
+  5-segment colored frame icon with a new design: colorful frame border +
+  sun/moon circle + mountain silhouette (converted from 512-space SVG to
+  108dp Android VectorDrawable). (2) Foreground content wrapped in `<group
+  scaleX/Y=0.75>` to add ~12% padding (opaque square was showing under
+  launcher mask). (3) Removed legacy PNG fallbacks in mipmap-hdpi/mdpi/
+  xhdpi/xxhdpi/xxxhdpi — unreachable since minSdk=26 uses adaptive icons.
+  (4) Created dedicated `app_logo.xml` drawable (no background fill, full
+  viewport, no scaling) for the Setup screen; updated from 72dp foreground
+  to 120dp logo. (5) Debug variant keeps amber bg (#FFB400) with navy
+  replacing the orange segment. Variants: day (drawable/), night
+  (drawable-night/), monochrome (drawable/), debug (debug/drawable/).
+  Updated: technical-spec (resource layout), ui-spec (setup logo),
+  README (icon feature list).
+
+
+- **2026-07-26** — Onboarding tour post-PR fixes. (1) Added two new slideshow
+  tour steps: `slideshow_albums` (back-to-album-selection button) and
+  `slideshow_update` (update status icon, force-shown as dimmed placeholder
+  during tour since the icon normally only appears when an update is available).
+  Total slideshow steps: 5→7, overall: 16→18. (2) Centered (no-target) tour
+  steps were rendering at screen top — fixed by adding `contentAlignment =
+  Alignment.Center` to the overlay Box. (3) Per-screen tour reset:
+  `resetOnboardingForScreen(stepIds)` in SettingsRepository +
+  `resetOnboardingForSettings()` in SettingsViewModel; Settings now has two
+  buttons: "Show Tour Again" (Settings-only) + "Reset All Tours" (all screens);
+  Setup screen also has "Show Tour Again". (4) Target lifecycle tracking
+  rewritten — `tourTarget()` modifier uses `DisposableEffect` to register/
+  unregister in `presentKeys` set; TourHost computes `readySteps` from
+  pendingSteps whose targets are present, deferring activation until targets
+  appear. (5) Black spotlight bug fixed: `CompositingStrategy.Offscreen` on
+  Canvas so `BlendMode.Clear` punches a transparent hole. (6) Settings back-
+  navigation stuck bug fixed: `onBack` uses explicit route via `startRoute` +
+  `popUpTo(0)` instead of `popBackStack()`. (7) Slideshow controls now respect
+  system bar insets (`statusBarsPadding` on top bar, `navigationBarsPadding`
+  on bottom progress bar + play/pause row). (8) Setup screen: added app icon
+  (launcher foreground drawable, 72dp), `imePadding()` so keyboard doesn't
+  hide the connect button. Updated: functional-spec (F7 step inventory + 18
+  count), technical-spec (resource layout), ui-spec (overlay centering, setup
+  logo, tour buttons, insets), README (tour step detail + icon variants).
+
+- **2026-07-26** — Onboarding Tour feature. Added a modular, per-step
+  coachmark tour system that auto-triggers on screen entry for any
+  un-completed steps. Per-step completion tracking via
+  `onboarding_completed_steps` StringSet in DataStore (not a single boolean).
+  16 steps across 4 screens: Setup (4), Albums (3), Slideshow (5), Settings
+  (4). Custom Compose overlay — no third-party showcase library. New package
+  `ui/onboarding/` with `TourStep.kt` (step registry), `TourState.kt` (state
+  holder + `tourTarget` modifier), and `CoachmarkOverlay.kt` (scrim +
+  spotlight + tooltip card + `TourHost` wrapper). Settings → System section
+  gains a "Show Tour Again" button (`resetOnboarding()`). Slideshow forces
+  controls visible + suppresses auto-hide during tour. Settings scrolls target
+  sections into view. 37 new strings (EN + 12 locales). Updated:
+  functional-spec (F7), technical-spec (persistence table + package layout),
+  ui-spec (overlay description), README.
 - **2026-07-26** — Launcher Mode feature. After real-hardware testing on a
   Realme PKH110 (ColorOS 16 / Android 16), BOOT_COMPLETED was confirmed to
   never fire (boot_verified stayed false across 2 reboots) — this is both

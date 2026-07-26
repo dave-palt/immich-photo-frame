@@ -1,13 +1,23 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Background: amber (dev variant — distinct from release white) -->
-    <path
-        android:fillColor="#FFB400"
-        android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z" />
+    <!-- Background: dark gradient (photo-frame scene works best on dark) -->
+    <path android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:startColor="#1A1A2E"
+                android:endColor="#16213E" />
+        </aapt:attr>
+    </path>
 
     <!-- Icon content scaled to 75% and re-centered for breathing room. -->
     <group
@@ -24,9 +34,9 @@
             android:fillColor="#00000000"
             android:pathData="M 32.91,23.62 L 75.09,23.62" />
 
-        <!-- Dark navy (replaces orange to stand out on amber bg) -->
+        <!-- Orange: top-right corner + right edge -->
         <path
-            android:strokeColor="#1A1A2E"
+            android:strokeColor="#FFB400"
             android:strokeWidth="7.17"
             android:strokeLineCap="round"
             android:fillColor="#00000000"
@@ -56,17 +66,17 @@
             android:fillColor="#00000000"
             android:pathData="M 23.62,52.31 L 23.62,32.91 Q 23.62,23.62 32.91,23.62" />
 
-        <!-- Sun/moon (dark navy, semi-transparent — visible on amber) -->
+        <!-- Sun/moon (amber, semi-transparent) -->
         <path
-            android:fillColor="#1A1A2E"
-            android:fillAlpha="0.5"
+            android:fillColor="#FFB400"
+            android:fillAlpha="0.7"
             android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
 
-        <!-- Mountain silhouette (dark navy on amber for dev) -->
+        <!-- Mountain silhouette (light gray, semi-transparent) -->
         <path
-            android:fillColor="#1A1A2E"
-            android:fillAlpha="0.3"
-            android:strokeColor="#1A1A2E"
+            android:fillColor="#E8E8E8"
+            android:fillAlpha="0.2"
+            android:strokeColor="#E8E8E8"
             android:strokeWidth="0.53"
             android:strokeAlpha="0.5"
             android:strokeLineJoin="round"

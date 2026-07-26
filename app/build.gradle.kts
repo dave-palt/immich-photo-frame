@@ -15,7 +15,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.2.0"
+        versionName = "0.3.0"
 
         // Git SHA for self-update version comparison (config-cache safe)
         buildConfigField(
@@ -171,4 +171,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Biometric authentication (fingerprint / face / device credential)
+    implementation(libs.androidx.biometric)
 }

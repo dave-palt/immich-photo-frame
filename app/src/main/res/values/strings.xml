@@ -89,6 +89,15 @@
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="reveal">Reveal</string>
+    <string name="hide">Hide</string>
+    <string name="copy">Copy</string>
+    <string name="api_key_copied">API key copied to clipboard</string>
+    <string name="biometric_auth_title">Authenticate</string>
+    <string name="biometric_auth_subtitle_key">Authenticate to view your API key</string>
+    <string name="biometric_auth_subtitle_media">Authenticate to manage media selection</string>
+    <string name="biometric_not_setup_title">Screen Lock Required</string>
+    <string name="biometric_not_setup_message">This action requires a screen lock (fingerprint, face, or PIN). Set one up in your device security settings to use this feature.</string>
 
     <!-- Settings UI -->
     <string name="settings">Settings</string>
@@ -120,6 +129,8 @@
     <string name="select_albums">Select Albums</string>
     <string name="done">Done</string>
     <string name="no_albums">No albums found</string>
+    <string name="no_albums_available">No albums available</string>
+    <string name="no_albums_available_desc">Your Immich account doesn\'t have any albums yet. Create one in Immich, then tap retry.</string>
     <string name="loading_albums">Loading albums…</string>
     <string name="hide_key">Hide key</string>
     <string name="show_key">Show key</string>
@@ -137,6 +148,74 @@
     <string name="install">Install</string>
     <string name="later">Later</string>
 
+    <!-- Update status (settings) -->
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_up_to_date">Up to date</string>
+    <string name="update_error">Update check failed</string>
+
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d photos</string>
+    <string name="photos_count">%1$d / %2$d media</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">Media Selection</string>
+    <string name="media_selection_count">%1$d of %2$d shown</string>
+    <string name="media_selection_new_items_default">Show new media by default</string>
+    <string name="media_selection_select_all">Show All</string>
+    <string name="media_selection_select_none">Hide All</string>
+    <string name="media_selection_shown">Shown in slideshow</string>
+    <string name="media_selection_hidden">Hidden from slideshow</string>
+    <!-- Onboarding Tour -->
+    <string name="tour_next">Next</string>
+    <string name="tour_got_it">Got it</string>
+    <string name="tour_skip">Skip tour</string>
+    <string name="tour_step_counter">Step %1$d of %2$d</string>
+    <string name="show_tour">Show Tour Again</string>
+    <string name="reset_all_tours">Reset All Tours</string>
+
+    <!-- Setup tour steps -->
+    <string name="tour_setup_welcome_title">Welcome to Immich Media Frame</string>
+    <string name="tour_setup_welcome_body">Connect to your Immich server to display your photos. Let\'s walk through the setup.</string>
+    <string name="tour_setup_server_title">Server Address</string>
+    <string name="tour_setup_server_body">Enter your Immich server URL here. Use the format photos.example.com or 192.168.1.100:2283.</string>
+    <string name="tour_setup_apikey_title">API Key</string>
+    <string name="tour_setup_apikey_body">Create an API key in Immich under Settings → API Keys. It needs album, asset, and user read permissions.</string>
+    <string name="tour_setup_connect_title">Test &amp; Connect</string>
+    <string name="tour_setup_connect_body">Tap Test Connection to verify your credentials. Once connected, you\'ll pick which albums to display.</string>
+
+    <!-- Albums tour steps -->
+    <string name="tour_albums_select_title">Choose Your Albums</string>
+    <string name="tour_albums_select_body">Tap one or more albums to include in your slideshow. Selected albums show a checkmark.</string>
+    <string name="tour_albums_start_title">Start the Show</string>
+    <string name="tour_albums_start_body">When you\'ve picked your albums, tap Start Slideshow to begin.</string>
+    <string name="tour_albums_settings_title">Settings</string>
+    <string name="tour_albums_settings_body">Access settings anytime from this gear icon — adjust intervals, clock, caching, and more.</string>
+
+    <!-- Slideshow tour steps -->
+    <string name="tour_slideshow_tap_title">Tap to Control</string>
+    <string name="tour_slideshow_tap_body">Tap anywhere on the screen to show or hide the playback controls. They auto-hide after a few seconds.</string>
+    <string name="tour_slideshow_nav_title">Navigate Photos</string>
+    <string name="tour_slideshow_nav_body">Use these arrows to move to the previous or next photo manually.</string>
+    <string name="tour_slideshow_playback_title">Pause &amp; Mute</string>
+    <string name="tour_slideshow_playback_body">Pause the slideshow or mute video audio with these controls.</string>
+    <string name="tour_slideshow_media_selection_title">Pick Your Media</string>
+    <string name="tour_slideshow_media_selection_body">Tap here to choose which media appear in the slideshow. You\'ll confirm with your fingerprint or screen lock first.</string>
+    <string name="tour_slideshow_albums_title">Back to Albums</string>
+    <string name="tour_slideshow_albums_body">Want to pick different photos? Tap here to go back to album selection.</string>
+    <string name="tour_slideshow_update_title">Update Indicator</string>
+    <string name="tour_slideshow_update_body">When an update is available, this icon appears here so you can install the latest version. If it\'s not showing, you\'re already up to date.</string>
+    <string name="tour_slideshow_settings_title">Adjust on the Fly</string>
+    <string name="tour_slideshow_settings_body">Open settings without leaving the slideshow — change interval, enable the clock, and more.</string>
+    <string name="tour_slideshow_close_title">Exit Slideshow</string>
+    <string name="tour_slideshow_close_body">Tap here to exit the slideshow and return to album selection.</string>
+
+    <!-- Settings tour steps -->
+    <string name="tour_settings_overview_title">Settings Overview</string>
+    <string name="tour_settings_overview_body">All changes save automatically — no save button needed. Scroll down to explore each section.</string>
+    <string name="tour_settings_system_title">System &amp; Autostart</string>
+    <string name="tour_settings_system_body">Start on Boot and Launcher Mode let the app launch automatically — ideal for dedicated photo frames.</string>
+    <string name="tour_settings_cache_title">Media Cache</string>
+    <string name="tour_settings_cache_body">Auto Sync downloads photos in the background so the slideshow works offline and loads instantly.</string>
+    <string name="tour_settings_connection_title">Connection</string>
+    <string name="tour_settings_connection_body">Update your server URL or API key here if your Immich setup changes.</string>
 </resources>

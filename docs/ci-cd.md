@@ -1,9 +1,3 @@
-# CI/CD Setup
-
-## Branching Strategy
-
-- `develop` — active development branch. Push/PR triggers a debug APK build.
-- `main` — production branch. Merges trigger a signed release AAB + APK build.
 ## CI/CD Setup
 
 ### Branching Strategy
@@ -11,6 +5,27 @@
 - `develop` — active development branch. Push/PR triggers a debug APK build.
 - `main` — production branch. Merges trigger a signed release AAB + APK build.
 - Feature branches off `develop`: `feat/<description>`, `fix/<description>`.
+- Release branches: `release/v<x.y.z>` off `develop`, PR target `main`.
+
+#### Release PR flow & merge-back (MANDATORY)
+
+Every production release touches `app/build.gradle.kts` (`versionName`) and
+`.github/workflows/prod-build.yml` (release tag/name/body) — the same two
+files on both `develop` and `main`. To keep the two branches from diverging
+on these files and causing merge conflicts on the *next* release:
+
+1. Branch `release/v<x.y.z>` off the current `develop` HEAD.
+2. Bump `versionName`, update `prod-build.yml` release metadata.
+3. Open PR **`release/v<x.y.z>` → `main`** (the release PR).
+4. Immediately after merge (or in parallel), open a **backport PR
+   `release/v<x.y.z>` → `develop`** that bumps `versionName` to the **next
+   dev version** (`v<x.y.z+1>`, rendered as `<x.y.z+1>-dev` via the debug
+   `versionNameSuffix`). This carries `main`'s release-specific commits
+   (version bump, CI fixes, release-notes text) back into `develop` so the
+   branches stay aligned.
+5. Never skip the merge-back — forgetting it (as happened after v0.2.0)
+   leaves `develop` pinned to a stale `versionName` and guarantees
+   conflicts on the next release PR.
 
 ### Dev Build (develop branch)
 
@@ -138,7 +153,19 @@ If no `DEBUG_KEYSTORE_PATH` env var is set, the build falls back to the default 
 
 ### Self-Update (GitHub Releases)
 
-Dev builds published to the `develop` branch are consumed by the app's self-update feature (see [functional-spec.md](functional-spec.md#F5c)). The app compares `BuildConfig.GIT_SHA` against the release tag SHA (`dev-{sha}`). If they differ, it downloads the APK and invokes the system installer. This only works for non-Play-Store installs.
+The app's self-update feature consumes GitHub releases. The behavior depends on
+build type:
+
+- **Release builds** (primary target): fetch `/releases/latest` and compare the
+  `vX.Y.Z` tag against the installed `versionName` via semantic version comparison.
+  If newer, download the APK and invoke the system installer.
+- **Debug builds** (dev channel): list recent releases, pick the newest `dev-{sha}`
+  tag, and compare its SHA against `BuildConfig.GIT_SHA`. If different, download
+  and install.
+
+Dev builds published to the `develop` branch feed the dev channel. Production
+releases published to the `main` branch feed the release channel. Self-update is
+disabled entirely for Play Store installs (see [functional-spec.md](functional-spec.md#F5d)).
 
 ### Play Store Publishing (Future)
 

@@ -15,26 +15,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +61,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
@@ -67,6 +75,12 @@ import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.system.openOtherLauncher
+import com.dav3.immichframe.ui.onboarding.TourHost
+import com.dav3.immichframe.ui.onboarding.TourScreen
+import com.dav3.immichframe.ui.onboarding.TourSteps
+import com.dav3.immichframe.ui.onboarding.rememberTourState
+import com.dav3.immichframe.ui.onboarding.tourTarget
+import com.dav3.immichframe.ui.update.UpdateViewModel
 import com.dav3.immichframe.util.extractDominantColor
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -78,13 +92,34 @@ fun SlideshowScreen(
     onClose: () -> Unit,
     onSettings: () -> Unit,
     onChangeAlbums: () -> Unit,
+    onMediaSelection: () -> Unit = {},
     viewModel: SlideshowViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val settings by viewModel.settings.collectAsState(initial = SlideshowSettings())
     val s = settings
 
+    val tourState = rememberTourState()
+    val completedSteps by viewModel.onboardingSteps.collectAsState()
+    val tourActive = remember(completedSteps) {
+        TourSteps.forScreen(TourScreen.SLIDESHOW).any { it.id !in completedSteps }
+    }
+
+    val updateVm: UpdateViewModel = hiltViewModel()
+    val updateState by updateVm.updateState.collectAsState()
+    val updateDismissed by updateVm.updateDismissed.collectAsState()
+    var showUpdateDialog by remember { mutableStateOf(false) }
+
+    val authTitle = stringResource(R.string.biometric_auth_title)
+    val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
+
     LaunchedEffect(Unit) { viewModel.load() }
+
+    // Album deleted on server — bounce back to album selection so the user
+    // can pick again. Only fires once per load() that sets the flag.
+    LaunchedEffect(state.albumGone) {
+        if (state.albumGone) onChangeAlbums()
+    }
 
     // Immersive fullscreen
     val view = LocalView.current
@@ -139,8 +174,14 @@ fun SlideshowScreen(
     }
 
     var controlsVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(controlsVisible) {
-        if (controlsVisible) {
+
+    // Force controls visible during onboarding tour, suppress auto-hide
+    LaunchedEffect(tourActive) {
+        if (tourActive) controlsVisible = true
+    }
+
+    LaunchedEffect(controlsVisible, tourActive) {
+        if (controlsVisible && !tourActive) {
             delay(5000)
             controlsVisible = false
         }
@@ -176,222 +217,335 @@ fun SlideshowScreen(
         }
     }
 
-    Surface(color = Color.Black) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(if (s.adaptiveBackground) dominantColor else Color.Black)
-                .onSizeChanged { containerSize = it }
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = { controlsVisible = !controlsVisible })
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            when {
-                state.isLoading -> CircularProgressIndicator()
+    TourHost(
+        screen = TourScreen.SLIDESHOW,
+        completedSteps = completedSteps,
+        onStepCompleted = viewModel::markStepCompleted,
+        onSkipped = { },
+        tourState = tourState,
+    ) {
+        Surface(color = Color.Black) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(if (s.adaptiveBackground) dominantColor else Color.Black)
+                    .onSizeChanged { containerSize = it }
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = { controlsVisible = !controlsVisible })
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                when {
+                    state.isLoading -> CircularProgressIndicator()
 
-                state.error != null -> Text(state.error!!, color = Color.White)
+                    state.error != null -> Text(state.error!!, color = Color.White)
 
-                state.assets.isNotEmpty() -> {
-                    val asset = state.assets[state.currentIndex]
-                    val scale = if (s.fillMode == FillMode.COVER) {
-                        ContentScale.Crop
-                    } else {
-                        ContentScale.Fit
-                    }
-
-                    AnimatedContent(
-                        targetState = asset.id,
-                        transitionSpec = {
-                            val ms = (s.transitionSeconds * 1000).toInt()
-                            fadeIn(tween(ms)) togetherWith fadeOut(tween(ms))
-                        },
-                        label = "slideshow",
-                    ) { assetId ->
-                        val currentAsset = state.assets.find { it.id == assetId }
-                        if (currentAsset?.type == AssetType.VIDEO) {
-                            VideoPlayer(
-                                asset = currentAsset,
-                                viewModel = viewModel,
-                                muted = s.muted,
-                                isSlideshowPaused = isPaused,
-                                isVideoPaused = isVideoPaused,
-                                fillMode = s.fillMode,
-                            )
+                    state.assets.isNotEmpty() -> {
+                        val asset = state.assets[state.currentIndex]
+                        val scale = if (s.fillMode == FillMode.COVER) {
+                            ContentScale.Crop
                         } else {
-                            KenBurnsImage(
-                                url = viewModel.imageUrl(assetId),
-                                contentScale = scale,
-                                assetId = assetId,
-                                photoAnimations = s.photoAnimations,
-                                enabledAnims = s.enabledAnimations,
-                                durationMs = s.intervalSeconds * 1000L,
+                            ContentScale.Fit
+                        }
+
+                        AnimatedContent(
+                            targetState = asset.id,
+                            transitionSpec = {
+                                val ms = (s.transitionSeconds * 1000).toInt()
+                                fadeIn(tween(ms)) togetherWith fadeOut(tween(ms))
+                            },
+                            label = "slideshow",
+                        ) { assetId ->
+                            val currentAsset = state.assets.find { it.id == assetId }
+                            if (currentAsset?.type == AssetType.VIDEO) {
+                                VideoPlayer(
+                                    asset = currentAsset,
+                                    viewModel = viewModel,
+                                    muted = s.muted,
+                                    isSlideshowPaused = isPaused,
+                                    isVideoPaused = isVideoPaused,
+                                    fillMode = s.fillMode,
+                                )
+                            } else {
+                                KenBurnsImage(
+                                    url = viewModel.imageUrl(assetId),
+                                    contentScale = scale,
+                                    assetId = assetId,
+                                    photoAnimations = s.photoAnimations,
+                                    enabledAnims = s.enabledAnimations,
+                                    durationMs = s.intervalSeconds * 1000L,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Draggable clock overlay — positioned from top-left via absolute offset
+                if (s.showClock && currentTime.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier.align(Alignment.TopStart),
+                    ) {
+                        DraggableClock(
+                            time = currentTime,
+                            fontSize = s.clockSize,
+                            position = s.clockPosition,
+                            containerSize = containerSize,
+                            clockDrift = s.photoAnimations,
+                            snapToGrid = s.clockSnapToGrid,
+                            onPositionChanged = { normX, normY ->
+                                viewModel.setClockPosition(ClockPosition(normX, normY))
+                            },
+                        )
+                    }
+                }
+
+                // Progress bar (bottom, thin line) — shows when controls visible
+                AnimatedVisibility(
+                    visible = controlsVisible && !isPaused,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                ) {
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding(),
+                        color = Color.White,
+                        trackColor = Color(0x33FFFFFF),
+                    )
+                }
+
+                // Top bar: photo count + mute + albums + settings + close
+                AnimatedVisibility(
+                    visible = controlsVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.TopCenter),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0x80000000))
+                            .statusBarsPadding()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
+                        // Media selection — biometric-gated grid to pick which
+                        // photos are shown in the slideshow
+                        val biometric = com.dav3.immichframe.ui.components.rememberBiometricLauncher()
+                        var showBioNotSetup by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = {
+                                biometric.launch(
+                                    title = authTitle,
+                                    subtitle = authSubtitleMedia,
+                                    onNotSetup = { showBioNotSetup = true },
+                                    onSuccess = { onMediaSelection() },
+                                )
+                            },
+                            modifier = Modifier.tourTarget("slideshow_media_selection", tourState),
+                        ) {
+                            Icon(Icons.Default.GridView, "Media selection", tint = Color.White)
+                        }
+                        if (showBioNotSetup) {
+                            AlertDialog(
+                                onDismissRequest = { showBioNotSetup = false },
+                                title = { Text(stringResource(R.string.biometric_not_setup_title)) },
+                                text = { Text(stringResource(R.string.biometric_not_setup_message)) },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        showBioNotSetup = false
+                                        com.dav3.immichframe.domain.system.BiometricHelper
+                                            .openSecuritySettings(context)
+                                    }) { Text(stringResource(R.string.open_settings)) }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showBioNotSetup = false }) {
+                                        Text(stringResource(R.string.cancel))
+                                    }
+                                },
+                            )
+                        }
+                        Spacer(Modifier.weight(1f))
+                        // Update status icon — shows checking/downloading/ready states.
+                        // Clicking opens the install dialog (only when download is ready).
+                        // During the tour, force-show a placeholder so the coachmark
+                        // has a target (the icon normally only appears when an update
+                        // is available, which would leave the tour step highlighting
+                        // nothing).
+                        Box(modifier = Modifier.tourTarget("slideshow_update", tourState)) {
+                            UpdateStatusIcon(
+                                state = updateState,
+                                onClick = {
+                                    if (updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
+                                        updateVm.resetDismissed()
+                                        showUpdateDialog = true
+                                    }
+                                },
+                                forceVisible = tourState.activeTargetKey == "slideshow_update",
+                            )
+                        }
+                        if (s.launcherMode) {
+                            val context = LocalContext.current
+                            IconButton(onClick = { openOtherLauncher(context) }) {
+                                Icon(Icons.AutoMirrored.Filled.ExitToApp, "Switch to another launcher", tint = Color.White)
+                            }
+                        }
+                        IconButton(
+                            onClick = onChangeAlbums,
+                            modifier = Modifier.tourTarget("slideshow_albums", tourState),
+                        ) {
+                            Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
+                        }
+                        IconButton(
+                            onClick = onSettings,
+                            modifier = Modifier.tourTarget("slideshow_settings_gear", tourState),
+                        ) {
+                            Icon(Icons.Default.Settings, "Settings", tint = Color.White)
+                        }
+                        IconButton(
+                            onClick = onClose,
+                            modifier = Modifier.tourTarget("slideshow_close", tourState),
+                        ) {
+                            Icon(Icons.Default.Close, "Close", tint = Color.White)
+                        }
+                    }
+                }
+
+                // Left/right nav
+                AnimatedVisibility(
+                    visible = controlsVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.CenterStart),
+                ) {
+                    IconButton(onClick = { viewModel.previous() }) {
+                        Icon(Icons.AutoMirrored.Filled.NavigateBefore, "Previous", tint = Color.White, modifier = Modifier.size(48.dp))
+                    }
+                }
+                AnimatedVisibility(
+                    visible = controlsVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                ) {
+                    IconButton(
+                        onClick = { viewModel.next() },
+                        modifier = Modifier.tourTarget("slideshow_next", tourState),
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.NavigateNext, "Next", tint = Color.White, modifier = Modifier.size(48.dp))
+                    }
+                }
+
+                // Pause/play + mute (bottom-center)
+                AnimatedVisibility(
+                    visible = controlsVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.navigationBarsPadding(),
+                    ) {
+                        IconButton(
+                            onClick = { isPaused = !isPaused },
+                            modifier = Modifier.tourTarget("slideshow_pause", tourState),
+                        ) {
+                            Icon(
+                                if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
+                                if (isPaused) "Play slideshow" else "Pause slideshow",
+                                tint = Color.White,
+                                modifier = Modifier.size(36.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(16.dp))
+                        IconButton(onClick = { viewModel.setMuted(!s.muted) }) {
+                            Icon(
+                                if (s.muted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
+                                "Mute",
+                                tint = Color.White,
+                                modifier = Modifier.size(28.dp),
                             )
                         }
                     }
                 }
-            }
+                // Big centered video play/pause overlay — only for videos
+                if (isVideoPaused) {
+                    val currentAsset = state.assets.getOrNull(state.currentIndex)
+                    if (currentAsset?.type == AssetType.VIDEO) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .background(Color(0x80000000), shape = androidx.compose.foundation.shape.CircleShape)
+                                .size(96.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = { isVideoPaused = false })
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Default.PlayArrow,
+                                "Play video",
+                                tint = Color.White,
+                                modifier = Modifier.size(48.dp),
+                            )
+                        }
+                    }
+                }
 
-            // Draggable clock overlay — positioned from top-left via absolute offset
-            if (s.showClock && currentTime.isNotEmpty()) {
-                Box(
-                    modifier = Modifier.align(Alignment.TopStart),
-                ) {
-                    DraggableClock(
-                        time = currentTime,
-                        fontSize = s.clockSize,
-                        position = s.clockPosition,
-                        containerSize = containerSize,
-                        clockDrift = s.photoAnimations,
-                        snapToGrid = s.clockSnapToGrid,
-                        onPositionChanged = { normX, normY ->
-                            viewModel.setClockPosition(ClockPosition(normX, normY))
+                // Update install dialog — triggered by the update status icon.
+                if (showUpdateDialog && updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showUpdateDialog = false
+                            updateVm.dismissUpdate()
+                        },
+                        title = { Text(stringResource(R.string.update_available)) },
+                        text = {
+                            Text(stringResource(R.string.update_message, updateState.newVersion.take(14)))
+                        },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showUpdateDialog = false
+                                updateVm.installUpdate()
+                            }) {
+                                Text(stringResource(R.string.install), color = MaterialTheme.colorScheme.primary)
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                showUpdateDialog = false
+                                updateVm.dismissUpdate()
+                            }) {
+                                Text(stringResource(R.string.later))
+                            }
                         },
                     )
                 }
-            }
 
-            // Progress bar (bottom, thin line) — shows when controls visible
-            AnimatedVisibility(
-                visible = controlsVisible && !isPaused,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.BottomCenter),
-            ) {
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.White,
-                    trackColor = Color(0x33FFFFFF),
-                )
-            }
-
-            // Top bar: photo count + mute + albums + settings + close
-            AnimatedVisibility(
-                visible = controlsVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.TopCenter),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0x80000000))
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
-                    Spacer(Modifier.weight(1f))
-                    if (s.launcherMode) {
-                        val context = LocalContext.current
-                        IconButton(onClick = { openOtherLauncher(context) }) {
-                            Icon(Icons.AutoMirrored.Filled.ExitToApp, "Switch to another launcher", tint = Color.White)
+                // Video paused indicator (small, centered) — tap to resume
+                if (!isVideoPaused) {
+                    val currentAsset = state.assets.getOrNull(state.currentIndex)
+                    if (currentAsset?.type == AssetType.VIDEO && controlsVisible) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(72.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = { isVideoPaused = true })
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Default.Pause,
+                                "Pause video",
+                                tint = Color.White.copy(alpha = 0.7f),
+                                modifier = Modifier.size(32.dp),
+                            )
                         }
-                    }
-                    IconButton(onClick = onChangeAlbums) {
-                        Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
-                    }
-                    IconButton(onClick = onSettings) {
-                        Icon(Icons.Default.Settings, "Settings", tint = Color.White)
-                    }
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.Default.Close, "Close", tint = Color.White)
-                    }
-                }
-            }
-
-            // Left/right nav
-            AnimatedVisibility(
-                visible = controlsVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.CenterStart),
-            ) {
-                IconButton(onClick = { viewModel.previous() }) {
-                    Icon(Icons.AutoMirrored.Filled.NavigateBefore, "Previous", tint = Color.White, modifier = Modifier.size(48.dp))
-                }
-            }
-            AnimatedVisibility(
-                visible = controlsVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.CenterEnd),
-            ) {
-                IconButton(onClick = { viewModel.next() }) {
-                    Icon(Icons.AutoMirrored.Filled.NavigateNext, "Next", tint = Color.White, modifier = Modifier.size(48.dp))
-                }
-            }
-
-            // Pause/play + mute (bottom-center)
-            AnimatedVisibility(
-                visible = controlsVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.BottomCenter),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { isPaused = !isPaused }) {
-                        Icon(
-                            if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                            if (isPaused) "Play slideshow" else "Pause slideshow",
-                            tint = Color.White,
-                            modifier = Modifier.size(36.dp),
-                        )
-                    }
-                    Spacer(Modifier.width(16.dp))
-                    IconButton(onClick = { viewModel.setMuted(!s.muted) }) {
-                        Icon(
-                            if (s.muted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
-                            "Mute",
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp),
-                        )
-                    }
-                }
-            }
-            // Big centered video play/pause overlay — only for videos
-            if (isVideoPaused) {
-                val currentAsset = state.assets.getOrNull(state.currentIndex)
-                if (currentAsset?.type == AssetType.VIDEO) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .background(Color(0x80000000), shape = androidx.compose.foundation.shape.CircleShape)
-                            .size(96.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onTap = { isVideoPaused = false })
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            Icons.Default.PlayArrow,
-                            "Play video",
-                            tint = Color.White,
-                            modifier = Modifier.size(48.dp),
-                        )
-                    }
-                }
-            }
-
-            // Video paused indicator (small, centered) — tap to resume
-            if (!isVideoPaused) {
-                val currentAsset = state.assets.getOrNull(state.currentIndex)
-                if (currentAsset?.type == AssetType.VIDEO && controlsVisible) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(72.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onTap = { isVideoPaused = true })
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            Icons.Default.Pause,
-                            "Pause video",
-                            tint = Color.White.copy(alpha = 0.7f),
-                            modifier = Modifier.size(32.dp),
-                        )
                     }
                 }
             }
@@ -499,4 +653,109 @@ private fun VideoPlayer(
         },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+/**
+ * Update status icon for the slideshow top bar.
+ * Shows different states:
+ * - checking: spinner
+ * - downloading: spinner with percentage overlay (tap → tooltip with ETA)
+ * - ready (downloaded): SystemUpdate icon with accent color (clickable → opens dialog)
+ * - error: SystemUpdate icon with red tint
+ * - idle: not shown (unless forceVisible for tour)
+ */
+@Composable
+private fun UpdateStatusIcon(
+    state: com.dav3.immichframe.data.update.UpdateState,
+    onClick: () -> Unit,
+    forceVisible: Boolean = false,
+) {
+    var showTooltip by remember { mutableStateOf(false) }
+
+    when {
+        state.checking -> {
+            IconButton(onClick = {}) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Color.White,
+                )
+            }
+        }
+        state.downloading -> {
+            IconButton(onClick = { showTooltip = !showTooltip }) {
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        progress = { state.downloadProgress.coerceIn(0f, 1f) },
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White,
+                        trackColor = Color.White.copy(alpha = 0.3f),
+                    )
+                    Text(
+                        text = "${(state.downloadProgress * 100).toInt()}%",
+                        color = Color.White,
+                        fontSize = 8.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    )
+                }
+            }
+            if (showTooltip) {
+                val eta = state.downloadEtaSeconds
+                val etaText = when {
+                    eta <= 0 -> "Calculating…"
+                    eta < 60 -> "${eta}s left"
+                    else -> "${eta / 60}m ${eta % 60}s left"
+                }
+                androidx.compose.ui.window.Popup(
+                    alignment = Alignment.TopCenter,
+                    onDismissRequest = { showTooltip = false },
+                ) {
+                    Surface(
+                        color = Color(0xCC000000),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+                    ) {
+                        Text(
+                            "Downloading update ($etaText)",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
+                    }
+                }
+            }
+        }
+        state.error != null -> {
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update check failed",
+                    tint = Color.Red,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+        state.available && state.downloadedApkPath != null -> {
+            IconButton(onClick = onClick) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update ready — tap to install",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+        forceVisible -> {
+            // Tour placeholder — no real update, but show the icon so the
+            // coachmark has a visible target to highlight.
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update indicator",
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
 }

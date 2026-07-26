@@ -18,6 +18,7 @@
 | Media Cache DB | Room | 2.7.1 |
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
+| Biometric Auth | AndroidX Biometric | 1.1.0 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -60,22 +61,36 @@ immich-android/
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
 │   │   │   ├── repository/      # Repository interfaces
-│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
 │   │   │   ├── setup/           # Setup screen (URL + API key)
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
+│   │   │   ├── media/           # Media selection grid (biometric-gated)
 │   │   │   ├── settings/        # Settings screen
-│   │   │   ├── update/          # Update dialog + ViewModel
+│   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
+│   │   │   ├── components/      # Reusable composables (BiometricLauncher)
+│   │   │   ├── onboarding/      # Coachmark tour system (TourStep, TourState, CoachmarkOverlay)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
 │   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)
 │   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp)
 │   │   └── MainActivity.kt      # Single activity (also target of LauncherAlias)
 │   ├── src/main/res/
+│   │   ├── drawable/app_logo.xml             # In-app logo (no bg fill): frame + sun + mountain
+│   │   ├── drawable/ic_launcher_foreground.xml  # Launcher foreground (day: white bg + icon at 75%)
+│   │   ├── drawable/ic_launcher_monochrome.xml  # Android 13+ themed icon silhouette
+│   │   ├── drawable-night/ic_launcher_foreground.xml  # Dark variant (gradient bg #1A1A2E→#16213E)
+│   │   ├── values/colors.xml          # ic_launcher_background = #FFFFFF (day)
+│   │   ├── values-night/colors.xml    # ic_launcher_background = #1A1A2E (night)
+│   │   ├── mipmap-anydpi-v26/ic_launcher.xml   # Adaptive icon (background + foreground + monochrome)
+│   │   ├── mipmap-anydpi-v26/ic_launcher_round.xml
 │   │   └── xml/file_paths.xml   # FileProvider config for APK install
+│   ├── src/debug/res/
+│   │   ├── drawable/ic_launcher_foreground.xml  # Debug variant (amber bg #FFB400, navy replaces orange)
+│   │   └── values/colors.xml                    # ic_launcher_background = #FFB400 (debug)
 │   └── build.gradle.kts
 ├── docs/                        # This documentation
 ├── .github/workflows/           # dev-build.yml, prod-build.yml
@@ -115,6 +130,13 @@ Configuration:
 - **Memory cache**: 25% of available app memory (Coil default)
 - **Disk cache**: 500 MB (configurable), stores preview-quality images
 - **Prefetch**: Slideshow prefetches the next 3 images ahead of the current one
+
+**Offline display**: `SlideshowViewModel.imageUrl()` / `videoUrl()` resolve
+the asset's local cached file first (`file://<path>`) and only fall back to
+the network URL (`.../api/assets/{id}/...?apiKey=...`) on a cache miss. This
+makes the slideshow fully offline-capable once assets are synced. The same
+pattern applies to `MediaSelectionViewModel.thumbnailUrl()` for the
+media-selection grid.
 - **Image size**: Request preview thumbnails (`size=preview` in Immich API)
   for slideshow display, not full originals — saves bandwidth and disk
 
@@ -148,7 +170,11 @@ loading.
 ### Sync lifecycle
 
 1. **On slideshow load**: the ViewModel first checks the cache. If cached
-   assets exist, they're displayed immediately (offline-capable). If
+   assets exist, they're displayed immediately. The ViewModel resolves
+   each asset's local `file_path` up front (batch query via
+   `MediaCacheRepository.getAssetFilePaths`) and serves `file://` URIs
+   to Coil/ExoPlayer — so the slideshow is fully **offline-capable**,
+   reading image and video bytes from disk with no network access. If
    `autoSync` is on, a one-time `MediaCacheWorker` is enqueued to
    reconcile the cache against the server.
 2. **Periodic sync**: `SyncScheduler` enqueues a periodic
@@ -157,10 +183,20 @@ loading.
    removes deleted ones.
 3. **Worker logic** (`MediaCacheWorker.performFullSync`):
    - Fetches remote asset list for each album via `POST /search/metadata`
-   - Deletes cached assets no longer in the remote album
+   - **Album deletion detection**: if the fetch returns 404, the album is
+     treated as permanently deleted — its cache is purged and it's flagged
+     as gone. Transient errors (network, 5xx) are skipped; cache preserved.
+   - **Empty-response guard**: the reconcile step only prunes cached assets
+     when the remote list is non-empty. An empty response (possible
+     search-service transient issue) does not wipe the cache.
+   - Deletes cached assets no longer in the remote album (only when remote
+     list is non-empty)
    - Downloads new/updated assets (original + thumbnail) via OkHttp
    - Updates `AlbumSyncState` with sync timestamp + asset count
    - Reports progress via `SyncProgress` StateFlow
+   - If **all** selected albums were deleted (404), clears
+     `selected_album_ids` in DataStore so `NavViewModel` routes the user
+     back to album selection on next foreground.
 
 Cache files are stored in `getExternalFilesDir("media_cache")`.
 
@@ -194,6 +230,7 @@ Setup → Albums → Slideshow
 - `Setup` is the start destination when no credentials are stored.
 - Once credentials + album selection exist, start destination is `Slideshow`.
 - `Settings` is accessible from `Slideshow` and `Albums`.
+- `MediaSelection` is accessible from `Slideshow` (biometric-gated).
 
 ## State Persistence
 
@@ -229,6 +266,9 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
+| Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
+| Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file
@@ -242,7 +282,11 @@ or Android throws `IllegalStateException`.
 - **Release builds**: R8 minification + resource shrinking, signed with the
   production keystore.
 - **`BuildConfig.GIT_SHA`**: injected at build time via `git rev-parse HEAD`,
-  used by the self-update feature to compare against GitHub release tag SHAs.
+  used by the self-update feature to compare against GitHub `dev-{sha}` release
+  tags (debug/dev channel only).
+- **`BuildConfig.VERSION_NAME`**: the app's semver (e.g. `0.1.0`), used by
+  the self-update feature to compare against GitHub `vX.Y.Z` release tags
+  (release builds — the primary auto-update target).
 
 ## Permissions
 

@@ -26,14 +26,25 @@
 5. Selected album IDs persisted to DataStore.
 6. Slideshow begins.
 
+**Empty states:**
+- **Server reachable but zero albums**: shows a "No albums available"
+  message with a Retry button (the user may need to create an album in
+  Immich first).
+- **Server unreachable**: shows the error detail with a Retry button.
+  Previously selected albums (if any) are preserved in DataStore so the
+  user can retry without re-selecting.
+
 ### F3: Slideshow Playback
 
 1. App loads assets for selected album(s). **Cache-first**: if assets are
    already cached locally (Room database), they're displayed immediately
-   without network access. On a cold start (empty cache), the app fetches
-   asset metadata from the server via `POST /search/metadata`. If **Auto
-   Sync** is enabled, a background WorkManager job downloads new/updated
-   assets and reconciles deletions for the next launch.
+   — including the image/video bytes themselves, which are read from disk
+   via `file://` URIs. This means the slideshow works fully **offline**:
+   once assets are cached, no server contact is needed to display them.
+   On a cold start (empty cache), the app fetches asset metadata from the
+   server via `POST /search/metadata`. If **Auto Sync** is enabled, a
+   background WorkManager job downloads new/updated assets and reconciles
+   deletions for the next launch.
 2. If multiple albums selected, asset lists are merged.
 3. If **Shuffle** is enabled (default on), the merged list is randomized.
 4. If **Skip Videos** is enabled (default on), video assets are filtered out.
@@ -51,12 +62,33 @@
     Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks
     from the other enabled types and requires at least one other type enabled.
 
+**Offline / album lifecycle:**
+- **Server unreachable**: the slideshow continues displaying cached media
+  from disk. No error is shown as long as the cache has content. The
+  background sync worker silently skips (transient errors are non-fatal;
+  existing cache is preserved).
+- **Album deleted on server**: when the sync worker detects a 404 for a
+  selected album, it purges that album's cache. If **all** selected albums
+  are gone, the selection is cleared and the app navigates back to album
+  selection so the user can pick again. If only some albums are gone, the
+  remaining albums keep displaying.
+- **Transient empty metadata response**: the reconcile step guards against
+  wiping the cache when the server returns an empty asset list (which could
+  indicate a transient search-service issue). Cache is only pruned when the
+  remote list is non-empty.
+
 ### F4: In-Slideshow Controls
 
 Tap the screen to reveal controls:
 - Previous / Next arrows
 - Pause / Play
-- Album name (current)
+- Photo count (current position / total)
+- **Media Selection** (grid icon, next to the photo count) — biometric-gated;
+  opens a grid of all album media where the user can tap thumbnails to
+  show/hide them from the slideshow (see F8)
+- Update status icon (checking / downloading / ready)
+- Launcher switch (apps icon, when Launcher Mode is active)
+- Albums (photo library icon)
 - Settings (gear icon)
 - Close slideshow (return to album selection)
 
@@ -129,12 +161,38 @@ behaviour.
 ### F5d: Self-Update via GitHub Releases
 
 On startup (if **Auto-Update** is enabled and the app was NOT installed from the
-Play Store), the app checks `api.github.com/repos/dave-palt/immich-photo-frame/releases/latest`
-for a new release. If the release tag SHA differs from the build's `GIT_SHA`, the
-APK is downloaded to the app's cache and the system package installer is invoked.
-The user sees the standard Android "Install?" dialog but stays in-app.
+Play Store), the app checks GitHub for a new release:
 
-This setting is hidden when the app is installed from the Play Store.
+- **Release builds** (the primary auto-update target) fetch
+  `/releases/latest` and compare the tag (`vX.Y.Z`) against the installed
+  `versionName` using semantic version comparison. If the remote version is
+  newer, the APK is downloaded.
+- **Debug builds** (dev channel) list recent releases, filter to `dev-{sha}`
+  tags, sort by `created_at` descending, and compare the newest tag's SHA
+  against `BuildConfig.GIT_SHA`.
+
+The downloaded APK is stored in the app's cache directory. An update status
+icon appears in the slideshow top bar (visible when controls are toggled on):
+spinner while **checking**, a circular progress ring with live percentage while
+**downloading** (tap for a tooltip with ETA), red icon on **error**, and a
+highlighted icon when **ready to install**. The icon is hidden entirely when no
+update is available and nothing is in progress. Tapping the icon when ready
+opens the install dialog (**Install** / **Later**), which can be re-triggered at
+any time.
+
+Downloads support HTTP Range-based resume: if a partial APK of the same version
+already exists in cache, the download resumes from where it left off rather than
+restarting. Old APKs from different versions are deleted before each new
+download.
+
+On the first install attempt, the app checks for the
+**"Install unknown apps"** permission (`REQUEST_INSTALL_PACKAGES`). If not
+granted, it opens the system settings page for the user to enable it before
+launching the package installer.
+
+The **Auto-Update** toggle and **Check Now** button are hidden when the app
+is installed from the Play Store — Play Store installs receive updates through
+the Play Store, not self-update.
 
 ### F6: Settings
 
@@ -174,18 +232,108 @@ Options:
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline
-  - **API Key** — editable inline, masked
+  - **API Key** — editable inline. For security, tapping **Edit** empties
+    the field (the key is never pre-populated); the user must re-type it.
+    When the key is set, two biometric-gated buttons appear:
+    **Reveal** (shows the key in monospace; tap again to hide) and
+    **Copy** (copies to clipboard, then auto-hides). Both require
+    fingerprint / face / device-PIN authentication. If no screen lock
+    is set up, a dialog prompts the user to create one.
   - Test Connection button
 - **Albums** — change album selection (returns to album picker)
 - **Reset All Settings** — clears everything, returns to setup screen
+
+### F8: Media Selection
+
+Accessible from the slideshow top bar (grid icon, next to the photo count).
+Requires biometric / device-credential authentication to open.
+
+1. User taps the grid icon in the slideshow controls.
+2. Biometric prompt appears (fingerprint / face / device PIN). If the user
+   cancels, nothing happens. If no screen lock is set up, a dialog directs
+   them to security settings.
+3. On success, a grid of all album assets loads (cache-first, thumbnails via
+   Coil). Each thumbnail shows:
+   - A checkmark badge (white = shown, dimmed = hidden)
+   - A video badge for video assets
+   - A dim overlay on hidden assets
+4. Tapping a thumbnail toggles its shown/hidden state. Changes persist
+   immediately to DataStore and take effect the next time the slideshow
+   loads.
+5. A **"Show new photos by default"** switch at the top controls the mode:
+   - **ON** (default): all media starts shown; tapping hides individual items.
+     New photos added to the album later appear automatically.
+   - **OFF**: all media starts hidden; tapping shows individual items. New
+     photos added later are hidden until manually shown.
+   Flipping the switch preserves the current visible selection — it only
+   changes the default for future new media.
+6. **Show All** / **Hide All** buttons provide bulk selection.
+7. A counter shows "X of Y shown" in the top bar.
+8. Back arrow returns to the slideshow.
 
 ## Error Handling
 
 | Scenario | Behavior |
 |---|---|
-| Server unreachable | Show retry button with error detail |
+| Server unreachable | If cache has content: keep showing cached media (offline mode). If cold start: show error + retry on album selection screen. |
 | API key invalid (401) | Show "API key rejected", return to setup |
+| Selected album deleted on server (404) | Purge that album's cache. If all selected albums gone: clear selection, navigate to album selection. |
+| Server reachable but zero albums | Show "No albums available" message with retry button |
 | Album has no images | Skip album, show toast notification |
 | Image fails to load | Skip to next image, log error |
+| Update download fails | Show "Update check failed" on Check Now button, allow retry |
 | Network timeout | Retry up to 3 times with backoff, then skip |
-| Update download fails | Show error in update dialog, allow retry |
+| Transient empty metadata response | Preserve existing cache (do not prune); retry on next sync |
+
+### F7: Onboarding Tour
+
+The app includes a **modular, per-step onboarding tour** that teaches users
+the available settings and controls. The tour is triggered automatically when
+a user lands on a screen — only steps not yet completed are shown.
+
+**How it works:**
+
+- Each screen (Setup, Albums, Slideshow, Settings) declares an ordered list
+  of tour steps. Each step has an ID, a tooltip title/body, and an optional
+  target element (a control or section to spotlight).
+- When the user navigates to a screen, the tour checks which of that screen's
+  step IDs are NOT yet in the persisted `onboarding_completed_steps` set. If
+  any remain, the tour auto-starts for those steps.
+- The overlay shows a semi-transparent scrim over the screen with a
+  rounded-rect spotlight cutout around the target element (if any). A tooltip
+  card displays the step title, body, step counter ("Step X of Y"), and
+  **Next/Got it** + **Skip** buttons.
+- Completing a step (Next/Got it) marks its ID as completed. Skipping marks
+  all remaining steps on that screen as completed.
+- **Slideshow-specific behavior**: during the tour, the on-tap controls are
+  force-shown and the 5-second auto-hide is suppressed, so the tour can
+  spotlight the prev/next, pause/mute, settings, and close buttons.
+- **Settings-specific behavior**: the tour scrolls the target section into
+  view before showing its spotlight (System → Media Cache → Connection).
+- **Two replay buttons** in Settings → System section:
+  - **"Show Tour Again"** clears only the Settings screen's step IDs, so
+    only the Settings tour re-runs.
+  - **"Reset All Tours"** clears the entire completed-steps set, so the
+    tour re-runs on every screen next visit.
+- A **"Show Tour Again"** button is also available on the Setup screen.
+- Resetting all settings also clears the onboarding set (DataStore is wiped).
+
+**Step inventory (19 steps across 4 screens):**
+
+| Screen | Steps |
+|---|---|
+| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
+| Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
+| Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
+
+- **`slideshow_media_selection`**: highlights the grid icon next to the photo
+  count. The tooltip explains that this opens the biometric-gated media
+  selection grid where the user can choose which photos and videos appear.
+
+- **`slideshow_albums`**: highlights the back-to-album-selection button.
+- **`slideshow_update`**: highlights the update status icon. Since this icon
+  normally only appears when an update is available, the tour force-shows a
+  dimmed placeholder icon so the coachmark always has a visible target on the
+  first run. The tooltip explains that the icon's presence means an update is
+  available.

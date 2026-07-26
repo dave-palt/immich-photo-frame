@@ -7,8 +7,10 @@ import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +19,12 @@ data class AlbumSelectionUiState(
     val selectedIds: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    /**
+     * True when the server was reached successfully but returned zero albums.
+     * Distinct from [error] (server unreachable) — shows a dedicated message
+     * instead of a retry button.
+     */
+    val noAlbumsAvailable: Boolean = false,
 )
 
 @HiltViewModel
@@ -29,6 +37,20 @@ constructor(
     private val _uiState = MutableStateFlow(AlbumSelectionUiState())
     val uiState: StateFlow<AlbumSelectionUiState> = _uiState
 
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
+
     init {
         loadAlbums()
     }
@@ -40,12 +62,19 @@ constructor(
             val savedSelections = settingsRepo.selectedAlbumIds.first().toSet()
             _uiState.value =
                 result.fold(
-                    onSuccess = {
-                        AlbumSelectionUiState(
-                            albums = it,
-                            selectedIds = savedSelections,
-                            isLoading = false,
-                        )
+                    onSuccess = { albums ->
+                        if (albums.isEmpty()) {
+                            AlbumSelectionUiState(
+                                isLoading = false,
+                                noAlbumsAvailable = true,
+                            )
+                        } else {
+                            AlbumSelectionUiState(
+                                albums = albums,
+                                selectedIds = savedSelections,
+                                isLoading = false,
+                            )
+                        }
                     },
                     onFailure = {
                         AlbumSelectionUiState(

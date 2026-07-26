@@ -12,7 +12,7 @@ Shown on first launch or when credentials are missing/invalid.
 ```
 ┌──────────────────────────────┐
 │                              │
-│         [App Logo]           │
+│         [App Logo]           │ ← app logo vector (120dp, no background fill)
 │                              │
 │   Immich Server URL          │
 │   ┌────────────────────────┐ │
@@ -79,6 +79,10 @@ Shown on first launch or when credentials are missing/invalid.
 - Start button disabled if no albums selected.
 - Settings gear in top app bar.
 - Loading state: shimmer placeholders while album list loads.
+- **Empty states**:
+  - Server reachable but zero albums: centered photo-library icon,
+    "No albums available" title, explanation text, Retry button.
+  - Server unreachable: centered error text + Retry button.
 
 ### 3. Slideshow Screen
 
@@ -106,7 +110,7 @@ Fullscreen, immersive mode (status bar + nav bar hidden).
 
 ```
 ┌──────────────────────────────┐
-│ [Album Name]           [⚙] [✕]│
+│ [Album Name]    [⬇/⟳/⬆] [⚙] [✕]│
 ├──────────────────────────────┤
 │                              │
 │                              │
@@ -123,6 +127,10 @@ Fullscreen, immersive mode (status bar + nav bar hidden).
 - Previous/Next arrows on left/right edges.
 - Pause/Play button at bottom center.
 - Album name top-left, Settings + Close top-right.
+- **Update status icon** (left of Settings): hidden when idle; spinner while
+  checking, circular progress ring with percentage while downloading (tap →
+  tooltip with ETA), red on error, highlighted when ready to install. Tap
+  when ready opens the install dialog.
 - Controls are semi-transparent overlay, do not push image.
 - Controls auto-hide after 5 seconds.
 - Immersive flag re-engages when controls hide.
@@ -133,7 +141,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 
 ```
 ┌──────────────────────────────┐
-│  ← Settings                  │
+│  ← Settings v1.2.0           │
 ├──────────────────────────────┤
 │                              │
 │  SLIDESHOW                   │
@@ -161,7 +169,8 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  Start on Boot          [○]  │ ← toggle (+ overlay & OEM autostart prompts)
 │  Launcher Mode          [○]  │ ← toggle (+ Open Launcher Settings button)
 │  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
-│  Check Now                   │ ← button (manual update check)
+│  Check Now                   │ ← button: shows status while active
+│                              │     ("Checking…", "Downloading…", "Update check failed")
 │                              │
 │  MEDIA CACHE                 │
 │  Auto Sync              [●]  │ ← toggle
@@ -189,10 +198,14 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  ┌──────────────────────┐    │
 │  │ Server URL   [Edit]  │    │
 │  │ API Key      [Edit]  │    │
+│  │ [Reveal] [Copy]      │    │
 │  │ [Test Connection]    │    │
 │  └──────────────────────┘    │
 │                              │
 │  Reset All Settings          │ ← red text button
+│                              │
+│  Show Tour Again             │ ← replays Settings tour
+│  Reset All Tours             │ ← replays all screens' tours
 │                              │
 └──────────────────────────────┘
 ```
@@ -201,9 +214,39 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
 - Back arrow returns to previous screen.
+- **System section** includes a version string in the top bar (`Settings vX.Y.Z`)
+  and two tour replay buttons: **"Show Tour Again"** (replays only the Settings
+  tour) and **"Reset All Tours"** (replays tours on all screens).
+
+### Onboarding Tour Overlay
+
+When the user enters a screen with uncompleted tour steps, a coachmark overlay
+appears:
+
+- Semi-transparent black scrim (78% alpha) covers the full screen.
+- A rounded-rect spotlight cutout reveals the target element (button, field,
+  or section header). A subtle white ring outlines the spotlight.
+- A Material 3 `Card` tooltip appears below (or above, if space is tight) the
+  spotlight, containing:
+  - Step counter ("Step X of Y") in primary color
+  - Close (X) icon to skip remaining steps
+  - Step title (`titleMedium`) and body text (`bodyMedium`)
+  - **Skip tour** text button + **Next** / **Got it** button
+- Centered steps (no target) show the tooltip centered on screen (both
+  horizontally and vertically) with a plain scrim (no cutout).
+- In the Slideshow, the top control bar respects `statusBarsPadding()` and the
+  bottom controls (progress bar, play/pause row) respect `navigationBarsPadding()`,
+  so they never sit under the system status/navigation bars in any mode.
+- In the Slideshow, controls are force-shown during the tour and the 5-second
+  auto-hide is suppressed.
+- In Settings, the tour scrolls each target section into view before showing
+  its spotlight.
 - Editing server URL or API key does not auto-navigate; the change takes
   effect next time the app fetches data (or when user manually restarts
   the slideshow).
+- API key **Edit** empties the field for security (no pre-population);
+  **Reveal** and **Copy** buttons appear when the key is set and require
+  biometric / device-PIN authentication.
 - Changing selected albums navigates back to the album picker.
 - Auto-Update toggle is hidden when installed from Play Store
   (`getInstallSourceInfo() == "com.android.vending"`).
@@ -223,7 +266,10 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
   enabled, a dialog appears on resume prompting the user to re-select
   Immich Media Frame as the default Home.
 - Auto-Update, when visible, shows a "Check Now" button below it that
-  triggers an immediate update check regardless of the toggle state.
+  triggers an immediate update check regardless of the toggle state. While
+  active, the button label reflects state: "Checking for updates…",
+  "Downloading update…", or "Update check failed" (error). The button is
+  disabled while checking/downloading to prevent concurrent checks.
 
 Material 3 dynamic colors are NOT used (frame context needs consistent dark background).
 
