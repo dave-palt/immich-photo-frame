@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">사진 %1$d / %2$d장</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">미디어 선택</string>
+    <string name="media_selection_count">%2$d개 중 %1$d개 표시</string>
+    <string name="media_selection_new_items_default">새 사진을 기본적으로 표시</string>
+    <string name="media_selection_select_all">모두 표시</string>
+    <string name="media_selection_select_none">모두 숨기기</string>
+    <string name="media_selection_shown">슬라이드 쇼에 표시됨</string>
+    <string name="media_selection_hidden">슬라이드 쇼에서 숨겨짐</string>
 </resources>

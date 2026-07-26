@@ -56,6 +56,9 @@ constructor(
                 return@launch
             }
 
+            val toggledIds = settingsRepo.mediaSelectionToggledIds.first()
+            val newItemsShown = settingsRepo.mediaSelectionNewItemsShown.first()
+
             // First, try to load from cache (offline-capable fast path)
             val cachedAssets = mutableListOf<Asset>()
             for (id in albumIds) {
@@ -70,7 +73,8 @@ constructor(
                 val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
                 val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
                 android.util.Log.d("SlideshowLoad", "Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
-                val filteredAssets = if (s.skipVideos) cachedAssets.filter { it.type == AssetType.IMAGE } else cachedAssets
+                val filteredAssets = applyMediaSelection(cachedAssets, toggledIds, newItemsShown)
+                    .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
                 _uiState.value = if (ordered.isNotEmpty()) {
                     SlideshowUiState(assets = ordered, currentIndex = 0, isLoading = false)
@@ -93,7 +97,8 @@ constructor(
                     )
                 }
 
-                val filteredAssets = if (s.skipVideos) allAssets.filter { it.type == AssetType.IMAGE } else allAssets
+                val filteredAssets = applyMediaSelection(allAssets, toggledIds, newItemsShown)
+                    .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 android.util.Log.d("SlideshowLoad", "Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
 
@@ -153,3 +158,24 @@ fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(
     type = type,
     lastModified = lastModified,
 )
+
+/**
+ * Computes which assets are visible based on the media-selection state.
+ *
+ * - [newItemsShown] = true (default): all assets start **shown**. IDs in
+ *   [toggledIds] are the ones the user tapped to **hide**.
+ * - [newItemsShown] = false: all assets start **hidden**. IDs in
+ *   [toggledIds] are the ones the user tapped to **show**.
+ *
+ * This is used by both the slideshow playback and the media-selection grid
+ * so the two views stay consistent.
+ */
+fun applyMediaSelection(
+    assets: List<Asset>,
+    toggledIds: Set<String>,
+    newItemsShown: Boolean,
+): List<Asset> = if (newItemsShown) {
+    assets.filter { it.id !in toggledIds }
+} else {
+    assets.filter { it.id in toggledIds }
+}

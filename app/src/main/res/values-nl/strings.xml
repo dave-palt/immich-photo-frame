@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d foto\'s</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">Mediaselectie</string>
+    <string name="media_selection_count">%1$d van %2$d weergegeven</string>
+    <string name="media_selection_new_items_default">"Nieuwe foto's standaard weergeven"</string>
+    <string name="media_selection_select_all">Alles weergeven</string>
+    <string name="media_selection_select_none">Alles verbergen</string>
+    <string name="media_selection_shown">Weergegeven in diavoorstelling</string>
+    <string name="media_selection_hidden">Verborgen uit diavoorstelling</string>
 </resources>

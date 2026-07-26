@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d صور</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">اختيار الوسائط</string>
+    <string name="media_selection_count">%1$d من %2$d معروض</string>
+    <string name="media_selection_new_items_default">إظهار الصور الجديدة افتراضيًا</string>
+    <string name="media_selection_select_all">إظهار الكل</string>
+    <string name="media_selection_select_none">إخفاء الكل</string>
+    <string name="media_selection_shown">معروض في عرض الشرائح</string>
+    <string name="media_selection_hidden">مخفي من عرض الشرائح</string>
 </resources>

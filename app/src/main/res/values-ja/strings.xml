@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d枚の写真</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">メディア選択</string>
+    <string name="media_selection_count">%2$d件中%1$d件表示</string>
+    <string name="media_selection_new_items_default">新しい写真をデフォルトで表示</string>
+    <string name="media_selection_select_all">すべて表示</string>
+    <string name="media_selection_select_none">すべて非表示</string>
+    <string name="media_selection_shown">スライドショーに表示</string>
+    <string name="media_selection_hidden">スライドショーから非表示</string>
 </resources>

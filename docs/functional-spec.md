@@ -56,7 +56,13 @@
 Tap the screen to reveal controls:
 - Previous / Next arrows
 - Pause / Play
-- Album name (current)
+- Photo count (current position / total)
+- **Media Selection** (grid icon, next to the photo count) — biometric-gated;
+  opens a grid of all album media where the user can tap thumbnails to
+  show/hide them from the slideshow (see F8)
+- Update status icon (checking / downloading / ready)
+- Launcher switch (apps icon, when Launcher Mode is active)
+- Albums (photo library icon)
 - Settings (gear icon)
 - Close slideshow (return to album selection)
 
@@ -203,6 +209,34 @@ Options:
   - Test Connection button
 - **Albums** — change album selection (returns to album picker)
 - **Reset All Settings** — clears everything, returns to setup screen
+
+### F8: Media Selection
+
+Accessible from the slideshow top bar (grid icon, next to the photo count).
+Requires biometric / device-credential authentication to open.
+
+1. User taps the grid icon in the slideshow controls.
+2. Biometric prompt appears (fingerprint / face / device PIN). If the user
+   cancels, nothing happens. If no screen lock is set up, a dialog directs
+   them to security settings.
+3. On success, a grid of all album assets loads (cache-first, thumbnails via
+   Coil). Each thumbnail shows:
+   - A checkmark badge (white = shown, dimmed = hidden)
+   - A video badge for video assets
+   - A dim overlay on hidden assets
+4. Tapping a thumbnail toggles its shown/hidden state. Changes persist
+   immediately to DataStore and take effect the next time the slideshow
+   loads.
+5. A **"Show new photos by default"** switch at the top controls the mode:
+   - **ON** (default): all media starts shown; tapping hides individual items.
+     New photos added to the album later appear automatically.
+   - **OFF**: all media starts hidden; tapping shows individual items. New
+     photos added later are hidden until manually shown.
+   Flipping the switch preserves the current visible selection — it only
+   changes the default for future new media.
+6. **Show All** / **Hide All** buttons provide bulk selection.
+7. A counter shows "X of Y shown" in the top bar.
+8. Back arrow returns to the slideshow.
 
 ## Error Handling
 

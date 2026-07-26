@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d fotos</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">Selección de medios</string>
+    <string name="media_selection_count">%1$d de %2$d mostrados</string>
+    <string name="media_selection_new_items_default">Mostrar fotos nuevas por defecto</string>
+    <string name="media_selection_select_all">Mostrar todo</string>
+    <string name="media_selection_select_none">Ocultar todo</string>
+    <string name="media_selection_shown">Mostrado en la presentación</string>
+    <string name="media_selection_hidden">Oculto de la presentación</string>
 </resources>

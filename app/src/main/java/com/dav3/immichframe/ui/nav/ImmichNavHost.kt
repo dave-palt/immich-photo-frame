@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.ui.albums.AlbumSelectionScreen
+import com.dav3.immichframe.ui.media.MediaSelectionScreen
 import com.dav3.immichframe.ui.settings.SettingsScreen
 import com.dav3.immichframe.ui.setup.SetupScreen
 import com.dav3.immichframe.ui.slideshow.SlideshowScreen
@@ -29,6 +30,7 @@ object Routes {
     const val ALBUMS = "albums"
     const val SLIDESHOW = "slideshow"
     const val SETTINGS = "settings"
+    const val MEDIA_SELECTION = "media_selection"
 }
 
 @HiltViewModel
@@ -95,6 +97,12 @@ fun ImmichNavHost() {
                         popUpTo(Routes.SLIDESHOW) { inclusive = true }
                     }
                 },
+                onMediaSelection = { navController.navigate(Routes.MEDIA_SELECTION) },
+            )
+        }
+        composable(Routes.MEDIA_SELECTION) {
+            MediaSelectionScreen(
+                onBack = { navController.popBackStack() },
             )
         }
         composable(Routes.SETTINGS) {

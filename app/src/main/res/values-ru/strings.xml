@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d фото</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">Выбор медиа</string>
+    <string name="media_selection_count">%1$d из %2$d отображено</string>
+    <string name="media_selection_new_items_default">Показывать новые фото по умолчанию</string>
+    <string name="media_selection_select_all">Показать все</string>
+    <string name="media_selection_select_none">Скрыть все</string>
+    <string name="media_selection_shown">Отображается в слайд-шоу</string>
+    <string name="media_selection_hidden">Скрыто из слайд-шоу</string>
 </resources>

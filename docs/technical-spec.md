@@ -68,6 +68,7 @@ immich-android/
 │   │   │   ├── setup/           # Setup screen (URL + API key)
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
+│   │   │   ├── media/           # Media selection grid (biometric-gated)
 │   │   │   ├── settings/        # Settings screen
 │   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
 │   │   │   ├── components/      # Reusable composables (BiometricLauncher)
@@ -196,6 +197,7 @@ Setup → Albums → Slideshow
 - `Setup` is the start destination when no credentials are stored.
 - Once credentials + album selection exist, start destination is `Slideshow`.
 - `Settings` is accessible from `Slideshow` and `Albums`.
+- `MediaSelection` is accessible from `Slideshow` (biometric-gated).
 
 ## State Persistence
 
@@ -231,6 +233,8 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
+| Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file

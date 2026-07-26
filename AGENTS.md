@@ -132,6 +132,23 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Media Selection feature (PR2 of media-selection feature).
+  New screen `ui/media/MediaSelectionScreen.kt` + `MediaSelectionViewModel`
+  showing a grid of all album assets. Tap thumbnails to show/hide from the
+  slideshow. "Show new photos by default" switch (default ON): ON = all start
+  shown, tap to hide; OFF = all start hidden, tap to show. Flipping preserves
+  current visible selection (recomputes stored toggled set against all assets).
+  Show All / Hide All bulk buttons. Counter "X of Y shown". Accessible from
+  slideshow top bar (GridView icon next to photo count), biometric-gated.
+  New DataStore keys: `media_selection_toggled_ids` (StringSet),
+  `media_selection_new_shown` (String bool, default true).
+  `SlideshowViewModel.load()` now applies media-selection filter via shared
+  `applyMediaSelection()` helper. New nav route `media_selection`. New strings
+  (EN + 12 locales): media_selection_title, media_selection_count,
+  media_selection_new_items_default, media_selection_select_all,
+  media_selection_select_none, media_selection_shown, media_selection_hidden.
+  Updated: functional-spec (F4 controls, new F8 flow), technical-spec
+  (persistence table, package layout, nav routes), README.
 - **2026-07-26** — Biometric auth + API key security (PR1 of media-selection
   feature). Added `androidx.biometric:biometric:1.1.0` dependency.
   `MainActivity` changed from `ComponentActivity` to `FragmentActivity`

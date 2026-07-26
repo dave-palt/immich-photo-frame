@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d Fotos</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">Medienauswahl</string>
+    <string name="media_selection_count">%1$d von %2$d angezeigt</string>
+    <string name="media_selection_new_items_default">Neue Fotos standardmäßig anzeigen</string>
+    <string name="media_selection_select_all">Alle anzeigen</string>
+    <string name="media_selection_select_none">Alle ausblenden</string>
+    <string name="media_selection_shown">In Diashow angezeigt</string>
+    <string name="media_selection_hidden">Aus Diashow ausgeblendet</string>
 </resources>

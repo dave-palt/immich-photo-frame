@@ -132,4 +132,13 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d张照片</string>
+
+    <!-- Media Selection -->
+    <string name="media_selection_title">媒体选择</string>
+    <string name="media_selection_count">显示%1$d / %2$d</string>
+    <string name="media_selection_new_items_default">默认显示新照片</string>
+    <string name="media_selection_select_all">全部显示</string>
+    <string name="media_selection_select_none">全部隐藏</string>
+    <string name="media_selection_shown">在幻灯片中显示</string>
+    <string name="media_selection_hidden">从幻灯片中隐藏</string>
 </resources>

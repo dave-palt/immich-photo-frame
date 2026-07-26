@@ -40,6 +40,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
 - Biometric-protected API key reveal & copy (fingerprint / face / PIN)
+- Media selection grid — biometric-gated, tap to show/hide individual photos
 
 ## Setup
 
