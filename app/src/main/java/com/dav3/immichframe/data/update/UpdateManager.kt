@@ -24,7 +24,9 @@ import javax.inject.Singleton
 
 data class UpdateState(
     val available: Boolean = false,
+    val checking: Boolean = false,
     val downloading: Boolean = false,
+    val error: String? = null,
     val downloadedApkPath: File? = null,
     val newVersion: String = "",
     val releaseNotes: String = "",
@@ -86,6 +88,8 @@ constructor(
             return@withContext false
         }
 
+        _state.value = UpdateState(checking = true)
+
         try {
             // Debug builds use the dev channel (pre-releases); release builds use /releases/latest
             val release = if (BuildConfig.DEBUG) {
@@ -95,6 +99,7 @@ constructor(
                     .also { Log.d(TAG, "checkForUpdate: latest dev release = ${it?.tagName ?: "none"}") }
                     ?: run {
                         Log.d(TAG, "checkForUpdate: no dev-* release found")
+                        _state.value = UpdateState(available = false)
                         return@withContext false
                     }
             } else {
@@ -106,18 +111,23 @@ constructor(
 
             val latestSha = extractSha(release.tagName)
             if (latestSha == null) {
-                Log.d(TAG, "checkForUpdate: tag '${release.tagName}' is not a dev-<sha> tag — no update detected")
-                _state.value = UpdateState(available = false)
-                return@withContext false
-            }
+                // Not a dev-<sha> tag — try semver comparison for release builds
+                // (e.g. tag "v0.2.0" vs installed "0.1.0")
+                if (!isNewerVersion(release.tagName, BuildConfig.VERSION_NAME)) {
+                    Log.d(TAG, "checkForUpdate: tag '${release.tagName}' is not newer than ${BuildConfig.VERSION_NAME} — no update detected")
+                    _state.value = UpdateState(available = false)
+                    return@withContext false
+                }
+            } else {
+                // Dev channel: compare SHAs directly
+                val currentSha = BuildConfig.GIT_SHA
+                Log.d(TAG, "checkForUpdate: currentSha=${currentSha.take(8)}, latestSha=${latestSha.take(8)}")
 
-            val currentSha = BuildConfig.GIT_SHA
-            Log.d(TAG, "checkForUpdate: currentSha=${currentSha.take(8)}, latestSha=${latestSha.take(8)}")
-
-            if (latestSha == currentSha) {
-                Log.d(TAG, "checkForUpdate: already up to date")
-                _state.value = UpdateState(available = false)
-                return@withContext false
+                if (latestSha == currentSha) {
+                    Log.d(TAG, "checkForUpdate: already up to date")
+                    _state.value = UpdateState(available = false)
+                    return@withContext false
+                }
             }
 
             Log.d(TAG, "checkForUpdate: NEW version available! ${release.tagName}")
@@ -134,6 +144,7 @@ constructor(
 
             // Download silently in background
             _state.value = _state.value.copy(
+                checking = false,
                 available = true,
                 downloading = true,
                 newVersion = release.tagName,
@@ -152,7 +163,7 @@ constructor(
             true
         } catch (e: Exception) {
             Log.e(TAG, "checkForUpdate: failed", e)
-            _state.value = UpdateState(available = false, downloading = false)
+            _state.value = UpdateState(available = false, error = e.message ?: "Update check failed")
             false
         }
     }
@@ -179,6 +190,35 @@ constructor(
     private fun extractSha(tagName: String): String? {
         // Tag format: dev-<full-sha>
         return tagName.removePrefix("dev-").takeIf { it.length == 40 }
+    }
+
+    /**
+     * Parse a version string into a list of integers: "v0.2.0" → [0, 2, 0].
+     * Non-numeric suffixes (e.g. "-dev", "-rc1") are ignored.
+     */
+    private fun parseSemver(version: String): List<Int> = version
+        .removePrefix("v")
+        .substringBefore("-") // drop pre-release suffix
+        .split(".")
+        .mapNotNull { it.toIntOrNull() }
+
+    /**
+     * Returns true if [remoteTag] represents a newer version than [localVersion].
+     * Handles both "v0.2.0" (remote) and "0.1.0" / "0.1.0-dev" (local).
+     */
+    private fun isNewerVersion(remoteTag: String, localVersion: String): Boolean {
+        val remote = parseSemver(remoteTag)
+        val local = parseSemver(localVersion)
+        if (remote.isEmpty() || local.isEmpty()) return false
+        // Compare component-by-component; pad shorter with 0s so that
+        // 0.2.0.1 > 0.2.0 rather than silently truncating via zip().
+        val maxLen = maxOf(remote.size, local.size)
+        for (i in 0 until maxLen) {
+            val r = remote.getOrElse(i) { 0 }
+            val l = local.getOrElse(i) { 0 }
+            if (r != l) return r > l
+        }
+        return false
     }
 
     private fun downloadApk(url: String, dest: File) {

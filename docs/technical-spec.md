@@ -242,7 +242,11 @@ or Android throws `IllegalStateException`.
 - **Release builds**: R8 minification + resource shrinking, signed with the
   production keystore.
 - **`BuildConfig.GIT_SHA`**: injected at build time via `git rev-parse HEAD`,
-  used by the self-update feature to compare against GitHub release tag SHAs.
+  used by the self-update feature to compare against GitHub `dev-{sha}` release
+  tags (debug/dev channel only).
+- **`BuildConfig.VERSION_NAME`**: the app's semver (e.g. `0.1.0`), used by
+  the self-update feature to compare against GitHub `vX.Y.Z` release tags
+  (release builds — the primary auto-update target).
 
 ## Permissions
 

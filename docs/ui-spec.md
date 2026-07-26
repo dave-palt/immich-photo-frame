@@ -161,7 +161,8 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  Start on Boot          [○]  │ ← toggle (+ overlay & OEM autostart prompts)
 │  Launcher Mode          [○]  │ ← toggle (+ Open Launcher Settings button)
 │  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
-│  Check Now                   │ ← button (manual update check)
+│  Check Now                   │ ← button: shows status while active
+│                              │     ("Checking…", "Downloading…", "Update check failed")
 │                              │
 │  MEDIA CACHE                 │
 │  Auto Sync              [●]  │ ← toggle
@@ -223,7 +224,10 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
   enabled, a dialog appears on resume prompting the user to re-select
   Immich Media Frame as the default Home.
 - Auto-Update, when visible, shows a "Check Now" button below it that
-  triggers an immediate update check regardless of the toggle state.
+  triggers an immediate update check regardless of the toggle state. While
+  active, the button label reflects state: "Checking for updates…",
+  "Downloading update…", or "Update check failed" (error). The button is
+  disabled while checking/downloading to prevent concurrent checks.
 
 Material 3 dynamic colors are NOT used (frame context needs consistent dark background).
 
