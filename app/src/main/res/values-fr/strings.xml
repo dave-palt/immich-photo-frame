@@ -123,4 +123,48 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d photos</string>
+
+    <!-- Onboarding Tour -->
+    <string name="tour_next">Suivant</string>
+    <string name="tour_got_it">Compris</string>
+    <string name="tour_skip">Passer le tour</string>
+    <string name="tour_step_counter">Étape %1$d sur %2$d</string>
+    <string name="reset_all_tours">Réinitialiser toutes les visites</string>
+    <string name="show_tour">Rejouer le tour</string>
+    <string name="tour_setup_welcome_title">Bienvenue dans Immich Media Frame</string>
+    <string name="tour_setup_welcome_body">Connectez-vous à votre serveur Immich pour afficher vos photos. Parcourons la configuration.</string>
+    <string name="tour_setup_server_title">Adresse du serveur</string>
+    <string name="tour_setup_server_body">Saisissez l\'URL de votre serveur Immich ici. Format : photos.example.com ou 192.168.1.100:2283.</string>
+    <string name="tour_setup_apikey_title">Clé API</string>
+    <string name="tour_setup_apikey_body">Créez une clé API dans Immich sous Paramètres → Clés API. Elle nécessite les permissions de lecture des albums, assets et utilisateurs.</string>
+    <string name="tour_setup_connect_title">Tester et connecter</string>
+    <string name="tour_setup_connect_body">Appuyez sur Tester la connexion pour vérifier vos identifiants. Une fois connecté, vous choisirez les albums à afficher.</string>
+    <string name="tour_albums_select_title">Choisissez vos albums</string>
+    <string name="tour_albums_select_body">Touchez un ou plusieurs albums pour les inclure dans votre diaporama. Les albums sélectionnés affichent une coche.</string>
+    <string name="tour_albums_start_title">Démarrer le diaporama</string>
+    <string name="tour_albums_start_body">Une fois vos albums choisis, appuyez sur Démarrer le diaporama pour commencer.</string>
+    <string name="tour_albums_settings_title">Paramètres</string>
+    <string name="tour_albums_settings_body">Accédez aux paramètres à tout moment via cette icône d\'engrenage — réglez les intervalles, l\'horloge, le cache et plus.</string>
+    <string name="tour_slideshow_tap_title">Touchez pour contrôler</string>
+    <string name="tour_slideshow_tap_body">Touchez n\'importe où sur l\'écran pour afficher ou masquer les contrôles de lecture. Ils disparaissent automatiquement après quelques secondes.</string>
+    <string name="tour_slideshow_nav_title">Naviguer les photos</string>
+    <string name="tour_slideshow_nav_body">Utilisez ces flèches pour passer manuellement à la photo précédente ou suivante.</string>
+    <string name="tour_slideshow_playback_title">Pause et muet</string>
+    <string name="tour_slideshow_playback_body">Mettez le diaporama en pause ou coupez le son des vidéos avec ces contrôles.</string>
+        <string name="tour_slideshow_albums_title">Retour aux Albums</string>
+    <string name="tour_slideshow_albums_body">Vous voulez choisir d\'autres photos ? Appuyez ici pour revenir à la sélection des albums.</string>
+    <string name="tour_slideshow_update_title">Indicateur de Mise à Jour</string>
+    <string name="tour_slideshow_update_body">Lorsqu\'une mise à jour est disponible, cette icône apparaît ici pour vous permettre d\'installer la dernière version. Si elle n\'est pas visible, vous êtes déjà à jour.</string>
+<string name="tour_slideshow_settings_title">Ajuster à la volée</string>
+    <string name="tour_slideshow_settings_body">Ouvrez les paramètres sans quitter le diaporama — modifiez l\'intervalle, activez l\'horloge et plus.</string>
+    <string name="tour_slideshow_close_title">Quitter le diaporama</string>
+    <string name="tour_slideshow_close_body">Touchez ici pour quitter le diaporama et revenir à la sélection des albums.</string>
+    <string name="tour_settings_overview_title">Aperçu des paramètres</string>
+    <string name="tour_settings_overview_body">Toutes les modifications sont enregistrées automatiquement — pas de bouton de sauvegarde. Faites défiler pour explorer chaque section.</string>
+    <string name="tour_settings_system_title">Système et démarrage auto</string>
+    <string name="tour_settings_system_body">Démarrage au démarrage et Mode Lanceur permettent à l\'app de se lancer automatiquement — idéal pour les cadres photo dédiés.</string>
+    <string name="tour_settings_cache_title">Cache média</string>
+    <string name="tour_settings_cache_body">La synchro auto télécharge les photos en arrière-plan pour que le diaporama fonctionne hors ligne et se charge instantanément.</string>
+    <string name="tour_settings_connection_title">Connexion</string>
+    <string name="tour_settings_connection_body">Mettez à jour l\'URL du serveur ou la clé API ici si votre configuration Immich change.</string>
 </resources>

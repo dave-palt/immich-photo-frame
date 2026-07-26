@@ -132,6 +132,61 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Launcher icon redesign + app logo. (1) Replaced the old
+  5-segment colored frame icon with a new design: colorful frame border +
+  sun/moon circle + mountain silhouette (converted from 512-space SVG to
+  108dp Android VectorDrawable). (2) Foreground content wrapped in `<group
+  scaleX/Y=0.75>` to add ~12% padding (opaque square was showing under
+  launcher mask). (3) Removed legacy PNG fallbacks in mipmap-hdpi/mdpi/
+  xhdpi/xxhdpi/xxxhdpi — unreachable since minSdk=26 uses adaptive icons.
+  (4) Created dedicated `app_logo.xml` drawable (no background fill, full
+  viewport, no scaling) for the Setup screen; updated from 72dp foreground
+  to 120dp logo. (5) Debug variant keeps amber bg (#FFB400) with navy
+  replacing the orange segment. Variants: day (drawable/), night
+  (drawable-night/), monochrome (drawable/), debug (debug/drawable/).
+  Updated: technical-spec (resource layout), ui-spec (setup logo),
+  README (icon feature list).
+
+
+- **2026-07-26** — Onboarding tour post-PR fixes. (1) Added two new slideshow
+  tour steps: `slideshow_albums` (back-to-album-selection button) and
+  `slideshow_update` (update status icon, force-shown as dimmed placeholder
+  during tour since the icon normally only appears when an update is available).
+  Total slideshow steps: 5→7, overall: 16→18. (2) Centered (no-target) tour
+  steps were rendering at screen top — fixed by adding `contentAlignment =
+  Alignment.Center` to the overlay Box. (3) Per-screen tour reset:
+  `resetOnboardingForScreen(stepIds)` in SettingsRepository +
+  `resetOnboardingForSettings()` in SettingsViewModel; Settings now has two
+  buttons: "Show Tour Again" (Settings-only) + "Reset All Tours" (all screens);
+  Setup screen also has "Show Tour Again". (4) Target lifecycle tracking
+  rewritten — `tourTarget()` modifier uses `DisposableEffect` to register/
+  unregister in `presentKeys` set; TourHost computes `readySteps` from
+  pendingSteps whose targets are present, deferring activation until targets
+  appear. (5) Black spotlight bug fixed: `CompositingStrategy.Offscreen` on
+  Canvas so `BlendMode.Clear` punches a transparent hole. (6) Settings back-
+  navigation stuck bug fixed: `onBack` uses explicit route via `startRoute` +
+  `popUpTo(0)` instead of `popBackStack()`. (7) Slideshow controls now respect
+  system bar insets (`statusBarsPadding` on top bar, `navigationBarsPadding`
+  on bottom progress bar + play/pause row). (8) Setup screen: added app icon
+  (launcher foreground drawable, 72dp), `imePadding()` so keyboard doesn't
+  hide the connect button. Updated: functional-spec (F7 step inventory + 18
+  count), technical-spec (resource layout), ui-spec (overlay centering, setup
+  logo, tour buttons, insets), README (tour step detail + icon variants).
+
+- **2026-07-26** — Onboarding Tour feature. Added a modular, per-step
+  coachmark tour system that auto-triggers on screen entry for any
+  un-completed steps. Per-step completion tracking via
+  `onboarding_completed_steps` StringSet in DataStore (not a single boolean).
+  16 steps across 4 screens: Setup (4), Albums (3), Slideshow (5), Settings
+  (4). Custom Compose overlay — no third-party showcase library. New package
+  `ui/onboarding/` with `TourStep.kt` (step registry), `TourState.kt` (state
+  holder + `tourTarget` modifier), and `CoachmarkOverlay.kt` (scrim +
+  spotlight + tooltip card + `TourHost` wrapper). Settings → System section
+  gains a "Show Tour Again" button (`resetOnboarding()`). Slideshow forces
+  controls visible + suppresses auto-hide during tour. Settings scrolls target
+  sections into view. 37 new strings (EN + 12 locales). Updated:
+  functional-spec (F7), technical-spec (persistence table + package layout),
+  ui-spec (overlay description), README.
 - **2026-07-26** — Launcher Mode feature. After real-hardware testing on a
   Realme PKH110 (ColorOS 16 / Android 16), BOOT_COMPLETED was confirmed to
   never fire (boot_verified stayed false across 2 reboots) — this is both

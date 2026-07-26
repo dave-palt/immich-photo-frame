@@ -27,3 +27,4 @@ release.jks
 /keymgr.exe
 /dist/
 /scripts/mock-immich.ts
+.worktrees

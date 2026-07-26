@@ -12,7 +12,7 @@ Shown on first launch or when credentials are missing/invalid.
 ```
 ┌──────────────────────────────┐
 │                              │
-│         [App Logo]           │
+│         [App Logo]           │ ← app logo vector (120dp, no background fill)
 │                              │
 │   Immich Server URL          │
 │   ┌────────────────────────┐ │
@@ -136,7 +136,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 
 ```
 ┌──────────────────────────────┐
-│  ← Settings                  │
+│  ← Settings v1.2.0           │
 ├──────────────────────────────┤
 │                              │
 │  SLIDESHOW                   │
@@ -198,6 +198,9 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  Reset All Settings          │ ← red text button
 │                              │
+│  Show Tour Again             │ ← replays Settings tour
+│  Reset All Tours             │ ← replays all screens' tours
+│                              │
 └──────────────────────────────┘
 ```
 
@@ -205,6 +208,33 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
 - Back arrow returns to previous screen.
+- **System section** includes a version string in the top bar (`Settings vX.Y.Z`)
+  and two tour replay buttons: **"Show Tour Again"** (replays only the Settings
+  tour) and **"Reset All Tours"** (replays tours on all screens).
+
+### Onboarding Tour Overlay
+
+When the user enters a screen with uncompleted tour steps, a coachmark overlay
+appears:
+
+- Semi-transparent black scrim (78% alpha) covers the full screen.
+- A rounded-rect spotlight cutout reveals the target element (button, field,
+  or section header). A subtle white ring outlines the spotlight.
+- A Material 3 `Card` tooltip appears below (or above, if space is tight) the
+  spotlight, containing:
+  - Step counter ("Step X of Y") in primary color
+  - Close (X) icon to skip remaining steps
+  - Step title (`titleMedium`) and body text (`bodyMedium`)
+  - **Skip tour** text button + **Next** / **Got it** button
+- Centered steps (no target) show the tooltip centered on screen (both
+  horizontally and vertically) with a plain scrim (no cutout).
+- In the Slideshow, the top control bar respects `statusBarsPadding()` and the
+  bottom controls (progress bar, play/pause row) respect `navigationBarsPadding()`,
+  so they never sit under the system status/navigation bars in any mode.
+- In the Slideshow, controls are force-shown during the tour and the 5-second
+  auto-hide is suppressed.
+- In Settings, the tour scrolls each target section into view before showing
+  its spotlight.
 - Editing server URL or API key does not auto-navigate; the change takes
   effect next time the app fetches data (or when user manually restarts
   the slideshow).
