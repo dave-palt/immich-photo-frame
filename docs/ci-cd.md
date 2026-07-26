@@ -73,8 +73,10 @@ Triggers on push to `main` or manual `workflow_dispatch` (workflow: `.github/wor
   `keymgr-darwin-arm64`, `keymgr-darwin-x64`, `keymgr-linux-arm64`,
   `keymgr-linux-x64`, `keymgr-windows-x64.exe`
 - Decodes signing keystore from `SIGNING_KEYSTORE_BASE64` secret
-- Builds signed release **AAB** (`bundleRelease`) with R8 minification + resource shrinking
-- Builds signed release **APK** (`assembleRelease`)
+- Builds signed release **AAB + APK** in a single Gradle invocation
+  (`bundleRelease assembleRelease`) with R8 minification + resource shrinking.
+  Both targets share one task graph (compile + R8 once), which is faster than
+  two sequential invocations and avoids the duplicated setup of split jobs.
 - Uploads both as artifacts (90-day retention)
 - Creates a GitHub Release with `softprops/action-gh-release@v3`
 
