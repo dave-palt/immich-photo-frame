@@ -131,12 +131,12 @@
     <string name="later">Später</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d Fotos</string>
+    <string name="photos_count">%1$d / %2$d Medien</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">Medienauswahl</string>
     <string name="media_selection_count">%1$d von %2$d angezeigt</string>
-    <string name="media_selection_new_items_default">Neue Fotos standardmäßig anzeigen</string>
+    <string name="media_selection_new_items_default">Neue Medien standardmäßig anzeigen</string>
     <string name="media_selection_select_all">Alle anzeigen</string>
     <string name="media_selection_select_none">Alle ausblenden</string>
     <string name="media_selection_shown">In Diashow angezeigt</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">Verwende diese Pfeile, um manuell zum vorherigen oder nächsten Foto zu wechseln.</string>
     <string name="tour_slideshow_playback_title">Pause &amp; Stumm</string>
     <string name="tour_slideshow_playback_body">Pausiere die Diashow oder schalte Video-Ton stumm mit diesen Steuerelementen.</string>
-    <string name="tour_slideshow_media_selection_title">Fotos auswählen</string>
-    <string name="tour_slideshow_media_selection_body">Tippe hier, um auszuwählen, welche Fotos und Videos in der Diashow angezeigt werden. Du bestätigst zuerst mit Fingerabdruck oder Displaysperre.</string>
+    <string name="tour_slideshow_media_selection_title">Medien auswählen</string>
+    <string name="tour_slideshow_media_selection_body">Tippe hier, um auszuwählen, welche Medien in der Diashow angezeigt werden. Du bestätigst zuerst mit Fingerabdruck oder Displaysperre.</string>
         <string name="tour_slideshow_albums_title">Zurück zu Alben</string>
     <string name="tour_slideshow_albums_body">Möchtest du andere Fotos auswählen? Tippe hier, um zur Albumauswahl zurückzukehren.</string>
     <string name="tour_slideshow_update_title">Update-Anzeige</string>

@@ -543,16 +543,17 @@ fun SettingsScreen(
                         // API Key — secure row: edit empties field, reveal/copy
                         // are biometric-gated. Key is never shown in plain text
                         // in an editable field.
-                        Row(
+                        // API Key — label on top, value below (full width so
+                        // the key can wrap naturally), actions in a row below.
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
                                 stringResource(R.string.api_key),
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f),
                             )
                             if (!editingKey) {
                                 if (state.apiKey.isNotBlank()) {
@@ -567,76 +568,87 @@ fun SettingsScreen(
                                         fontFamily = if (revealedApiKey) FontFamily.Monospace else null,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
-                                    IconButton(onClick = {
-                                        biometricLauncher.launch(
-                                            title = authTitleKey,
-                                            subtitle = authSubtitleKey,
-                                            onNotSetup = { showBiometricNotSetupDialog = true },
-                                            onSuccess = { revealedApiKey = !revealedApiKey },
-                                        )
-                                    }) {
-                                        Icon(
-                                            if (revealedApiKey) {
-                                                Icons.Default.VisibilityOff
-                                            } else {
-                                                Icons.Default.Visibility
-                                            },
-                                            contentDescription = stringResource(
-                                                if (revealedApiKey) R.string.hide else R.string.reveal,
-                                            ),
-                                        )
-                                    }
-                                    IconButton(onClick = {
-                                        biometricLauncher.launch(
-                                            title = authTitleKey,
-                                            subtitle = authSubtitleKey,
-                                            onNotSetup = { showBiometricNotSetupDialog = true },
-                                            onSuccess = {
-                                                val clipboard = context
-                                                    .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                clipboard.setPrimaryClip(
-                                                    ClipData.newPlainText("API Key", state.apiKey),
-                                                )
-                                                scope.launch {
-                                                    snackbarHostState.showSnackbar(
-                                                        apiKeyCopiedText,
+                                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                        IconButton(onClick = {
+                                            biometricLauncher.launch(
+                                                title = authTitleKey,
+                                                subtitle = authSubtitleKey,
+                                                onNotSetup = { showBiometricNotSetupDialog = true },
+                                                onSuccess = { revealedApiKey = !revealedApiKey },
+                                            )
+                                        }) {
+                                            Icon(
+                                                if (revealedApiKey) {
+                                                    Icons.Default.VisibilityOff
+                                                } else {
+                                                    Icons.Default.Visibility
+                                                },
+                                                contentDescription = stringResource(
+                                                    if (revealedApiKey) R.string.hide else R.string.reveal,
+                                                ),
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            biometricLauncher.launch(
+                                                title = authTitleKey,
+                                                subtitle = authSubtitleKey,
+                                                onNotSetup = { showBiometricNotSetupDialog = true },
+                                                onSuccess = {
+                                                    val clipboard = context
+                                                        .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                    clipboard.setPrimaryClip(
+                                                        ClipData.newPlainText("API Key", state.apiKey),
                                                     )
-                                                }
-                                            },
-                                        )
-                                    }) {
-                                        Icon(
-                                            Icons.Default.ContentCopy,
-                                            contentDescription = stringResource(R.string.copy),
-                                        )
+                                                    scope.launch {
+                                                        snackbarHostState.showSnackbar(
+                                                            apiKeyCopiedText,
+                                                        )
+                                                    }
+                                                },
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Default.ContentCopy,
+                                                contentDescription = stringResource(R.string.copy),
+                                            )
+                                        }
+                                        TextButton(onClick = {
+                                            keyDraft = ""
+                                            editingKey = true
+                                        }) { Text(stringResource(R.string.edit)) }
                                     }
                                 } else {
-                                    Text(
-                                        stringResource(R.string.not_set),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                                    Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                        Text(
+                                            stringResource(R.string.not_set),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        TextButton(onClick = {
+                                            keyDraft = ""
+                                            editingKey = true
+                                        }) { Text(stringResource(R.string.edit)) }
+                                    }
                                 }
-                                TextButton(onClick = {
-                                    keyDraft = ""
-                                    editingKey = true
-                                }) { Text(stringResource(R.string.edit)) }
                             } else {
                                 OutlinedTextField(
                                     value = keyDraft,
                                     onValueChange = { keyDraft = it },
                                     label = { Text(stringResource(R.string.api_key)) },
                                     singleLine = true,
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
-                                TextButton(onClick = {
-                                    keyDraft = state.apiKey
-                                    editingKey = false
-                                }) { Text(stringResource(R.string.cancel)) }
-                                TextButton(onClick = {
-                                    viewModel.updateApiKey(keyDraft)
-                                    editingKey = false
-                                }) { Text(stringResource(R.string.save)) }
+                                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                    TextButton(onClick = {
+                                        keyDraft = state.apiKey
+                                        editingKey = false
+                                    }) { Text(stringResource(R.string.cancel)) }
+                                    TextButton(onClick = {
+                                        viewModel.updateApiKey(keyDraft)
+                                        editingKey = false
+                                    }) { Text(stringResource(R.string.save)) }
+                                }
                             }
                         }
                     }

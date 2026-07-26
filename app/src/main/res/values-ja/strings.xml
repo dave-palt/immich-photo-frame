@@ -131,12 +131,12 @@
     <string name="later">後で</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d枚の写真</string>
+    <string name="photos_count">%1$d / %2$d 件</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">メディア選択</string>
     <string name="media_selection_count">%2$d件中%1$d件表示</string>
-    <string name="media_selection_new_items_default">新しい写真をデフォルトで表示</string>
+    <string name="media_selection_new_items_default">新しいメディアをデフォルトで表示</string>
     <string name="media_selection_select_all">すべて表示</string>
     <string name="media_selection_select_none">すべて非表示</string>
     <string name="media_selection_shown">スライドショーに表示</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">この矢印を使って手動で前または次の写真に移動します。</string>
     <string name="tour_slideshow_playback_title">一時停止とミュート</string>
     <string name="tour_slideshow_playback_body">これらのコントロールでスライドショーを一時停止したり、ビデオの音声をミュートできます。</string>
-    <string name="tour_slideshow_media_selection_title">写真を選択</string>
-    <string name="tour_slideshow_media_selection_body">ここをタップして、スライドショーに表示する写真と動画を選択します。まず指紋または画面ロックで認証します。</string>
+    <string name="tour_slideshow_media_selection_title">メディアを選択</string>
+    <string name="tour_slideshow_media_selection_body">ここをタップして、スライドショーに表示するメディアを選択します。まず指紋または画面ロックで認証します。</string>
         <string name="tour_slideshow_albums_title">アルバムに戻る</string>
     <string name="tour_slideshow_albums_body">別の写真を選びたいですか？ここをタップしてアルバム選択に戻ります。</string>
     <string name="tour_slideshow_update_title">更新インジケーター</string>

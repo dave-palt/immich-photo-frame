@@ -131,12 +131,12 @@
     <string name="later">Più tardi</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d foto</string>
+    <string name="photos_count">%1$d / %2$d elementi</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">Selezione dei media</string>
     <string name="media_selection_count">%1$d di %2$d mostrati</string>
-    <string name="media_selection_new_items_default">Mostra nuove foto per impostazione predefinita</string>
+    <string name="media_selection_new_items_default">Mostra nuovi media per impostazione predefinita</string>
     <string name="media_selection_select_all">Mostra tutto</string>
     <string name="media_selection_select_none">Nascondi tutto</string>
     <string name="media_selection_shown">Mostrato nella presentazione</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">Usa queste frecce per passare manualmente alla foto precedente o successiva.</string>
     <string name="tour_slideshow_playback_title">Pausa e muto</string>
     <string name="tour_slideshow_playback_body">Metti in pausa la presentazione o silenzia l\'audio dei video con questi controlli.</string>
-    <string name="tour_slideshow_media_selection_title">Scegli le tue foto</string>
-    <string name="tour_slideshow_media_selection_body">Tocca qui per scegliere quali foto e video mostrare nella presentazione. Confermerai prima con impronta digitale o blocco schermo.</string>
+    <string name="tour_slideshow_media_selection_title">Scegli i tuoi media</string>
+    <string name="tour_slideshow_media_selection_body">Tocca qui per scegliere quali media mostrare nella presentazione. Confermerai prima con impronta digitale o blocco schermo.</string>
         <string name="tour_slideshow_albums_title">Torna agli Album</string>
     <string name="tour_slideshow_albums_body">Vuoi scegliere foto diverse? Tocca qui per tornare alla selezione degli album.</string>
     <string name="tour_slideshow_update_title">Indicatore di Aggiornamento</string>

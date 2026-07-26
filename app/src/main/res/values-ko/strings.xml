@@ -131,12 +131,12 @@
     <string name="later">나중에</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">사진 %1$d / %2$d장</string>
+    <string name="photos_count">%1$d / %2$d개</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">미디어 선택</string>
     <string name="media_selection_count">%2$d개 중 %1$d개 표시</string>
-    <string name="media_selection_new_items_default">새 사진을 기본적으로 표시</string>
+    <string name="media_selection_new_items_default">새 미디어를 기본으로 표시</string>
     <string name="media_selection_select_all">모두 표시</string>
     <string name="media_selection_select_none">모두 숨기기</string>
     <string name="media_selection_shown">슬라이드 쇼에 표시됨</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">이 화살표를 사용하여 이전 또는 다음 사진으로 수동으로 이동하세요.</string>
     <string name="tour_slideshow_playback_title">일시정지 및 음소거</string>
     <string name="tour_slideshow_playback_body">이 컨트롤로 슬라이드 쇼를 일시정지하거나 비디오 오디오를 음소거할 수 있습니다.</string>
-    <string name="tour_slideshow_media_selection_title">사진 선택</string>
-    <string name="tour_slideshow_media_selection_body">여기를 탭하여 슬라이드 쇼에 표시할 사진과 동영상을 선택하세요. 먼저 지문 또는 화면 잠금으로 인증합니다.</string>
+    <string name="tour_slideshow_media_selection_title">미디어 선택</string>
+    <string name="tour_slideshow_media_selection_body">여기를 탭하여 슬라이드 쇼에 표시할 미디어를 선택하세요. 먼저 지문 또는 화면 잠금으로 인증합니다.</string>
         <string name="tour_slideshow_albums_title">앨범으로 돌아가기</string>
     <string name="tour_slideshow_albums_body">다른 사진을 선택하고 싶으신가요? 여기를 탭하여 앨범 선택으로 돌아가세요.</string>
     <string name="tour_slideshow_update_title">업데이트 표시</string>

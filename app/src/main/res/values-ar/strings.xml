@@ -131,12 +131,12 @@
     <string name="later">لاحقًا</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d صور</string>
+    <string name="photos_count">%1$d / %2$d وسائط</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">اختيار الوسائط</string>
     <string name="media_selection_count">%1$d من %2$d معروض</string>
-    <string name="media_selection_new_items_default">إظهار الصور الجديدة افتراضيًا</string>
+    <string name="media_selection_new_items_default">إظهار الوسائط الجديدة افتراضياً</string>
     <string name="media_selection_select_all">إظهار الكل</string>
     <string name="media_selection_select_none">إخفاء الكل</string>
     <string name="media_selection_shown">معروض في عرض الشرائح</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">استخدم هذه الأسهم للانتقال يدوياً إلى الصورة السابقة أو التالية.</string>
     <string name="tour_slideshow_playback_title">إيقاف مؤقت وكتم</string>
     <string name="tour_slideshow_playback_body">أوقف العرض مؤقتاً أو اكتم صوت الفيديو باستخدام هذه الضوابط.</string>
-    <string name="tour_slideshow_media_selection_title">اختر صورك</string>
-    <string name="tour_slideshow_media_selection_body">اضغط هنا لاختيار الصور ومقاطع الفيديو التي تظهر في عرض الشرائح. ستؤكد أولاً ببصمتك أو قفل الشاشة.</string>
+    <string name="tour_slideshow_media_selection_title">اختر وسائطك</string>
+    <string name="tour_slideshow_media_selection_body">اضغط هنا لاختيار الوسائط التي تظهر في عرض الشرائح. ستؤكد أولاً ببصمتك أو قفل الشاشة.</string>
         <string name="tour_slideshow_albums_title">العودة إلى الألبومات</string>
     <string name="tour_slideshow_albums_body">هل تريد اختيار صور مختلفة؟ اضغط هنا للعودة إلى اختيار الألبوم.</string>
     <string name="tour_slideshow_update_title">مؤشر التحديث</string>

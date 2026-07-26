@@ -131,12 +131,12 @@
     <string name="later">Mais tarde</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d fotos</string>
+    <string name="photos_count">%1$d / %2$d mídia</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">Seleção de mídia</string>
     <string name="media_selection_count">%1$d de %2$d exibidos</string>
-    <string name="media_selection_new_items_default">Mostrar novas fotos por padrão</string>
+    <string name="media_selection_new_items_default">Mostrar novas mídias por padrão</string>
     <string name="media_selection_select_all">Mostrar tudo</string>
     <string name="media_selection_select_none">Ocultar tudo</string>
     <string name="media_selection_shown">Exibido na apresentação de slides</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">Use estas setas para avançar para a foto anterior ou próxima manualmente.</string>
     <string name="tour_slideshow_playback_title">Pausar e Silenciar</string>
     <string name="tour_slideshow_playback_body">Pause a apresentação ou silencie o áudio do vídeo com estes controles.</string>
-    <string name="tour_slideshow_media_selection_title">Escolha suas fotos</string>
-    <string name="tour_slideshow_media_selection_body">Toque aqui para escolher quais fotos e vídeos aparecem na apresentação. Você confirmará primeiro com impressão digital ou bloqueio de tela.</string>
+    <string name="tour_slideshow_media_selection_title">Escolha suas mídias</string>
+    <string name="tour_slideshow_media_selection_body">Toque aqui para escolher quais mídias aparecem na apresentação. Você confirmará primeiro com impressão digital ou bloqueio de tela.</string>
         <string name="tour_slideshow_albums_title">Voltar aos Álbuns</string>
     <string name="tour_slideshow_albums_body">Quer escolher fotos diferentes? Toque aqui para voltar à seleção de álbuns.</string>
     <string name="tour_slideshow_update_title">Indicador de Atualização</string>

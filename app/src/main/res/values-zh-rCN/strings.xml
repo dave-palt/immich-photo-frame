@@ -131,12 +131,12 @@
     <string name="later">稍后</string>
 
     <!-- Slideshow -->
-    <string name="photos_count">%1$d / %2$d张照片</string>
+    <string name="photos_count">%1$d / %2$d 个媒体</string>
 
     <!-- Media Selection -->
     <string name="media_selection_title">媒体选择</string>
     <string name="media_selection_count">显示%1$d / %2$d</string>
-    <string name="media_selection_new_items_default">默认显示新照片</string>
+    <string name="media_selection_new_items_default">默认显示新媒体</string>
     <string name="media_selection_select_all">全部显示</string>
     <string name="media_selection_select_none">全部隐藏</string>
     <string name="media_selection_shown">在幻灯片中显示</string>
@@ -168,8 +168,8 @@
     <string name="tour_slideshow_nav_body">使用这些箭头手动切换到上一张或下一张照片。</string>
     <string name="tour_slideshow_playback_title">暂停和静音</string>
     <string name="tour_slideshow_playback_body">使用这些控制暂停幻灯片或将视频静音。</string>
-    <string name="tour_slideshow_media_selection_title">选择照片</string>
-    <string name="tour_slideshow_media_selection_body">点击此处选择要在幻灯片中显示的照片和视频。您需要先通过指纹或屏幕锁定验证。</string>
+    <string name="tour_slideshow_media_selection_title">选择媒体</string>
+    <string name="tour_slideshow_media_selection_body">点击此处选择要在幻灯片中显示的媒体。您需要先通过指纹或屏幕锁定验证。</string>
         <string name="tour_slideshow_albums_title">返回相册</string>
     <string name="tour_slideshow_albums_body">想选择其他照片？点击此处返回相册选择。</string>
     <string name="tour_slideshow_update_title">更新指示器</string>

@@ -3,6 +3,7 @@ package com.dav3.immichframe.ui.media
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
@@ -18,17 +19,23 @@ data class MediaSelectionUiState(
     val assets: List<Asset> = emptyList(),
     val toggledIds: Set<String> = emptySet(),
     val newItemsShown: Boolean = true,
+    val skipVideos: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
 ) {
     /** Whether a given asset is currently marked as "shown" (visible). */
     fun isShown(assetId: String): Boolean = if (newItemsShown) assetId !in toggledIds else assetId in toggledIds
 
+    /**
+     * Count of assets the user has marked as "shown" AND that would actually
+     * appear in the slideshow. Videos are excluded when [skipVideos] is true,
+     * so the counter matches what the slideshow will display.
+     */
     val shownCount: Int
-        get() = assets.count { isShown(it.id) }
+        get() = assets.count { isShown(it.id) && !(skipVideos && it.type == AssetType.VIDEO) }
 
     val totalCount: Int
-        get() = assets.size
+        get() = assets.count { !(skipVideos && it.type == AssetType.VIDEO) }
 }
 
 @HiltViewModel
@@ -49,6 +56,7 @@ constructor(
             val albumIds = settingsRepo.selectedAlbumIds.first()
             val toggledIds = settingsRepo.mediaSelectionToggledIds.first()
             val newItemsShown = settingsRepo.mediaSelectionNewItemsShown.first()
+            val skipVideos = settingsRepo.slideshowSettings.first().skipVideos
 
             if (albumIds.isEmpty()) {
                 _uiState.value = MediaSelectionUiState(
@@ -81,6 +89,7 @@ constructor(
                 assets = assets.sortedByDescending { it.lastModified },
                 toggledIds = toggledIds,
                 newItemsShown = newItemsShown,
+                skipVideos = skipVideos,
                 isLoading = false,
             )
         }

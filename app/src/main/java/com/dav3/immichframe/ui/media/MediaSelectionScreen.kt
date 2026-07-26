@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -173,53 +175,65 @@ private fun MediaThumbnail(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp),
+                .height(120.dp)
+                // Dim the thumbnail itself when hidden — not just an overlay icon
+                .alpha(if (isShown) 1f else 0.3f),
         )
 
-        // Dim overlay when hidden
+        // Dim overlay when hidden (makes it unmistakable)
         if (!isShown) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f)),
+                    .background(Color.Black.copy(alpha = 0.5f)),
             )
         }
 
-        // Selection indicator (top-end)
+        // Selection indicator (top-end) — different icons for shown vs hidden
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(4.dp),
+                .padding(6.dp),
         ) {
             if (isShown) {
                 Icon(
                     Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.media_selection_shown),
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(32.dp),
                 )
             } else {
                 Icon(
-                    Icons.Default.CheckCircle,
+                    Icons.Default.RadioButtonUnchecked,
                     contentDescription = stringResource(R.string.media_selection_hidden),
-                    tint = Color.White.copy(alpha = 0.4f),
-                    modifier = Modifier.size(28.dp),
+                    tint = Color.White.copy(alpha = 0.7f),
+                    modifier = Modifier.size(32.dp),
                 )
             }
         }
 
-        // Video indicator (bottom-start)
+        // Video indicator (bottom-start) — dark pill background for prominence
         if (asset.type == AssetType.VIDEO) {
-            Box(
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(4.dp),
+                    .padding(6.dp)
+                    .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp)),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     Icons.Default.PlayCircle,
                     contentDescription = "Video",
-                    tint = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.size(20.dp),
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(16.dp),
+                )
+                Text(
+                    "VIDEO",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 2.dp, end = 6.dp),
                 )
             }
         }

@@ -28,6 +28,8 @@ data class UpdateState(
     val available: Boolean = false,
     val checking: Boolean = false,
     val downloading: Boolean = false,
+    val downloadProgress: Float = 0f,
+    val downloadEtaSeconds: Long = 0L,
     val error: String? = null,
     val downloadedApkPath: File? = null,
     val newVersion: String = "",
@@ -164,7 +166,7 @@ constructor(
 
             val apkFile = File(updateDir, apkAsset.name)
             Log.d(TAG, "checkForUpdate: downloading ${apkAsset.browserDownloadUrl} → ${apkFile.absolutePath}")
-            downloadApk(apkAsset.browserDownloadUrl, apkFile)
+            downloadApk(apkAsset.browserDownloadUrl, apkFile, apkAsset.size)
             Log.d(TAG, "checkForUpdate: download complete (${apkFile.length() / 1024} KB)")
 
             _state.value = _state.value.copy(
@@ -247,23 +249,76 @@ constructor(
         return false
     }
 
-    private fun downloadApk(url: String, dest: File) {
-        // Clean old APKs
-        updateDir.listFiles()?.forEach { it.delete() }
+    private fun downloadApk(url: String, dest: File, expectedSize: Long) {
+        // Clean old APKs — but preserve a partial download of the *same* file
+        // so we can resume via HTTP Range. We match by filename: if dest already
+        // exists (even partially), keep it and resume from its current length.
+        updateDir.listFiles()?.forEach { f ->
+            if (f.name != dest.name) {
+                Log.d(TAG, "downloadApk: deleting old file ${f.name}")
+                f.delete()
+            }
+        }
 
-        Log.d(TAG, "downloadApk: fetching $url")
+        val existingLen = dest.length()
+        val resuming = existingLen > 0 && existingLen < expectedSize
+        if (resuming) {
+            Log.d(TAG, "downloadApk: resuming from $existingLen / $expectedSize bytes")
+        }
+
+        Log.d(TAG, "downloadApk: fetching $url${if (resuming) " (Range: $existingLen-)" else ""}")
         val client = OkHttpClient()
-        val request = Request.Builder().url(url).build()
+        val request = Request.Builder().url(url).apply {
+            if (resuming) header("Range", "bytes=$existingLen-")
+        }.build()
+
         client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
+            // 200 = full content (server ignored Range, start over)
+            // 206 = partial content (resume successful)
+            if (response.code != 200 && response.code != 206) {
                 Log.e(TAG, "downloadApk: HTTP ${response.code}")
                 error("Download failed: ${response.code}")
             }
-            response.body?.byteStream()?.use { input ->
-                dest.outputStream().use { output ->
-                    input.copyTo(output)
+
+            // If server ignored Range (returned 200), truncate existing file
+            val appendMode = resuming && response.code == 206
+            if (!appendMode && dest.exists()) {
+                dest.delete()
+            }
+
+            val body = response.body ?: error("Empty response body")
+            val totalBytes = if (appendMode) expectedSize else body.contentLength().let { if (it > 0) it else expectedSize }
+            val startBytes = if (appendMode) existingLen else 0L
+
+            body.byteStream().use { input ->
+                java.io.FileOutputStream(dest, appendMode).use { output ->
+                    val buffer = ByteArray(8192)
+                    var downloaded = startBytes
+                    var lastUpdate = 0L
+                    val startTime = System.currentTimeMillis()
+
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read == -1) break
+                        output.write(buffer, 0, read)
+                        downloaded += read
+
+                        // Throttle state updates to ~2/sec
+                        val now = System.currentTimeMillis()
+                        if (now - lastUpdate > 500) {
+                            lastUpdate = now
+                            val progress = if (totalBytes > 0) downloaded.toFloat() / totalBytes else 0f
+                            val elapsed = (now - startTime) / 1000.0
+                            val speed = if (elapsed > 0) (downloaded - startBytes) / elapsed else 0.0
+                            val remaining = if (speed > 0) ((totalBytes - downloaded) / speed).toLong() else 0
+                            _state.value = _state.value.copy(
+                                downloadProgress = progress.coerceIn(0f, 1f),
+                                downloadEtaSeconds = remaining,
+                            )
+                        }
+                    }
                 }
-            } ?: error("Empty response body")
+            }
         }
     }
 }
