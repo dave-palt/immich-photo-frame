@@ -2,6 +2,8 @@ package com.dav3.immichframe.data.update
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.core.content.FileProvider
 import com.dav3.immichframe.BuildConfig
@@ -78,6 +80,13 @@ constructor(
     }
 
     /**
+     * Returns true if the user has granted "Install unknown apps" permission
+     * (REQUEST_INSTALL_PACKAGES). If false, the installer intent will silently
+     * fail with "App not installed".
+     */
+    fun canRequestInstalls(): Boolean = context.packageManager.canRequestPackageInstalls()
+
+    /**
      * Check GitHub for a newer release. Downloads APK silently if found.
      */
     suspend fun checkForUpdate(): Boolean = withContext(Dispatchers.IO) {
@@ -95,8 +104,10 @@ constructor(
             val release = if (BuildConfig.DEBUG) {
                 Log.d(TAG, "checkForUpdate: DEBUG build — listing releases for dev-* tag")
                 api.listReleases()
-                    .firstOrNull { it.tagName.startsWith("dev-") }
-                    .also { Log.d(TAG, "checkForUpdate: latest dev release = ${it?.tagName ?: "none"}") }
+                    .filter { it.tagName.startsWith("dev-") }
+                    .sortedByDescending { it.createdAt }
+                    .firstOrNull()
+                    .also { Log.d(TAG, "checkForUpdate: latest dev release = ${it?.tagName ?: "none"} (createdAt=${it?.createdAt ?: "n/a"})") }
                     ?: run {
                         Log.d(TAG, "checkForUpdate: no dev-* release found")
                         _state.value = UpdateState(available = false)
@@ -170,6 +181,8 @@ constructor(
 
     /**
      * Launch the system installer intent for the downloaded APK.
+     * If the user hasn't granted "Install unknown apps" permission, opens
+     * the settings page for them to grant it first.
      */
     fun installUpdate() {
         val apkPath = _state.value.downloadedApkPath
@@ -177,6 +190,19 @@ constructor(
             Log.w(TAG, "installUpdate: no downloaded APK in state")
             return
         }
+
+        if (!canRequestInstalls()) {
+            Log.w(TAG, "installUpdate: install permission not granted — opening settings")
+            val intent = Intent(
+                Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                Uri.parse("package:${context.packageName}"),
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+            return
+        }
+
         Log.d(TAG, "installUpdate: launching installer for ${apkPath.absolutePath}")
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", apkPath)
         val intent = Intent(Intent.ACTION_VIEW).apply {
