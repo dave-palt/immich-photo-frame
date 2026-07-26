@@ -6,24 +6,31 @@
 
     <!-- Monochrome silhouette for Android 13+ themed icons.
          The system tints this single-color (white) shape based on the
-         user's wallpaper / icon theme preference. -->
+         user's wallpaper / icon theme preference.
 
-    <!-- Frame border outline (single continuous stroke) -->
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 32.91,23.62 L 75.09,23.62 Q 84.38,23.62 84.38,32.91 L 84.38,75.09 Q 84.38,84.38 75.09,84.38 L 32.91,84.38 Q 23.62,84.38 23.62,75.09 L 23.62,32.91 Q 23.62,23.62 32.91,23.62 Z" />
+         Icon content scaled to 75% and re-centered for breathing room. -->
+    <group
+        android:scaleX="0.75"
+        android:scaleY="0.75"
+        android:translateX="13.5"
+        android:translateY="13.5">
 
-    <!-- Sun/moon -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
+        <!-- Frame border outline (single continuous stroke) -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 32.91,23.62 L 75.09,23.62 Q 84.38,23.62 84.38,32.91 L 84.38,75.09 Q 84.38,84.38 75.09,84.38 L 32.91,84.38 Q 23.62,84.38 23.62,75.09 L 23.62,32.91 Q 23.62,23.62 32.91,23.62 Z" />
 
-    <!-- Mountain silhouette -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M 37.97,67.5 L 50.62,49.78 L 57.38,58.22 L 64.12,51.47 L 71.72,67.5 Z" />
+        <!-- Sun/moon -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
 
+        <!-- Mountain silhouette -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 37.97,67.5 L 50.62,49.78 L 57.38,58.22 L 64.12,51.47 L 71.72,67.5 Z" />
+    </group>
 </vector>

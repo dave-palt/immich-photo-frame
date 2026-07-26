@@ -9,62 +9,67 @@
         android:fillColor="#FFB400"
         android:pathData="M 0,0 L 108,0 L 108,108 L 0,108 Z" />
 
-    <!-- Colorful frame border (clockwise from top) -->
+    <!-- Icon content scaled to 75% and re-centered for breathing room. -->
+    <group
+        android:scaleX="0.75"
+        android:scaleY="0.75"
+        android:translateX="13.5"
+        android:translateY="13.5">
 
-    <!-- Red: top edge -->
-    <path
-        android:strokeColor="#FA2921"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 32.91,23.62 L 75.09,23.62" />
+        <!-- Red: top edge -->
+        <path
+            android:strokeColor="#FA2921"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 32.91,23.62 L 75.09,23.62" />
 
-    <!-- Dark navy (replaces orange to stand out on amber bg) -->
-    <path
-        android:strokeColor="#1A1A2E"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 75.09,23.62 Q 84.38,23.62 84.38,32.91 L 84.38,62.44" />
+        <!-- Dark navy (replaces orange to stand out on amber bg) -->
+        <path
+            android:strokeColor="#1A1A2E"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 75.09,23.62 Q 84.38,23.62 84.38,32.91 L 84.38,62.44" />
 
-    <!-- Green: right edge lower + bottom-right corner + bottom edge (right half) -->
-    <path
-        android:strokeColor="#18C249"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 84.38,62.44 L 84.38,75.09 Q 84.38,84.38 75.09,84.38 L 47.25,84.38" />
+        <!-- Green: right edge lower + bottom-right corner + bottom edge (right half) -->
+        <path
+            android:strokeColor="#18C249"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 84.38,62.44 L 84.38,75.09 Q 84.38,84.38 75.09,84.38 L 47.25,84.38" />
 
-    <!-- Blue: bottom edge (left half) + bottom-left corner + left edge lower -->
-    <path
-        android:strokeColor="#1E83F7"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 47.25,84.38 L 32.91,84.38 Q 23.62,84.38 23.62,75.09 L 23.62,52.31" />
+        <!-- Blue: bottom edge (left half) + bottom-left corner + left edge lower -->
+        <path
+            android:strokeColor="#1E83F7"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 47.25,84.38 L 32.91,84.38 Q 23.62,84.38 23.62,75.09 L 23.62,52.31" />
 
-    <!-- Purple: left edge upper + top-left corner -->
-    <path
-        android:strokeColor="#ED79B5"
-        android:strokeWidth="7.17"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M 23.62,52.31 L 23.62,32.91 Q 23.62,23.62 32.91,23.62" />
+        <!-- Purple: left edge upper + top-left corner -->
+        <path
+            android:strokeColor="#ED79B5"
+            android:strokeWidth="7.17"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M 23.62,52.31 L 23.62,32.91 Q 23.62,23.62 32.91,23.62" />
 
-    <!-- Sun/moon (dark navy, semi-transparent — visible on amber) -->
-    <path
-        android:fillColor="#1A1A2E"
-        android:fillAlpha="0.5"
-        android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
+        <!-- Sun/moon (dark navy, semi-transparent — visible on amber) -->
+        <path
+            android:fillColor="#1A1A2E"
+            android:fillAlpha="0.5"
+            android:pathData="M 43.87,45.56 a 4.22,4.22 0 1,0 8.44,0 a 4.22,4.22 0 1,0 -8.44,0" />
 
-    <!-- Mountain silhouette (dark navy on amber for dev) -->
-    <path
-        android:fillColor="#1A1A2E"
-        android:fillAlpha="0.3"
-        android:strokeColor="#1A1A2E"
-        android:strokeWidth="0.53"
-        android:strokeAlpha="0.5"
-        android:strokeLineJoin="round"
-        android:pathData="M 37.97,67.5 L 50.62,49.78 L 57.38,58.22 L 64.12,51.47 L 71.72,67.5 Z" />
-
+        <!-- Mountain silhouette (dark navy on amber for dev) -->
+        <path
+            android:fillColor="#1A1A2E"
+            android:fillAlpha="0.3"
+            android:strokeColor="#1A1A2E"
+            android:strokeWidth="0.53"
+            android:strokeAlpha="0.5"
+            android:strokeLineJoin="round"
+            android:pathData="M 37.97,67.5 L 50.62,49.78 L 57.38,58.22 L 64.12,51.47 L 71.72,67.5 Z" />
+    </group>
 </vector>
