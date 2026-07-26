@@ -123,4 +123,43 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d fotos</string>
+
+    <!-- Onboarding Tour -->
+    <string name="tour_next">Próximo</string>
+    <string name="tour_got_it">Entendi</string>
+    <string name="tour_skip">Pular tour</string>
+    <string name="tour_step_counter">Passo %1$d de %2$d</string>
+    <string name="show_tour">Mostrar tour novamente</string>
+    <string name="tour_setup_welcome_title">Bem-vindo ao Immich Media Frame</string>
+    <string name="tour_setup_welcome_body">Conecte-se ao seu servidor Immich para exibir suas fotos. Vamos passar pela configuração.</string>
+    <string name="tour_setup_server_title">Endereço do servidor</string>
+    <string name="tour_setup_server_body">Insira a URL do seu servidor Immich aqui. Use o formato photos.example.com ou 192.168.1.100:2283.</string>
+    <string name="tour_setup_apikey_title">Chave de API</string>
+    <string name="tour_setup_apikey_body">Crie uma chave de API no Immich em Configurações → Chaves de API. Ela precisa de permissões de leitura de álbum, ativo e usuário.</string>
+    <string name="tour_setup_connect_title">Testar e Conectar</string>
+    <string name="tour_setup_connect_body">Toque em Testar Conexão para verificar suas credenciais. Quando conectado, você escolherá quais álbuns exibir.</string>
+    <string name="tour_albums_select_title">Escolha Seus Álbuns</string>
+    <string name="tour_albums_select_body">Toque em um ou mais álbuns para incluí-los na sua apresentação. Álbuns selecionados mostram uma marca de verificação.</string>
+    <string name="tour_albums_start_title">Iniciar a Apresentação</string>
+    <string name="tour_albums_start_body">Quando terminar de escolher os álbuns, toque em Iniciar Apresentação para começar.</string>
+    <string name="tour_albums_settings_title">Configurações</string>
+    <string name="tour_albums_settings_body">Acesse as configurações a qualquer momento neste ícone de engrenagem — ajuste intervalos, relógio, cache e mais.</string>
+    <string name="tour_slideshow_tap_title">Toque para Controlar</string>
+    <string name="tour_slideshow_tap_body">Toque em qualquer lugar da tela para mostrar ou ocultar os controles de reprodução. Eles somem automaticamente após alguns segundos.</string>
+    <string name="tour_slideshow_nav_title">Navegar pelas Fotos</string>
+    <string name="tour_slideshow_nav_body">Use estas setas para avançar para a foto anterior ou próxima manualmente.</string>
+    <string name="tour_slideshow_playback_title">Pausar e Silenciar</string>
+    <string name="tour_slideshow_playback_body">Pause a apresentação ou silencie o áudio do vídeo com estes controles.</string>
+    <string name="tour_slideshow_settings_title">Ajuste em Tempo Real</string>
+    <string name="tour_slideshow_settings_body">Abra as configurações sem sair da apresentação — mude o intervalo, ative o relógio e mais.</string>
+    <string name="tour_slideshow_close_title">Sair da Apresentação</string>
+    <string name="tour_slideshow_close_body">Toque aqui para sair da apresentação e voltar à seleção de álbuns.</string>
+    <string name="tour_settings_overview_title">Visão Geral das Configurações</string>
+    <string name="tour_settings_overview_body">Todas as mudanças são salvas automaticamente — sem botão de salvar. Role para baixo para explorar cada seção.</string>
+    <string name="tour_settings_system_title">Sistema e Início Automático</string>
+    <string name="tour_settings_system_body">Iniciar na Inicialização e Modo Lançador permitem que o app inicie automaticamente — ideal para molduras digitais dedicadas.</string>
+    <string name="tour_settings_cache_title">Cache de Mídia</string>
+    <string name="tour_settings_cache_body">A sincronização automática baixa fotos em segundo plano para que a apresentação funcione offline e carregue instantaneamente.</string>
+    <string name="tour_settings_connection_title">Conexão</string>
+    <string name="tour_settings_connection_body">Atualize a URL do servidor ou a chave de API aqui se sua configuração do Immich mudar.</string>
 </resources>

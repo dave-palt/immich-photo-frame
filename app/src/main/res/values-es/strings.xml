@@ -123,4 +123,43 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d fotos</string>
+
+    <!-- Onboarding Tour -->
+    <string name="tour_next">Siguiente</string>
+    <string name="tour_got_it">Entendido</string>
+    <string name="tour_skip">Omitir tour</string>
+    <string name="tour_step_counter">Paso %1$d de %2$d</string>
+    <string name="show_tour">Mostrar tour de nuevo</string>
+    <string name="tour_setup_welcome_title">Bienvenido a Immich Media Frame</string>
+    <string name="tour_setup_welcome_body">Conéctate a tu servidor Immich para mostrar tus fotos. Repasemos la configuración.</string>
+    <string name="tour_setup_server_title">Dirección del servidor</string>
+    <string name="tour_setup_server_body">Introduce la URL de tu servidor Immich aquí. Usa el formato photos.example.com o 192.168.1.100:2283.</string>
+    <string name="tour_setup_apikey_title">Clave de API</string>
+    <string name="tour_setup_apikey_body">Crea una clave de API en Immich en Configuración → Claves de API. Necesita permisos de lectura de álbumes, activos y usuario.</string>
+    <string name="tour_setup_connect_title">Probar y conectar</string>
+    <string name="tour_setup_connect_body">Toca Probar conexión para verificar tus credenciales. Una vez conectado, elegirás qué álbumes mostrar.</string>
+    <string name="tour_albums_select_title">Elige tus álbumes</string>
+    <string name="tour_albums_select_body">Toca uno o más álbumes para incluirlos en tu presentación. Los álbumes seleccionados muestran una marca.</string>
+    <string name="tour_albums_start_title">Iniciar presentación</string>
+    <string name="tour_albums_start_body">Cuando hayas elegido los álbumes, toca Iniciar presentación para comenzar.</string>
+    <string name="tour_albums_settings_title">Configuración</string>
+    <string name="tour_albums_settings_body">Accede a la configuración en cualquier momento desde este ícono de engranaje — ajusta intervalos, reloj, caché y más.</string>
+    <string name="tour_slideshow_tap_title">Toca para controlar</string>
+    <string name="tour_slideshow_tap_body">Toca en cualquier parte de la pantalla para mostrar u ocultar los controles de reproducción. Se ocultan automáticamente tras unos segundos.</string>
+    <string name="tour_slideshow_nav_title">Navegar fotos</string>
+    <string name="tour_slideshow_nav_body">Usa estas flechas para ir manualmente a la foto anterior o siguiente.</string>
+    <string name="tour_slideshow_playback_title">Pausar y silenciar</string>
+    <string name="tour_slideshow_playback_body">Pausa la presentación o silencia el audio del video con estos controles.</string>
+    <string name="tour_slideshow_settings_title">Ajustar al vuelo</string>
+    <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>
+    <string name="tour_slideshow_close_title">Salir de presentación</string>
+    <string name="tour_slideshow_close_body">Toca aquí para salir de la presentación y volver a la selección de álbumes.</string>
+    <string name="tour_settings_overview_title">Vista general de configuración</string>
+    <string name="tour_settings_overview_body">Todos los cambios se guardan automáticamente — sin botón de guardar. Desplázate hacia abajo para explorar cada sección.</string>
+    <string name="tour_settings_system_title">Sistema y inicio automático</string>
+    <string name="tour_settings_system_body">Inicio en arranque y Modo Lanzador permiten que la app se inicie automáticamente — ideal para marcos de fotos dedicados.</string>
+    <string name="tour_settings_cache_title">Caché de medios</string>
+    <string name="tour_settings_cache_body">La sincronización automática descarga fotos en segundo plano para que la presentación funcione sin conexión y cargue al instante.</string>
+    <string name="tour_settings_connection_title">Conexión</string>
+    <string name="tour_settings_connection_body">Actualiza la URL del servidor o la clave de API aquí si cambia tu configuración de Immich.</string>
 </resources>

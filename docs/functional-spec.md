@@ -208,3 +208,41 @@ Options:
 | Image fails to load | Skip to next image, log error |
 | Update download fails | Show "Update check failed" on Check Now button, allow retry |
 | Network timeout | Retry up to 3 times with backoff, then skip |
+
+### F7: Onboarding Tour
+
+The app includes a **modular, per-step onboarding tour** that teaches users
+the available settings and controls. The tour is triggered automatically when
+a user lands on a screen — only steps not yet completed are shown.
+
+**How it works:**
+
+- Each screen (Setup, Albums, Slideshow, Settings) declares an ordered list
+  of tour steps. Each step has an ID, a tooltip title/body, and an optional
+  target element (a control or section to spotlight).
+- When the user navigates to a screen, the tour checks which of that screen's
+  step IDs are NOT yet in the persisted `onboarding_completed_steps` set. If
+  any remain, the tour auto-starts for those steps.
+- The overlay shows a semi-transparent scrim over the screen with a
+  rounded-rect spotlight cutout around the target element (if any). A tooltip
+  card displays the step title, body, step counter ("Step X of Y"), and
+  **Next/Got it** + **Skip** buttons.
+- Completing a step (Next/Got it) marks its ID as completed. Skipping marks
+  all remaining steps on that screen as completed.
+- **Slideshow-specific behavior**: during the tour, the on-tap controls are
+  force-shown and the 5-second auto-hide is suppressed, so the tour can
+  spotlight the prev/next, pause/mute, settings, and close buttons.
+- **Settings-specific behavior**: the tour scrolls the target section into
+  view before showing its spotlight (System → Media Cache → Connection).
+- **"Show Tour Again"** button in Settings → System section clears the
+  completed-steps set, causing the tour to re-run on all screens next visit.
+- Resetting all settings also clears the onboarding set (DataStore is wiped).
+
+**Step inventory (16 steps across 4 screens):**
+
+| Screen | Steps |
+|---|---|
+| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
+| Slideshow (5) | `slideshow_tap`, `slideshow_nav`, `slideshow_playback`, `slideshow_settings`, `slideshow_close` |
+| Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |

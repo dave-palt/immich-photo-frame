@@ -8,6 +8,7 @@ interface SettingsRepository {
     val apiKey: Flow<String>
     val selectedAlbumIds: Flow<List<String>>
     val slideshowSettings: Flow<SlideshowSettings>
+    val onboardingCompletedSteps: Flow<Set<String>>
 
     suspend fun setServerUrl(url: String)
 
@@ -16,6 +17,10 @@ interface SettingsRepository {
     suspend fun setSelectedAlbumIds(ids: List<String>)
 
     suspend fun setSlideshowSettings(settings: SlideshowSettings)
+
+    suspend fun markOnboardingStepCompleted(stepId: String)
+
+    suspend fun resetOnboarding()
 
     suspend fun clearAll()
 }

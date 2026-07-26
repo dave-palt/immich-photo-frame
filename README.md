@@ -36,6 +36,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
 - Offline media cache with background sync (Room + WorkManager)
 - Auto-resumes last album on launch
+- Interactive onboarding tour with coachmark overlays — guides users through setup, album selection, slideshow controls, and settings; replayable via "Show Tour Again" in Settings
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
 - Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)

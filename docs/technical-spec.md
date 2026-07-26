@@ -69,6 +69,7 @@ immich-android/
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
 │   │   │   ├── settings/        # Settings screen
 │   │   │   │   └── update/          # Update ViewModel (dialog is in slideshow)
+│   │   │   ├── onboarding/      # Coachmark tour system (TourStep, TourState, CoachmarkOverlay)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
 │   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)
@@ -229,6 +230,7 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file

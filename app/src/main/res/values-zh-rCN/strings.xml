@@ -123,4 +123,43 @@
 
     <!-- Slideshow -->
     <string name="photos_count">%1$d / %2$d张照片</string>
+
+    <!-- Onboarding Tour -->
+    <string name="tour_next">下一步</string>
+    <string name="tour_got_it">明白了</string>
+    <string name="tour_skip">跳过导览</string>
+    <string name="tour_step_counter">第 %1$d 步，共 %2$d 步</string>
+    <string name="show_tour">重新显示导览</string>
+    <string name="tour_setup_welcome_title">欢迎使用 Immich 相框</string>
+    <string name="tour_setup_welcome_body">连接到您的 Immich 服务器以显示照片。让我们来完成设置。</string>
+    <string name="tour_setup_server_title">服务器地址</string>
+    <string name="tour_setup_server_body">在此输入您的 Immich 服务器 URL。格式为 photos.example.com 或 192.168.1.100:2283。</string>
+    <string name="tour_setup_apikey_title">API 密钥</string>
+    <string name="tour_setup_apikey_body">在 Immich 的 设置 → API 密钥 中创建 API 密钥。需要相册、资产和用户读取权限。</string>
+    <string name="tour_setup_connect_title">测试并连接</string>
+    <string name="tour_setup_connect_body">点击测试连接以验证您的凭据。连接成功后，您将选择要显示的相册。</string>
+    <string name="tour_albums_select_title">选择您的相册</string>
+    <string name="tour_albums_select_body">点选一个或多个相册加入幻灯片。选中的相册会显示勾选标记。</string>
+    <string name="tour_albums_start_title">开始播放</string>
+    <string name="tour_albums_start_body">选好相册后，点击开始幻灯片即可播放。</string>
+    <string name="tour_albums_settings_title">设置</string>
+    <string name="tour_albums_settings_body">随时点击此齿轮图标访问设置——调整间隔、时钟、缓存等。</string>
+    <string name="tour_slideshow_tap_title">点击控制</string>
+    <string name="tour_slideshow_tap_body">点击屏幕任意位置可显示或隐藏播放控制。控制会在几秒后自动隐藏。</string>
+    <string name="tour_slideshow_nav_title">浏览照片</string>
+    <string name="tour_slideshow_nav_body">使用这些箭头手动切换到上一张或下一张照片。</string>
+    <string name="tour_slideshow_playback_title">暂停和静音</string>
+    <string name="tour_slideshow_playback_body">使用这些控制暂停幻灯片或将视频静音。</string>
+    <string name="tour_slideshow_settings_title">即时调整</string>
+    <string name="tour_slideshow_settings_body">无需离开幻灯片即可打开设置——更改间隔、启用时钟等。</string>
+    <string name="tour_slideshow_close_title">退出幻灯片</string>
+    <string name="tour_slideshow_close_body">点击此处退出幻灯片并返回相册选择。</string>
+    <string name="tour_settings_overview_title">设置概览</string>
+    <string name="tour_settings_overview_body">所有更改自动保存——无需保存按钮。向下滚动探索各个部分。</string>
+    <string name="tour_settings_system_title">系统和自启动</string>
+    <string name="tour_settings_system_body">开机启动和启动器模式可让应用自动启动——非常适合专用相框。</string>
+    <string name="tour_settings_cache_title">媒体缓存</string>
+    <string name="tour_settings_cache_body">自动同步在后台下载照片，使幻灯片可以离线工作并立即加载。</string>
+    <string name="tour_settings_connection_title">连接</string>
+    <string name="tour_settings_connection_body">如果您的 Immich 设置发生变化，请在此更新服务器 URL 或 API 密钥。</string>
 </resources>

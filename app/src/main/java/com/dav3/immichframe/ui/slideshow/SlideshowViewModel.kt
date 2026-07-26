@@ -46,6 +46,20 @@ constructor(
                     .SlideshowSettings(),
             )
 
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
+
     fun load() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)

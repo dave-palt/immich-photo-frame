@@ -132,6 +132,20 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Onboarding Tour feature. Added a modular, per-step
+  coachmark tour system that auto-triggers on screen entry for any
+  un-completed steps. Per-step completion tracking via
+  `onboarding_completed_steps` StringSet in DataStore (not a single boolean).
+  16 steps across 4 screens: Setup (4), Albums (3), Slideshow (5), Settings
+  (4). Custom Compose overlay — no third-party showcase library. New package
+  `ui/onboarding/` with `TourStep.kt` (step registry), `TourState.kt` (state
+  holder + `tourTarget` modifier), and `CoachmarkOverlay.kt` (scrim +
+  spotlight + tooltip card + `TourHost` wrapper). Settings → System section
+  gains a "Show Tour Again" button (`resetOnboarding()`). Slideshow forces
+  controls visible + suppresses auto-hide during tour. Settings scrolls target
+  sections into view. 37 new strings (EN + 12 locales). Updated:
+  functional-spec (F7), technical-spec (persistence table + package layout),
+  ui-spec (overlay description), README.
 - **2026-07-26** — Launcher Mode feature. After real-hardware testing on a
   Realme PKH110 (ColorOS 16 / Android 16), BOOT_COMPLETED was confirmed to
   never fire (boot_verified stayed false across 2 reboots) — this is both

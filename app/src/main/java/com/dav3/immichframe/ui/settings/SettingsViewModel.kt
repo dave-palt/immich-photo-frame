@@ -46,6 +46,24 @@ constructor(
             SettingsUiState(slideshow, url, key)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
+    val onboardingSteps: StateFlow<Set<String>> =
+        settingsRepo.onboardingCompletedSteps
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun markStepCompleted(stepId: String) {
+        viewModelScope.launch { settingsRepo.markOnboardingStepCompleted(stepId) }
+    }
+
+    fun skipOnboarding(stepIds: List<String>) {
+        viewModelScope.launch {
+            stepIds.forEach { settingsRepo.markOnboardingStepCompleted(it) }
+        }
+    }
+
+    fun resetOnboarding() {
+        viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
     private val updateMutex = Mutex()
 
     /** Reads the LATEST persisted state from DataStore (not stale StateFlow cache). */
