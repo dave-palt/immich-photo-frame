@@ -120,6 +120,20 @@ object TourSteps {
             targetKey = "slideshow_pause",
         ),
         TourStep(
+            id = "slideshow_albums",
+            screen = TourScreen.SLIDESHOW,
+            titleRes = R.string.tour_slideshow_albums_title,
+            bodyRes = R.string.tour_slideshow_albums_body,
+            targetKey = "slideshow_albums",
+        ),
+        TourStep(
+            id = "slideshow_update",
+            screen = TourScreen.SLIDESHOW,
+            titleRes = R.string.tour_slideshow_update_title,
+            bodyRes = R.string.tour_slideshow_update_body,
+            targetKey = "slideshow_update",
+        ),
+        TourStep(
             id = "slideshow_settings",
             screen = TourScreen.SLIDESHOW,
             titleRes = R.string.tour_slideshow_settings_title,

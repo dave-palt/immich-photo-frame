@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -295,7 +297,9 @@ fun SlideshowScreen(
                 ) {
                     LinearProgressIndicator(
                         progress = { progress },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding(),
                         color = Color.White,
                         trackColor = Color(0x33FFFFFF),
                     )
@@ -312,6 +316,7 @@ fun SlideshowScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0x80000000))
+                            .statusBarsPadding()
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -319,22 +324,32 @@ fun SlideshowScreen(
                         Spacer(Modifier.weight(1f))
                         // Update status icon — shows checking/downloading/ready states.
                         // Clicking opens the install dialog (only when download is ready).
-                        UpdateStatusIcon(
-                            state = updateState,
-                            onClick = {
-                                if (updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
-                                    updateVm.resetDismissed()
-                                    showUpdateDialog = true
-                                }
-                            },
-                        )
+                        // During the tour, force-show a placeholder so the coachmark
+                        // has a target (the icon normally only appears when an update
+                        // is available, which would leave the tour step highlighting
+                        // nothing).
+                        Box(modifier = Modifier.tourTarget("slideshow_update", tourState)) {
+                            UpdateStatusIcon(
+                                state = updateState,
+                                onClick = {
+                                    if (updateState.available && !updateState.downloading && updateState.downloadedApkPath != null) {
+                                        updateVm.resetDismissed()
+                                        showUpdateDialog = true
+                                    }
+                                },
+                                forceVisible = tourActive,
+                            )
+                        }
                         if (s.launcherMode) {
                             val context = LocalContext.current
                             IconButton(onClick = { openOtherLauncher(context) }) {
                                 Icon(Icons.AutoMirrored.Filled.ExitToApp, "Switch to another launcher", tint = Color.White)
                             }
                         }
-                        IconButton(onClick = onChangeAlbums) {
+                        IconButton(
+                            onClick = onChangeAlbums,
+                            modifier = Modifier.tourTarget("slideshow_albums", tourState),
+                        ) {
                             Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
                         }
                         IconButton(
@@ -384,7 +399,10 @@ fun SlideshowScreen(
                     exit = fadeOut(),
                     modifier = Modifier.align(Alignment.BottomCenter),
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.navigationBarsPadding(),
+                    ) {
                         IconButton(
                             onClick = { isPaused = !isPaused },
                             modifier = Modifier.tourTarget("slideshow_pause", tourState),
@@ -603,6 +621,7 @@ private fun VideoPlayer(
 private fun UpdateStatusIcon(
     state: com.dav3.immichframe.data.update.UpdateState,
     onClick: () -> Unit,
+    forceVisible: Boolean = false,
 ) {
     when {
         state.checking -> {
@@ -640,6 +659,18 @@ private fun UpdateStatusIcon(
                     Icons.Default.SystemUpdate,
                     "Update ready — tap to install",
                     tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+        forceVisible -> {
+            // Tour placeholder — no real update, but show the icon so the
+            // coachmark has a visible target to highlight.
+            IconButton(onClick = {}) {
+                Icon(
+                    Icons.Default.SystemUpdate,
+                    "Update indicator",
+                    tint = Color.White.copy(alpha = 0.5f),
                     modifier = Modifier.size(24.dp),
                 )
             }
