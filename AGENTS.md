@@ -132,6 +132,31 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-26** — Onboarding tour post-PR fixes. (1) Added two new slideshow
+  tour steps: `slideshow_albums` (back-to-album-selection button) and
+  `slideshow_update` (update status icon, force-shown as dimmed placeholder
+  during tour since the icon normally only appears when an update is available).
+  Total slideshow steps: 5→7, overall: 16→18. (2) Centered (no-target) tour
+  steps were rendering at screen top — fixed by adding `contentAlignment =
+  Alignment.Center` to the overlay Box. (3) Per-screen tour reset:
+  `resetOnboardingForScreen(stepIds)` in SettingsRepository +
+  `resetOnboardingForSettings()` in SettingsViewModel; Settings now has two
+  buttons: "Show Tour Again" (Settings-only) + "Reset All Tours" (all screens);
+  Setup screen also has "Show Tour Again". (4) Target lifecycle tracking
+  rewritten — `tourTarget()` modifier uses `DisposableEffect` to register/
+  unregister in `presentKeys` set; TourHost computes `readySteps` from
+  pendingSteps whose targets are present, deferring activation until targets
+  appear. (5) Black spotlight bug fixed: `CompositingStrategy.Offscreen` on
+  Canvas so `BlendMode.Clear` punches a transparent hole. (6) Settings back-
+  navigation stuck bug fixed: `onBack` uses explicit route via `startRoute` +
+  `popUpTo(0)` instead of `popBackStack()`. (7) Slideshow controls now respect
+  system bar insets (`statusBarsPadding` on top bar, `navigationBarsPadding`
+  on bottom progress bar + play/pause row). (8) Setup screen: added app icon
+  (launcher foreground drawable, 72dp), `imePadding()` so keyboard doesn't
+  hide the connect button. Updated: functional-spec (F7 step inventory + 18
+  count), technical-spec (resource layout), ui-spec (overlay centering, setup
+  logo, tour buttons, insets), README (tour step detail + icon variants).
+
 - **2026-07-26** — Onboarding Tour feature. Added a modular, per-step
   coachmark tour system that auto-triggers on screen entry for any
   un-completed steps. Per-step completion tracking via

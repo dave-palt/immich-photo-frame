@@ -76,6 +76,11 @@ immich-android/
 │   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp)
 │   │   └── MainActivity.kt      # Single activity (also target of LauncherAlias)
 │   ├── src/main/res/
+│   │   ├── drawable/ic_launcher_foreground.xml  # Vector (day: white bg, colored frame)
+│   │   ├── drawable/ic_launcher_monochrome.xml  # Android 13+ themed icon silhouette
+│   │   ├── drawable-night/ic_launcher_foreground.xml  # Dark variant
+│   │   ├── values/colors.xml          # ic_launcher_background = #FFFFFF (day)
+│   │   ├── values-night/colors.xml    # ic_launcher_background = #1A1A2E (night)
 │   │   └── xml/file_paths.xml   # FileProvider config for APK install
 │   └── build.gradle.kts
 ├── docs/                        # This documentation

@@ -234,15 +234,26 @@ a user lands on a screen — only steps not yet completed are shown.
   spotlight the prev/next, pause/mute, settings, and close buttons.
 - **Settings-specific behavior**: the tour scrolls the target section into
   view before showing its spotlight (System → Media Cache → Connection).
-- **"Show Tour Again"** button in Settings → System section clears the
-  completed-steps set, causing the tour to re-run on all screens next visit.
+- **Two replay buttons** in Settings → System section:
+  - **"Show Tour Again"** clears only the Settings screen's step IDs, so
+    only the Settings tour re-runs.
+  - **"Reset All Tours"** clears the entire completed-steps set, so the
+    tour re-runs on every screen next visit.
+- A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (16 steps across 4 screens):**
+**Step inventory (18 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
 | Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
-| Slideshow (5) | `slideshow_tap`, `slideshow_nav`, `slideshow_playback`, `slideshow_settings`, `slideshow_close` |
+| Slideshow (7) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
+
+- **`slideshow_albums`**: highlights the back-to-album-selection button.
+- **`slideshow_update`**: highlights the update status icon. Since this icon
+  normally only appears when an update is available, the tour force-shows a
+  dimmed placeholder icon so the coachmark always has a visible target on the
+  first run. The tooltip explains that the icon's presence means an update is
+  available.
