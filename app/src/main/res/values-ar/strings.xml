@@ -113,6 +113,8 @@
     <string name="select_albums">تحديد الألبومات</string>
     <string name="done">تم</string>
     <string name="no_albums">لم يتم العثور على ألبومات</string>
+    <string name="no_albums_available">لا توجد ألبومات متاحة</string>
+    <string name="no_albums_available_desc">حساب Immich الخاص بك لا يحتوي على أي ألبومات بعد. أنشئ واحدة في Immich، ثم اضغط إعادة المحاولة.</string>
     <string name="loading_albums">جارٍ تحميل الألبومات…</string>
     <string name="hide_key">إخفاء المفتاح</string>
     <string name="show_key">إظهار المفتاح</string>

@@ -26,14 +26,25 @@
 5. Selected album IDs persisted to DataStore.
 6. Slideshow begins.
 
+**Empty states:**
+- **Server reachable but zero albums**: shows a "No albums available"
+  message with a Retry button (the user may need to create an album in
+  Immich first).
+- **Server unreachable**: shows the error detail with a Retry button.
+  Previously selected albums (if any) are preserved in DataStore so the
+  user can retry without re-selecting.
+
 ### F3: Slideshow Playback
 
 1. App loads assets for selected album(s). **Cache-first**: if assets are
    already cached locally (Room database), they're displayed immediately
-   without network access. On a cold start (empty cache), the app fetches
-   asset metadata from the server via `POST /search/metadata`. If **Auto
-   Sync** is enabled, a background WorkManager job downloads new/updated
-   assets and reconciles deletions for the next launch.
+   — including the image/video bytes themselves, which are read from disk
+   via `file://` URIs. This means the slideshow works fully **offline**:
+   once assets are cached, no server contact is needed to display them.
+   On a cold start (empty cache), the app fetches asset metadata from the
+   server via `POST /search/metadata`. If **Auto Sync** is enabled, a
+   background WorkManager job downloads new/updated assets and reconciles
+   deletions for the next launch.
 2. If multiple albums selected, asset lists are merged.
 3. If **Shuffle** is enabled (default on), the merged list is randomized.
 4. If **Skip Videos** is enabled (default on), video assets are filtered out.
@@ -50,6 +61,21 @@
     set of individually-enabled animation types. Available types: Zoom In,
     Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks
     from the other enabled types and requires at least one other type enabled.
+
+**Offline / album lifecycle:**
+- **Server unreachable**: the slideshow continues displaying cached media
+  from disk. No error is shown as long as the cache has content. The
+  background sync worker silently skips (transient errors are non-fatal;
+  existing cache is preserved).
+- **Album deleted on server**: when the sync worker detects a 404 for a
+  selected album, it purges that album's cache. If **all** selected albums
+  are gone, the selection is cleared and the app navigates back to album
+  selection so the user can pick again. If only some albums are gone, the
+  remaining albums keep displaying.
+- **Transient empty metadata response**: the reconcile step guards against
+  wiping the cache when the server returns an empty asset list (which could
+  indicate a transient search-service issue). Cache is only pruned when the
+  remote list is non-empty.
 
 ### F4: In-Slideshow Controls
 
@@ -249,12 +275,15 @@ Requires biometric / device-credential authentication to open.
 
 | Scenario | Behavior |
 |---|---|
-| Server unreachable | Show retry button with error detail |
+| Server unreachable | If cache has content: keep showing cached media (offline mode). If cold start: show error + retry on album selection screen. |
 | API key invalid (401) | Show "API key rejected", return to setup |
+| Selected album deleted on server (404) | Purge that album's cache. If all selected albums gone: clear selection, navigate to album selection. |
+| Server reachable but zero albums | Show "No albums available" message with retry button |
 | Album has no images | Skip album, show toast notification |
 | Image fails to load | Skip to next image, log error |
 | Update download fails | Show "Update check failed" on Check Now button, allow retry |
 | Network timeout | Retry up to 3 times with backoff, then skip |
+| Transient empty metadata response | Preserve existing cache (do not prune); retry on next sync |
 
 ### F7: Onboarding Tour
 

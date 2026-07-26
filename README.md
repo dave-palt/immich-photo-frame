@@ -34,7 +34,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)
 - Launcher mode (Home replacement) — the most reliable boot method for dedicated photo frames; bypasses BOOT_COMPLETED entirely
 - Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
-- Offline media cache with background sync (Room + WorkManager)
+- Offline media cache with background sync (Room + WorkManager) — slideshow keeps playing from cached files when the server is unreachable; album deletions are detected and the user is sent back to album selection
 - Auto-resumes last album on launch
 - Interactive onboarding tour with coachmark overlays — guides users through setup, album selection, slideshow controls (including back-to-albums and update indicator), and settings; replayable per-screen ("Show Tour Again") or globally ("Reset All Tours")
 - Adaptive launcher icon with day/night variants and Android 13+ monochrome (themed icon) support; dedicated debug-build variant (amber background); separate background-free logo drawable for the Setup screen

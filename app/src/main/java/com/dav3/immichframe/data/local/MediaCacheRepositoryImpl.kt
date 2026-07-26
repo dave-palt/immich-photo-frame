@@ -108,6 +108,13 @@ class MediaCacheRepositoryImpl @Inject constructor(
         db.cachedAssetDao().getById(assetId)?.let { CachedAssetEntity.toDomain(it).thumbnailPath }
     }
 
+    override suspend fun getAssetFilePaths(assetIds: List<String>): Map<String, String> = withContext(Dispatchers.IO) {
+        if (assetIds.isEmpty()) return@withContext emptyMap()
+        db.cachedAssetDao().getByIds(assetIds)
+            .filter { File(it.filePath).exists() }
+            .associate { it.id to it.filePath }
+    }
+
     override suspend fun deleteAssetFiles(assetId: String) {
         withContext(Dispatchers.IO) {
             db.cachedAssetDao().getById(assetId)?.let { entity ->

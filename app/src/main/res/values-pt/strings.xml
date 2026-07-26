@@ -113,6 +113,8 @@
     <string name="select_albums">Selecionar álbuns</string>
     <string name="done">Concluído</string>
     <string name="no_albums">Nenhum álbum encontrado</string>
+    <string name="no_albums_available">Nenhum álbum disponível</string>
+    <string name="no_albums_available_desc">Sua conta do Immich ainda não tem álbuns. Crie um no Immich e toque em repetir.</string>
     <string name="loading_albums">A carregar álbuns…</string>
     <string name="hide_key">Ocultar chave</string>
     <string name="show_key">Mostrar chave</string>

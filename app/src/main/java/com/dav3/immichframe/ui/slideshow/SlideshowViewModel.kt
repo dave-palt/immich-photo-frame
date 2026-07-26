@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 data class SlideshowUiState(
@@ -23,6 +24,11 @@ data class SlideshowUiState(
     val currentIndex: Int = 0,
     val isLoading: Boolean = false,
     val error: String? = null,
+    /**
+     * Set when the selected album(s) no longer exist on the server. The UI
+     * should navigate back to album selection so the user can pick again.
+     */
+    val albumGone: Boolean = false,
 )
 
 @HiltViewModel
@@ -36,6 +42,13 @@ constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SlideshowUiState())
     val uiState: StateFlow<SlideshowUiState> = _uiState
+
+    /**
+     * Asset ID → local cached file path. Populated in [load] so that
+     * [imageUrl] / [videoUrl] can return a `file://` URI for offline display
+     * instead of a network URL. Falls back to network for cache misses.
+     */
+    private val localFilePaths = mutableMapOf<String, String>()
 
     val settings =
         settingsRepo.slideshowSettings
@@ -62,7 +75,7 @@ constructor(
 
     fun load() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, albumGone = false)
             val s = settingsRepo.slideshowSettings.first()
             val albumIds = settingsRepo.selectedAlbumIds.first()
             if (albumIds.isEmpty()) {
@@ -83,6 +96,13 @@ constructor(
             }
 
             if (cachedAssets.isNotEmpty()) {
+                // Resolve local file paths up front so imageUrl/videoUrl can
+                // serve offline `file://` URIs without per-frame DB lookups.
+                localFilePaths.clear()
+                localFilePaths.putAll(
+                    cacheRepo.getAssetFilePaths(cachedAssets.map { it.id }),
+                )
+
                 // Show cached assets immediately
                 val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
                 val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
@@ -104,11 +124,24 @@ constructor(
                 // Cold start: no cache yet — fetch metadata from network for immediate display
                 val allAssets = mutableListOf<Asset>()
                 val errors = mutableListOf<String>()
+                var albumGone = false
                 for (id in albumIds) {
                     immichRepo.getAlbumAssets(id).fold(
                         onSuccess = { allAssets.addAll(it) },
-                        onFailure = { errors.add("${id.take(8)}: ${it.message ?: "unknown"}") },
+                        onFailure = {
+                            // Immich returns 404 for a deleted album. Treat that
+                            // as permanent — we'll bounce back to album selection.
+                            if (isAlbumGone(it)) albumGone = true
+                            errors.add("${id.take(8)}: ${it.message ?: "unknown"}")
+                        },
                     )
+                }
+
+                if (albumGone) {
+                    // Album deleted on server — clear selection and signal UI
+                    settingsRepo.setSelectedAlbumIds(emptyList())
+                    _uiState.value = SlideshowUiState(isLoading = false, albumGone = true)
+                    return@launch
                 }
 
                 val filteredAssets = applyMediaSelection(allAssets, toggledIds, newItemsShown)
@@ -162,9 +195,35 @@ constructor(
         }
     }
 
-    fun imageUrl(assetId: String): String = immichRepo.imageUrl(assetId)
+    /**
+     * Returns a display URL for an image asset. If the asset is cached
+     * locally on disk, returns a `file://` URI (works offline). Otherwise
+     * returns the network URL (requires server connectivity).
+     */
+    fun imageUrl(assetId: String): String {
+        localFilePaths[assetId]?.let { path ->
+            if (File(path).exists()) return "file://$path"
+        }
+        return immichRepo.imageUrl(assetId)
+    }
 
-    fun videoUrl(assetId: String): String = immichRepo.videoUrl(assetId)
+    fun videoUrl(assetId: String): String {
+        localFilePaths[assetId]?.let { path ->
+            if (File(path).exists()) return "file://$path"
+        }
+        return immichRepo.videoUrl(assetId)
+    }
+}
+
+/**
+ * Returns true if the exception indicates the album no longer exists on the
+ * server (HTTP 404), as opposed to a transient network/server error.
+ */
+private fun isAlbumGone(throwable: Throwable): Boolean {
+    val msg = throwable.message.orEmpty()
+    // Retrofit/OkHttp surfaces HTTP status in the message for HttpException;
+    // for an IOException (server unreachable) the message won't contain a code.
+    return msg.contains("404") || msg.contains("Not Found", ignoreCase = true)
 }
 
 fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(

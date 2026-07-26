@@ -49,6 +49,12 @@ constructor(
     private val _uiState = MutableStateFlow(MediaSelectionUiState())
     val uiState: StateFlow<MediaSelectionUiState> = _uiState
 
+    /**
+     * Asset ID → local cached file path. Populated in [load] so that
+     * [thumbnailUrl] can serve offline `file://` URIs for the grid.
+     */
+    private val localFilePaths = mutableMapOf<String, String>()
+
     fun load() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
@@ -83,6 +89,10 @@ constructor(
                         onFailure = { },
                     )
                 }
+            } else {
+                // Cache hit — resolve local file paths for offline thumbnails
+                localFilePaths.clear()
+                localFilePaths.putAll(cacheRepo.getAssetFilePaths(assets.map { it.id }))
             }
 
             _uiState.value = MediaSelectionUiState(
@@ -175,5 +185,10 @@ constructor(
         }
     }
 
-    fun thumbnailUrl(assetId: String): String = immichRepo.thumbnailUrl(assetId)
+    fun thumbnailUrl(assetId: String): String {
+        localFilePaths[assetId]?.let { path ->
+            if (java.io.File(path).exists()) return "file://$path"
+        }
+        return immichRepo.thumbnailUrl(assetId)
+    }
 }

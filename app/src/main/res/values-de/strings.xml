@@ -113,6 +113,8 @@
     <string name="select_albums">Alben auswählen</string>
     <string name="done">Fertig</string>
     <string name="no_albums">Keine Alben gefunden</string>
+    <string name="no_albums_available">Keine Alben verfügbar</string>
+    <string name="no_albums_available_desc">Dein Immich-Konto hat noch keine Alben. Erstelle eines in Immich und tippe dann auf Wiederholen.</string>
     <string name="loading_albums">Alben werden geladen…</string>
     <string name="hide_key">Schlüssel ausblenden</string>
     <string name="show_key">Schlüssel anzeigen</string>

@@ -19,6 +19,12 @@ data class AlbumSelectionUiState(
     val selectedIds: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    /**
+     * True when the server was reached successfully but returned zero albums.
+     * Distinct from [error] (server unreachable) — shows a dedicated message
+     * instead of a retry button.
+     */
+    val noAlbumsAvailable: Boolean = false,
 )
 
 @HiltViewModel
@@ -56,12 +62,19 @@ constructor(
             val savedSelections = settingsRepo.selectedAlbumIds.first().toSet()
             _uiState.value =
                 result.fold(
-                    onSuccess = {
-                        AlbumSelectionUiState(
-                            albums = it,
-                            selectedIds = savedSelections,
-                            isLoading = false,
-                        )
+                    onSuccess = { albums ->
+                        if (albums.isEmpty()) {
+                            AlbumSelectionUiState(
+                                isLoading = false,
+                                noAlbumsAvailable = true,
+                            )
+                        } else {
+                            AlbumSelectionUiState(
+                                albums = albums,
+                                selectedIds = savedSelections,
+                                isLoading = false,
+                            )
+                        }
                     },
                     onFailure = {
                         AlbumSelectionUiState(
