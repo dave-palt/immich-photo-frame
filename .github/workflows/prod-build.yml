@@ -77,20 +77,39 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v${{ github.run_number }}
-          name: "v0.1.0"
+          tag_name: v0.2.0
+          name: "v0.2.0"
           body: |
-            ## ImmichFrame v0.1.0
+            ## ImmichFrame v0.2.0
 
-            First release of ImmichFrame — a native Android photo frame app for Immich.
+            Native Android photo frame app for Immich.
+
+            ### What's New (since v0.1.0)
+            - **Launcher Mode** — set as default Home for reliable boot launch (bypasses BOOT_COMPLETED entirely); ideal for dedicated photo frames
+            - **Start on Boot fix** — SYSTEM_ALERT_WINDOW permission as BAL exemption; boot_verified self-test
+            - **Manual update check** — "Check Now" button under Auto-Update
+            - **Launcher UX** — toggle auto-opens home picker; hover-UI exit button switches to another launcher; default-launcher monitoring with re-set prompt
 
             ### Features
-            - Direct Immich server connection (REST API)
-            - Album selection and slideshow
-            - Fullscreen immersive mode
-            - Clock overlay
-            - Settings: interval, fill mode, keep screen on
-            - Scoped API key (4 permissions only)
+            - Direct Immich API access (no middleman server)
+            - Native Jetpack Compose UI (no WebView)
+            - Album picker with multi-select
+            - Fullscreen slideshow with crossfade transitions
+            - Configurable interval, transition speed, fill mode (Contain/Cover)
+            - Video playback with mute and skip options (Media3/ExoPlayer)
+            - Draggable clock overlay with configurable size and snap-to-grid
+            - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
+            - Adaptive background (fills letterbox bars with each photo's dominant color)
+            - Shuffle mode for randomized image order
+            - Progress bar showing time remaining per image
+            - Start on boot (SAW/BAL exemption + OEM autostart detection)
+            - Launcher mode (Home replacement) — most reliable boot method
+            - Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
+            - Offline media cache with background sync (Room + WorkManager)
+            - Auto-resumes last album on launch
+            - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
+            - Scoped API key (album.read, asset.read, asset.view, asset.download, user.read)
+            - API key stored encrypted on-device (AES-256, Android Keystore)
 
             **SHA:** ${{ github.sha }}
           prerelease: false
