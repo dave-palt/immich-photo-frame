@@ -25,7 +25,6 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
@@ -61,6 +60,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
@@ -337,7 +337,7 @@ fun SlideshowScreen(
                                         showUpdateDialog = true
                                     }
                                 },
-                                forceVisible = tourActive,
+                                forceVisible = tourState.activeTargetKey == "slideshow_update",
                             )
                         }
                         if (s.launcherMode) {
@@ -611,11 +611,11 @@ private fun VideoPlayer(
 /**
  * Update status icon for the slideshow top bar.
  * Shows different states:
- * - checking: spinner (SystemUpdate icon with progress)
- * - downloading: Download icon with progress animation
+ * - checking: spinner
+ * - downloading: spinner with percentage overlay (tap → tooltip with ETA)
  * - ready (downloaded): SystemUpdate icon with accent color (clickable → opens dialog)
  * - error: SystemUpdate icon with red tint
- * - idle: not shown
+ * - idle: not shown (unless forceVisible for tour)
  */
 @Composable
 private fun UpdateStatusIcon(
@@ -623,6 +623,8 @@ private fun UpdateStatusIcon(
     onClick: () -> Unit,
     forceVisible: Boolean = false,
 ) {
+    var showTooltip by remember { mutableStateOf(false) }
+
     when {
         state.checking -> {
             IconButton(onClick = {}) {
@@ -634,13 +636,46 @@ private fun UpdateStatusIcon(
             }
         }
         state.downloading -> {
-            IconButton(onClick = {}) {
-                Icon(
-                    Icons.Default.Download,
-                    "Downloading update…",
-                    tint = Color.White,
-                    modifier = Modifier.size(22.dp),
-                )
+            IconButton(onClick = { showTooltip = !showTooltip }) {
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        progress = { state.downloadProgress.coerceIn(0f, 1f) },
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White,
+                        trackColor = Color.White.copy(alpha = 0.3f),
+                    )
+                    Text(
+                        text = "${(state.downloadProgress * 100).toInt()}%",
+                        color = Color.White,
+                        fontSize = 8.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    )
+                }
+            }
+            if (showTooltip) {
+                val eta = state.downloadEtaSeconds
+                val etaText = when {
+                    eta <= 0 -> "Calculating…"
+                    eta < 60 -> "${eta}s left"
+                    else -> "${eta / 60}m ${eta % 60}s left"
+                }
+                androidx.compose.ui.window.Popup(
+                    alignment = Alignment.TopCenter,
+                    onDismissRequest = { showTooltip = false },
+                ) {
+                    Surface(
+                        color = Color(0xCC000000),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+                    ) {
+                        Text(
+                            "Downloading update ($etaText)",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
+                    }
+                }
             }
         }
         state.error != null -> {
