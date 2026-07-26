@@ -65,9 +65,9 @@ fun SetupScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    painter = painterResource(R.drawable.app_logo),
                     contentDescription = null,
-                    modifier = Modifier.size(72.dp),
+                    modifier = Modifier.size(120.dp),
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
