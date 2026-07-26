@@ -138,7 +138,19 @@ If no `DEBUG_KEYSTORE_PATH` env var is set, the build falls back to the default 
 
 ### Self-Update (GitHub Releases)
 
-Dev builds published to the `develop` branch are consumed by the app's self-update feature (see [functional-spec.md](functional-spec.md#F5c)). The app compares `BuildConfig.GIT_SHA` against the release tag SHA (`dev-{sha}`). If they differ, it downloads the APK and invokes the system installer. This only works for non-Play-Store installs.
+The app's self-update feature consumes GitHub releases. The behavior depends on
+build type:
+
+- **Release builds** (primary target): fetch `/releases/latest` and compare the
+  `vX.Y.Z` tag against the installed `versionName` via semantic version comparison.
+  If newer, download the APK and invoke the system installer.
+- **Debug builds** (dev channel): list recent releases, pick the newest `dev-{sha}`
+  tag, and compare its SHA against `BuildConfig.GIT_SHA`. If different, download
+  and install.
+
+Dev builds published to the `develop` branch feed the dev channel. Production
+releases published to the `main` branch feed the release channel. Self-update is
+disabled entirely for Play Store installs (see [functional-spec.md](functional-spec.md#F5d)).
 
 ### Play Store Publishing (Future)
 

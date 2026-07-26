@@ -129,12 +129,22 @@ behaviour.
 ### F5d: Self-Update via GitHub Releases
 
 On startup (if **Auto-Update** is enabled and the app was NOT installed from the
-Play Store), the app checks `api.github.com/repos/dave-palt/immich-photo-frame/releases/latest`
-for a new release. If the release tag SHA differs from the build's `GIT_SHA`, the
-APK is downloaded to the app's cache and the system package installer is invoked.
-The user sees the standard Android "Install?" dialog but stays in-app.
+Play Store), the app checks GitHub for a new release:
 
-This setting is hidden when the app is installed from the Play Store.
+- **Release builds** (the primary auto-update target) fetch
+  `/releases/latest` and compare the tag (`vX.Y.Z`) against the installed
+  `versionName` using semantic version comparison. If the remote version is
+  newer, the APK is downloaded and the system installer is invoked.
+- **Debug builds** (dev channel) list recent releases and pick the newest
+  `dev-{sha}` tag, comparing its SHA against `BuildConfig.GIT_SHA`.
+
+The downloaded APK is stored in the app's cache directory. The user sees the
+update dialog (with **Install** / **Later**) and then the standard Android
+package installer.
+
+The **Auto-Update** toggle and **Check Now** button are hidden when the app
+is installed from the Play Store — Play Store installs receive updates through
+the Play Store, not self-update.
 
 ### F6: Settings
 
@@ -187,5 +197,5 @@ Options:
 | API key invalid (401) | Show "API key rejected", return to setup |
 | Album has no images | Skip album, show toast notification |
 | Image fails to load | Skip to next image, log error |
+| Update download fails | Show "Update check failed" on Check Now button, allow retry |
 | Network timeout | Retry up to 3 times with backoff, then skip |
-| Update download fails | Show error in update dialog, allow retry |

@@ -343,12 +343,20 @@ fun SettingsScreen(
                     checked = s.autoUpdate,
                     onToggle = { viewModel.toggleAutoUpdate() },
                 )
+                val updateState by updateViewModel.updateState.collectAsState()
                 TextButton(
                     onClick = { updateViewModel.checkForUpdateNow() },
+                    enabled = !updateState.checking && !updateState.downloading,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
+                    val label = when {
+                        updateState.checking -> stringResource(R.string.update_checking)
+                        updateState.downloading -> stringResource(R.string.update_downloading)
+                        updateState.error != null -> stringResource(R.string.update_error)
+                        else -> stringResource(R.string.check_now)
+                    }
                     Text(
-                        stringResource(R.string.check_now),
+                        label,
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

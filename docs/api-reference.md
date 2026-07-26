@@ -240,13 +240,27 @@ rather than crash. Version compatibility can be checked via
 
 ## GitHub API (Self-Update)
 
-The self-update feature uses the GitHub API (not Immich):
+The self-update feature uses the GitHub API (not Immich). The update path
+depends on build type:
 
+**Release builds** (primary auto-update target):
 ```
 GET https://api.github.com/repos/dave-palt/immich-photo-frame/releases/latest
 ```
+Returns the latest non-prerelease (tag format `vX.Y.Z`). The app compares
+the tag against `BuildConfig.VERSION_NAME` using semantic version comparison.
+If newer, the APK asset is downloaded and the system installer invoked.
 
-No authentication required (public repo). Returns the latest release with
-tag name (`dev-{sha}` format), assets (APK download URL), and release notes.
+**Debug builds** (dev channel):
+```
+GET https://api.github.com/repos/dave-palt/immich-photo-frame/releases?per_page=30
+```
+Lists recent releases (including prereleases). The newest `dev-{sha}` tag is
+selected and its SHA compared against `BuildConfig.GIT_SHA`. If different,
+the APK is downloaded and installed.
+
+No authentication required (public repo) for either path. Self-update is
+disabled entirely for Play Store installs — those receive updates via the
+Play Store.
 
 Implemented in `GitHubApi.kt` / `GitHubDtos.kt` / `UpdateManager.kt`.
