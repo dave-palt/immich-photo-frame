@@ -1,6 +1,7 @@
 package com.dav3.immichframe.ui.setup
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -57,10 +59,17 @@ fun SetupScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .padding(24.dp)
+                    .imePadding()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                )
+                Spacer(Modifier.height(16.dp))
                 Text(
                     stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
@@ -191,6 +200,11 @@ fun SetupScreen(
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 12.dp),
                     )
+                }
+
+                Spacer(Modifier.height(24.dp))
+                TextButton(onClick = viewModel::resetOnboarding) {
+                    Text(stringResource(R.string.show_tour))
                 }
             }
         }

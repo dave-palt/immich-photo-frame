@@ -129,6 +129,7 @@
     <string name="tour_got_it">Entendido</string>
     <string name="tour_skip">Omitir tour</string>
     <string name="tour_step_counter">Paso %1$d de %2$d</string>
+    <string name="reset_all_tours">Restablecer todos los recorridos</string>
     <string name="show_tour">Mostrar tour de nuevo</string>
     <string name="tour_setup_welcome_title">Bienvenido a Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Conéctate a tu servidor Immich para mostrar tus fotos. Repasemos la configuración.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Usa estas flechas para ir manualmente a la foto anterior o siguiente.</string>
     <string name="tour_slideshow_playback_title">Pausar y silenciar</string>
     <string name="tour_slideshow_playback_body">Pausa la presentación o silencia el audio del video con estos controles.</string>
-    <string name="tour_slideshow_settings_title">Ajustar al vuelo</string>
+        <string name="tour_slideshow_albums_title">Volver a Álbumes</string>
+    <string name="tour_slideshow_albums_body">¿Quieres elegir fotos diferentes? Toca aquí para volver a la selección de álbumes.</string>
+    <string name="tour_slideshow_update_title">Indicador de Actualización</string>
+    <string name="tour_slideshow_update_body">Cuando hay una actualización disponible, este icono aparece aquí para que puedas instalar la última versión. Si no se muestra, ya estás actualizado.</string>
+<string name="tour_slideshow_settings_title">Ajustar al vuelo</string>
     <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>
     <string name="tour_slideshow_close_title">Salir de presentación</string>
     <string name="tour_slideshow_close_body">Toca aquí para salir de la presentación y volver a la selección de álbumes.</string>

@@ -129,6 +129,7 @@
     <string name="tour_got_it">Entendi</string>
     <string name="tour_skip">Pular tour</string>
     <string name="tour_step_counter">Passo %1$d de %2$d</string>
+    <string name="reset_all_tours">Redefinir todos os tutoriais</string>
     <string name="show_tour">Mostrar tour novamente</string>
     <string name="tour_setup_welcome_title">Bem-vindo ao Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Conecte-se ao seu servidor Immich para exibir suas fotos. Vamos passar pela configuração.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Use estas setas para avançar para a foto anterior ou próxima manualmente.</string>
     <string name="tour_slideshow_playback_title">Pausar e Silenciar</string>
     <string name="tour_slideshow_playback_body">Pause a apresentação ou silencie o áudio do vídeo com estes controles.</string>
-    <string name="tour_slideshow_settings_title">Ajuste em Tempo Real</string>
+        <string name="tour_slideshow_albums_title">Voltar aos Álbuns</string>
+    <string name="tour_slideshow_albums_body">Quer escolher fotos diferentes? Toque aqui para voltar à seleção de álbuns.</string>
+    <string name="tour_slideshow_update_title">Indicador de Atualização</string>
+    <string name="tour_slideshow_update_body">Quando há uma atualização disponível, este ícone aparece aqui para você instalar a versão mais recente. Se não estiver visível, você já está atualizado.</string>
+<string name="tour_slideshow_settings_title">Ajuste em Tempo Real</string>
     <string name="tour_slideshow_settings_body">Abra as configurações sem sair da apresentação — mude o intervalo, ative o relógio e mais.</string>
     <string name="tour_slideshow_close_title">Sair da Apresentação</string>
     <string name="tour_slideshow_close_body">Toque aqui para sair da apresentação e voltar à seleção de álbuns.</string>

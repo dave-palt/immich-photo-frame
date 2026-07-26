@@ -129,6 +129,7 @@
     <string name="tour_got_it">확인</string>
     <string name="tour_skip">둘러보기 건너뛰기</string>
     <string name="tour_step_counter">%2$d단계 중 %1$d단계</string>
+    <string name="reset_all_tours">모든 투어 재설정</string>
     <string name="show_tour">둘러보기 다시 보기</string>
     <string name="tour_setup_welcome_title">Immich 미디어 프레임에 오신 것을 환영합니다</string>
     <string name="tour_setup_welcome_body">사진을 표시하려면 Immich 서버에 연결하세요. 설정을 안내해 드리겠습니다.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">이 화살표를 사용하여 이전 또는 다음 사진으로 수동으로 이동하세요.</string>
     <string name="tour_slideshow_playback_title">일시정지 및 음소거</string>
     <string name="tour_slideshow_playback_body">이 컨트롤로 슬라이드 쇼를 일시정지하거나 비디오 오디오를 음소거할 수 있습니다.</string>
-    <string name="tour_slideshow_settings_title">즉시 조정</string>
+        <string name="tour_slideshow_albums_title">앨범으로 돌아가기</string>
+    <string name="tour_slideshow_albums_body">다른 사진을 선택하고 싶으신가요? 여기를 탭하여 앨범 선택으로 돌아가세요.</string>
+    <string name="tour_slideshow_update_title">업데이트 표시</string>
+    <string name="tour_slideshow_update_body">업데이트가 available하면 최신 버전을 설치할 수 있도록 이 아이콘이 여기에 나타납니다. 표시되지 않으면 이미 최신 버전입니다.</string>
+<string name="tour_slideshow_settings_title">즉시 조정</string>
     <string name="tour_slideshow_settings_body">슬라이드 쇼를 나가지 않고 설정을 열어 간격 변경, 시계 활성화 등을 할 수 있습니다.</string>
     <string name="tour_slideshow_close_title">슬라이드 쇼 종료</string>
     <string name="tour_slideshow_close_body">여기를 탭하여 슬라이드 쇼를 종료하고 앨범 선택으로 돌아가세요.</string>

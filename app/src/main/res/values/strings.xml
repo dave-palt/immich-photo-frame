@@ -152,6 +152,7 @@
     <string name="tour_skip">Skip tour</string>
     <string name="tour_step_counter">Step %1$d of %2$d</string>
     <string name="show_tour">Show Tour Again</string>
+    <string name="reset_all_tours">Reset All Tours</string>
 
     <!-- Setup tour steps -->
     <string name="tour_setup_welcome_title">Welcome to Immich Media Frame</string>
@@ -178,6 +179,10 @@
     <string name="tour_slideshow_nav_body">Use these arrows to move to the previous or next photo manually.</string>
     <string name="tour_slideshow_playback_title">Pause &amp; Mute</string>
     <string name="tour_slideshow_playback_body">Pause the slideshow or mute video audio with these controls.</string>
+    <string name="tour_slideshow_albums_title">Back to Albums</string>
+    <string name="tour_slideshow_albums_body">Want to pick different photos? Tap here to go back to album selection.</string>
+    <string name="tour_slideshow_update_title">Update Indicator</string>
+    <string name="tour_slideshow_update_body">When an update is available, this icon appears here so you can install the latest version. If it\'s not showing, you\'re already up to date.</string>
     <string name="tour_slideshow_settings_title">Adjust on the Fly</string>
     <string name="tour_slideshow_settings_body">Open settings without leaving the slideshow — change interval, enable the clock, and more.</string>
     <string name="tour_slideshow_close_title">Exit Slideshow</string>

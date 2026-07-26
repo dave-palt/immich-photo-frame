@@ -129,6 +129,7 @@
     <string name="tour_got_it">Begrepen</string>
     <string name="tour_skip">Tour overslaan</string>
     <string name="tour_step_counter">Stap %1$d van %2$d</string>
+    <string name="reset_all_tours">Alle rondleidingen resetten</string>
     <string name="show_tour">Tour opnieuw tonen</string>
     <string name="tour_setup_welcome_title">Welkom bij Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Maak verbinding met je Immich-server om je foto\'s te tonen. Laten we de installatie doorlopen.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Gebruik deze pijlen om handmatig naar de vorige of volgende foto te gaan.</string>
     <string name="tour_slideshow_playback_title">Pauze en dempen</string>
     <string name="tour_slideshow_playback_body">Pauzeer de diavoorstelling of demp video-audio met deze bediening.</string>
-    <string name="tour_slideshow_settings_title">Direct aanpassen</string>
+        <string name="tour_slideshow_albums_title">Terug naar Albums</string>
+    <string name="tour_slideshow_albums_body">Andere foto\'s kiezen? Tik hier om terug te gaan naar albumselectie.</string>
+    <string name="tour_slideshow_update_title">Update-indicator</string>
+    <string name="tour_slideshow_update_body">Als er een update beschikbaar is, verschijnt dit icoon hier zodat u de nieuwste versie kunt installeren. Als het niet zichtbaar is, bent u al up-to-date.</string>
+<string name="tour_slideshow_settings_title">Direct aanpassen</string>
     <string name="tour_slideshow_settings_body">Open de instellingen zonder de diavoorstelling te verlaten — wijzig interval, schakel de klok in en meer.</string>
     <string name="tour_slideshow_close_title">Diavoorstelling sluiten</string>
     <string name="tour_slideshow_close_body">Tik hier om de diavoorstelling te sluiten en terug te keren naar de albumselectie.</string>

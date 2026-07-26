@@ -129,6 +129,7 @@
     <string name="tour_got_it">فهمت</string>
     <string name="tour_skip">تخطي الجولة</string>
     <string name="tour_step_counter">الخطوة %1$d من %2$d</string>
+    <string name="reset_all_tours">إعادة تعيين جميع الجولات</string>
     <string name="show_tour">إظهار الجولة مرة أخرى</string>
     <string name="tour_setup_welcome_title">مرحباً بك في Immich Media Frame</string>
     <string name="tour_setup_welcome_body">اتصل بخادم Immich لعرض صورك. دعنا نمر بالإعداد.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">استخدم هذه الأسهم للانتقال يدوياً إلى الصورة السابقة أو التالية.</string>
     <string name="tour_slideshow_playback_title">إيقاف مؤقت وكتم</string>
     <string name="tour_slideshow_playback_body">أوقف العرض مؤقتاً أو اكتم صوت الفيديو باستخدام هذه الضوابط.</string>
-    <string name="tour_slideshow_settings_title">اضبط فوراً</string>
+        <string name="tour_slideshow_albums_title">العودة إلى الألبومات</string>
+    <string name="tour_slideshow_albums_body">هل تريد اختيار صور مختلفة؟ اضغط هنا للعودة إلى اختيار الألبوم.</string>
+    <string name="tour_slideshow_update_title">مؤشر التحديث</string>
+    <string name="tour_slideshow_update_body">عندما يتوفر تحديث، يظهر هذا الرمز هنا لتتمكن من تثبيت أحدث إصدار. إذا لم يظهر، فأنت تستخدم بالفعل أحدث إصدار.</string>
+<string name="tour_slideshow_settings_title">اضبط فوراً</string>
     <string name="tour_slideshow_settings_body">افتح الإعدادات دون مغادرة العرض — غيّر الفاصل، فعّل الساعة والمزيد.</string>
     <string name="tour_slideshow_close_title">إنهاء العرض</string>
     <string name="tour_slideshow_close_body">اضغط هنا لإنهاء العرض والعودة إلى اختيار الألبوم.</string>

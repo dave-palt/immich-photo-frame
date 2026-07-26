@@ -129,6 +129,7 @@
     <string name="tour_got_it">了解</string>
     <string name="tour_skip">ツアーをスキップ</string>
     <string name="tour_step_counter">ステップ %1$d / %2$d</string>
+    <string name="reset_all_tours">すべてのツアーをリセット</string>
     <string name="show_tour">ツアーをもう一度表示</string>
     <string name="tour_setup_welcome_title">Immich Media Frameへようこそ</string>
     <string name="tour_setup_welcome_body">写真を表示するにはImmichサーバーに接続します。セットアップをご案内します。</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">この矢印を使って手動で前または次の写真に移動します。</string>
     <string name="tour_slideshow_playback_title">一時停止とミュート</string>
     <string name="tour_slideshow_playback_body">これらのコントロールでスライドショーを一時停止したり、ビデオの音声をミュートできます。</string>
-    <string name="tour_slideshow_settings_title">その場で調整</string>
+        <string name="tour_slideshow_albums_title">アルバムに戻る</string>
+    <string name="tour_slideshow_albums_body">別の写真を選びたいですか？ここをタップしてアルバム選択に戻ります。</string>
+    <string name="tour_slideshow_update_title">更新インジケーター</string>
+    <string name="tour_slideshow_update_body">更新が利用可能な場合、最新バージョンをインストールできるようにこのアイコンがここに表示されます。表示されていない場合は、すでに最新です。</string>
+<string name="tour_slideshow_settings_title">その場で調整</string>
     <string name="tour_slideshow_settings_body">スライドショーを抜けずに設定を開き — 間隔の変更、時計の有効化などができます。</string>
     <string name="tour_slideshow_close_title">スライドショーを終了</string>
     <string name="tour_slideshow_close_body">ここをタップしてスライドショーを終了し、アルバム選択に戻ります。</string>

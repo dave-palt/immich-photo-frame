@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PhotoAnimation
@@ -151,7 +152,19 @@ fun SettingsScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.settings)) },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(stringResource(R.string.settings))
+                            Text(
+                                text = "v${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -398,12 +411,25 @@ fun SettingsScreen(
 
                 // ---- Show Tour Again ----
                 TextButton(
-                    onClick = { viewModel.resetOnboarding() },
+                    onClick = {
+                        viewModel.resetOnboardingForSettings()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         stringResource(R.string.show_tour),
                         style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+
+                TextButton(
+                    onClick = { viewModel.resetOnboarding() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        stringResource(R.string.reset_all_tours),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 

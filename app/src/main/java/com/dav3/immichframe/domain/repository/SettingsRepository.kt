@@ -22,5 +22,7 @@ interface SettingsRepository {
 
     suspend fun resetOnboarding()
 
+    suspend fun resetOnboardingForScreen(stepIds: Collection<String>)
+
     suspend fun clearAll()
 }

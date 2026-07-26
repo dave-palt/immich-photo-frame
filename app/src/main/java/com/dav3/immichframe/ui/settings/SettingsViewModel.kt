@@ -12,6 +12,7 @@ import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
+import com.dav3.immichframe.ui.onboarding.TourSteps
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,6 +63,12 @@ constructor(
 
     fun resetOnboarding() {
         viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
+    fun resetOnboardingForSettings() {
+        viewModelScope.launch {
+            settingsRepo.resetOnboardingForScreen(TourSteps.SETTINGS.map { it.id })
+        }
     }
 
     private val updateMutex = Mutex()

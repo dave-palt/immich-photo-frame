@@ -184,6 +184,13 @@ constructor(
         }
     }
 
+    override suspend fun resetOnboardingForScreen(stepIds: Collection<String>) {
+        context.appDataStore.edit { prefs ->
+            val current = prefs[Keys.ONBOARDING_COMPLETED_STEPS] ?: emptySet()
+            prefs[Keys.ONBOARDING_COMPLETED_STEPS] = current - stepIds
+        }
+    }
+
     override suspend fun clearAll() {
         context.appDataStore.edit { it.clear() }
         encPrefs.edit().clear().apply()

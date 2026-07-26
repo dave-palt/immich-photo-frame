@@ -129,6 +129,7 @@
     <string name="tour_got_it">Rozumiem</string>
     <string name="tour_skip">Pomiń</string>
     <string name="tour_step_counter">Krok %1$d z %2$d</string>
+    <string name="reset_all_tours">Resetuj wszystkie samouczki</string>
     <string name="show_tour">Pokaż tour ponownie</string>
     <string name="tour_setup_welcome_title">Witaj w Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Połącz się z serwerem Immich, aby wyświetlać zdjęcia. Przejdźmy przez konfigurację.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Użyj tych strzałek, aby ręcznie przejść do poprzedniego lub następnego zdjęcia.</string>
     <string name="tour_slideshow_playback_title">Wstrzymaj i wycisz</string>
     <string name="tour_slideshow_playback_body">Wstrzymaj pokaz slajdów lub wycisz dźwięk wideo za pomocą tych elementów sterowania.</string>
-    <string name="tour_slideshow_settings_title">Dostosuj w locie</string>
+        <string name="tour_slideshow_albums_title">Powrót do Albumów</string>
+    <string name="tour_slideshow_albums_body">Chcesz wybrać inne zdjęcia? Stuknij tutaj, aby wrócić do wyboru albumów.</string>
+    <string name="tour_slideshow_update_title">Wskaźnik Aktualizacji</string>
+    <string name="tour_slideshow_update_body">Gdy aktualizacja jest dostępna, ta ikona pojawia się tutaj, abyś mógł zainstalować najnowszą wersję. Jeśli jej nie ma, masz już najnowszą wersję.</string>
+<string name="tour_slideshow_settings_title">Dostosuj w locie</string>
     <string name="tour_slideshow_settings_body">Otwórz ustawienia bez wychodzenia z pokazu slajdów — zmień interwał, włącz zegar i więcej.</string>
     <string name="tour_slideshow_close_title">Wyjdź z pokazu</string>
     <string name="tour_slideshow_close_body">Naciśnij tutaj, aby wyjść z pokazu slajdów i wrócić do wyboru albumów.</string>

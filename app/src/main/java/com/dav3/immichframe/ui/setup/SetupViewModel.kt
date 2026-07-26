@@ -50,6 +50,10 @@ constructor(
         }
     }
 
+    fun resetOnboarding() {
+        viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
     init {
         viewModelScope.launch {
             val url = settingsRepo.serverUrl.first()

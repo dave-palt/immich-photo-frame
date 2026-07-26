@@ -129,6 +129,7 @@
     <string name="tour_got_it">Compris</string>
     <string name="tour_skip">Passer le tour</string>
     <string name="tour_step_counter">Étape %1$d sur %2$d</string>
+    <string name="reset_all_tours">Réinitialiser toutes les visites</string>
     <string name="show_tour">Rejouer le tour</string>
     <string name="tour_setup_welcome_title">Bienvenue dans Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Connectez-vous à votre serveur Immich pour afficher vos photos. Parcourons la configuration.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Utilisez ces flèches pour passer manuellement à la photo précédente ou suivante.</string>
     <string name="tour_slideshow_playback_title">Pause et muet</string>
     <string name="tour_slideshow_playback_body">Mettez le diaporama en pause ou coupez le son des vidéos avec ces contrôles.</string>
-    <string name="tour_slideshow_settings_title">Ajuster à la volée</string>
+        <string name="tour_slideshow_albums_title">Retour aux Albums</string>
+    <string name="tour_slideshow_albums_body">Vous voulez choisir d\'autres photos ? Appuyez ici pour revenir à la sélection des albums.</string>
+    <string name="tour_slideshow_update_title">Indicateur de Mise à Jour</string>
+    <string name="tour_slideshow_update_body">Lorsqu\'une mise à jour est disponible, cette icône apparaît ici pour vous permettre d\'installer la dernière version. Si elle n\'est pas visible, vous êtes déjà à jour.</string>
+<string name="tour_slideshow_settings_title">Ajuster à la volée</string>
     <string name="tour_slideshow_settings_body">Ouvrez les paramètres sans quitter le diaporama — modifiez l\'intervalle, activez l\'horloge et plus.</string>
     <string name="tour_slideshow_close_title">Quitter le diaporama</string>
     <string name="tour_slideshow_close_body">Touchez ici pour quitter le diaporama et revenir à la sélection des albums.</string>

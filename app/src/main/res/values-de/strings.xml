@@ -129,6 +129,7 @@
     <string name="tour_got_it">Verstanden</string>
     <string name="tour_skip">Tour überspringen</string>
     <string name="tour_step_counter">Schritt %1$d von %2$d</string>
+    <string name="reset_all_tours">Alle Touren zurücksetzen</string>
     <string name="show_tour">Tour erneut anzeigen</string>
     <string name="tour_setup_welcome_title">Willkommen bei Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Verbinde dich mit deinem Immich-Server, um deine Fotos anzuzeigen. Lass uns die Einrichtung durchgehen.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Verwende diese Pfeile, um manuell zum vorherigen oder nächsten Foto zu wechseln.</string>
     <string name="tour_slideshow_playback_title">Pause &amp; Stumm</string>
     <string name="tour_slideshow_playback_body">Pausiere die Diashow oder schalte Video-Ton stumm mit diesen Steuerelementen.</string>
-    <string name="tour_slideshow_settings_title">Sofort anpassen</string>
+        <string name="tour_slideshow_albums_title">Zurück zu Alben</string>
+    <string name="tour_slideshow_albums_body">Möchtest du andere Fotos auswählen? Tippe hier, um zur Albumauswahl zurückzukehren.</string>
+    <string name="tour_slideshow_update_title">Update-Anzeige</string>
+    <string name="tour_slideshow_update_body">Wenn ein Update verfügbar ist, erscheint dieses Symbol hier, damit du die neueste Version installieren kannst. Wenn es nicht angezeigt wird, bist du bereits auf dem neuesten Stand.</string>
+<string name="tour_slideshow_settings_title">Sofort anpassen</string>
     <string name="tour_slideshow_settings_body">Öffne die Einstellungen, ohne die Diashow zu verlassen — ändere Intervall, aktiviere die Uhr und mehr.</string>
     <string name="tour_slideshow_close_title">Diashow beenden</string>
     <string name="tour_slideshow_close_body">Tippe hier, um die Diashow zu beenden und zur Albumauswahl zurückzukehren.</string>

@@ -129,6 +129,7 @@
     <string name="tour_got_it">Понятно</string>
     <string name="tour_skip">Пропустить</string>
     <string name="tour_step_counter">Шаг %1$d из %2$d</string>
+    <string name="reset_all_tours">Сбросить все обзоры</string>
     <string name="show_tour">Показать тур снова</string>
     <string name="tour_setup_welcome_title">Добро пожаловать в Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Подключитесь к серверу Immich для показа фото. Давайте пройдём настройку.</string>
@@ -150,7 +151,11 @@
     <string name="tour_slideshow_nav_body">Используйте эти стрелки для перехода к предыдущему или следующему фото вручную.</string>
     <string name="tour_slideshow_playback_title">Пауза и звук</string>
     <string name="tour_slideshow_playback_body">Приостановите слайд-шоу или выключите звук видео этими кнопками.</string>
-    <string name="tour_slideshow_settings_title">Настройте на лету</string>
+        <string name="tour_slideshow_albums_title">Назад к альбомам</string>
+    <string name="tour_slideshow_albums_body">Хотите выбрать другие фото? Нажмите здесь, чтобы вернуться к выбору альбомов.</string>
+    <string name="tour_slideshow_update_title">Индикатор обновления</string>
+    <string name="tour_slideshow_update_body">Когда обновление доступно, этот значок появляется здесь, чтобы вы могли установить последнюю версию. Если его нет, у вас уже последняя версия.</string>
+<string name="tour_slideshow_settings_title">Настройте на лету</string>
     <string name="tour_slideshow_settings_body">Откройте настройки, не выходя из слайд-шоу — измените интервал, включите часы и т.д.</string>
     <string name="tour_slideshow_close_title">Выйти из слайд-шоу</string>
     <string name="tour_slideshow_close_body">Нажмите здесь, чтобы выйти из слайд-шоу и вернуться к выбору альбомов.</string>
