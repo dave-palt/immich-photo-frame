@@ -266,9 +266,10 @@ fun SlideshowScreen(
     LaunchedEffect(state.currentIndex, s.adaptiveBackground, state.assets.size) {
         if (s.adaptiveBackground && state.assets.isNotEmpty()) {
             val asset = state.assets[state.currentIndex]
-            if (asset.type != AssetType.VIDEO) {
-                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset))
-            }
+            // Always extract from the small JPEG thumbnail — it's fast for
+            // all asset types (GIFs, videos, regular images) since Coil only
+            // needs a 128px bitmap for Palette.
+            dominantColor = extractDominantColor(context, viewModel.thumbnailUrl(asset.id))
         } else {
             dominantColor = Color.Black
         }

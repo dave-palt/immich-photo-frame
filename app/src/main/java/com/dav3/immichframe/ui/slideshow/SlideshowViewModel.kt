@@ -50,6 +50,13 @@ constructor(
      */
     private val localFilePaths = mutableMapOf<String, String>()
 
+    /**
+     * Asset ID → local cached thumbnail path. Populated in [load] so that
+     * [thumbnailUrl] can return a `file://` URI for the small JPEG thumbnail
+     * (used by adaptive background color extraction) without a DB lookup.
+     */
+    private val localThumbnailPaths = mutableMapOf<String, String>()
+
     val settings =
         settingsRepo.slideshowSettings
             .stateIn(
@@ -101,6 +108,10 @@ constructor(
                 localFilePaths.clear()
                 localFilePaths.putAll(
                     cacheRepo.getAssetFilePaths(cachedAssets.map { it.id }),
+                )
+                localThumbnailPaths.clear()
+                localThumbnailPaths.putAll(
+                    cacheRepo.getAssetThumbnailPaths(cachedAssets.map { it.id }),
                 )
 
                 // Show cached assets immediately
@@ -216,6 +227,19 @@ constructor(
             if (File(path).exists()) return "file://$path"
         }
         return immichRepo.videoUrl(assetId)
+    }
+
+    /**
+     * Small JPEG thumbnail URL — used for adaptive background color
+     * extraction. Always prefers the locally cached thumbnail (works for
+     * GIFs, videos, and regular images alike — Coil only needs a few pixels
+     * to extract a dominant color, so the tiny transcode is perfect).
+     */
+    fun thumbnailUrl(assetId: String): String {
+        localThumbnailPaths[assetId]?.let { path ->
+            if (File(path).exists()) return "file://$path"
+        }
+        return immichRepo.thumbnailUrl(assetId)
     }
 }
 
