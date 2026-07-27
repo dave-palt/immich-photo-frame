@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">ここにImmichサーバーのURLを入力します。photos.example.comまたは192.168.1.100:2283の形式を使用してください。</string>
     <string name="tour_setup_validate_title">サーバーを確認</string>
     <string name="tour_setup_validate_body">サーバーアドレスを入力したら、タップして接続を確認します。アプリがImmichのバージョンと利用可能なログイン方法を検出します。</string>
-    <string name="tour_setup_apikey_title">キーを生成</string>
-    <string name="tour_setup_apikey_body">メールとパスワードでログインしてAPIキーを自動作成するか、既存のキーを手動で貼り付けます。パスワードは一度だけ使用され、保存されません。</string>
+        <string name="tour_setup_generate_title">キーを自動生成</string>
+    <string name="tour_setup_generate_body">APIキーを手動で扱いたくないですか？ここをタップしてメールとパスワードでログインしてください — アプリがキーを作成し、パスワードは破棄されます。</string>
+<string name="tour_setup_apikey_title">キーを生成</string>
+    <string name="tour_setup_apikey_body">APIキーとは、Immichサーバー上の写真にこのアプリがアクセスするためのトークンです — パスワードを共有しません。ここに既存のキーを貼り付けるか、下のボタンで自動的に生成できます。</string>
     <string name="tour_setup_connect_title">接続</string>
     <string name="tour_setup_connect_body">タップして接続をテストし、スライドショーを開始します。</string>
     <string name="tour_albums_select_title">アルバムを選択</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">キーを生成</string>
     <string name="enter_manually">手動で入力</string>
+    <string name="generate_key_prompt">APIキーをお持ちでないですか？自動で生成できます：</string>
     <string name="generate_key_title">APIキーを生成</string>
     <string name="generate_key_desc">Immichのメールとパスワードでログインしてください。アプリがスコープ付きAPIキーを自動作成します — パスワードは一度だけ使用され、保存されません。</string>
+    <string name="generate_key_account_note">このフォトフレーム用のアカウントを使用してください — 利用可能なアルバムと写真が決まります。個人アカウントである必要はありません。</string>
     <string name="email">メール</string>
     <string name="password">パスワード</string>
     <string name="login_and_generate">ログインしてキーを生成</string>

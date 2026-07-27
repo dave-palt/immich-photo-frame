@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -270,26 +271,16 @@ private fun AuthStep(
         )
         Spacer(Modifier.height(24.dp))
 
-        // Auth mode toggle
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            FilterChip(
-                selected = state.authMode == AuthMode.GENERATE,
-                onClick = { viewModel.setAuthMode(AuthMode.GENERATE) },
-                label = { Text(stringResource(R.string.generate_key)) },
-            )
-            Spacer(Modifier.width(8.dp))
-            FilterChip(
-                selected = state.authMode == AuthMode.MANUAL_KEY,
-                onClick = { viewModel.setAuthMode(AuthMode.MANUAL_KEY) },
-                label = { Text(stringResource(R.string.enter_manually)) },
-            )
-        }
-        Spacer(Modifier.height(16.dp))
-
         when (state.authMode) {
+            AuthMode.MANUAL_KEY -> ManualKeySection(
+                state = state,
+                viewModel = viewModel,
+                showKey = showKey,
+                onToggleShowKey = onToggleShowKey,
+                onShowHelp = onShowHelp,
+                onSwitchToGenerate = { viewModel.setAuthMode(AuthMode.GENERATE) },
+                tourState = tourState,
+            )
             AuthMode.GENERATE -> GenerateKeySection(
                 state = state,
                 viewModel = viewModel,
@@ -297,14 +288,7 @@ private fun AuthStep(
                 onToggleShowPassword = onToggleShowPassword,
                 onShowHelp = onShowHelp,
                 onOpenOAuth = onOpenOAuth,
-                tourState = tourState,
-            )
-            AuthMode.MANUAL_KEY -> ManualKeySection(
-                state = state,
-                viewModel = viewModel,
-                showKey = showKey,
-                onToggleShowKey = onToggleShowKey,
-                onShowHelp = onShowHelp,
+                onSwitchToManual = { viewModel.setAuthMode(AuthMode.MANUAL_KEY) },
                 tourState = tourState,
             )
         }
@@ -341,6 +325,7 @@ private fun GenerateKeySection(
     onToggleShowPassword: () -> Unit,
     onShowHelp: () -> Unit,
     onOpenOAuth: (String) -> Unit,
+    onSwitchToManual: () -> Unit,
     tourState: com.dav3.immichframe.ui.onboarding.TourState,
 ) {
     Column(
@@ -368,6 +353,13 @@ private fun GenerateKeySection(
             stringResource(R.string.generate_key_desc),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            stringResource(R.string.generate_key_account_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
+            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
         )
         Spacer(Modifier.height(12.dp))
 
@@ -402,7 +394,9 @@ private fun GenerateKeySection(
         Button(
             onClick = viewModel::generateKey,
             enabled = state.connectionState != ConnectionState.CONNECTING,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .tourTarget("setup_connect", tourState),
         ) {
             if (state.connectionState == ConnectionState.CONNECTING) {
                 CircularProgressIndicator(
@@ -425,6 +419,11 @@ private fun GenerateKeySection(
                 Text(stringResource(R.string.sign_in_with_oauth))
             }
         }
+
+        Spacer(Modifier.height(12.dp))
+        TextButton(onClick = onSwitchToManual) {
+            Text(stringResource(R.string.enter_manually))
+        }
     }
 }
 
@@ -435,6 +434,7 @@ private fun ManualKeySection(
     showKey: Boolean,
     onToggleShowKey: () -> Unit,
     onShowHelp: () -> Unit,
+    onSwitchToGenerate: () -> Unit,
     tourState: com.dav3.immichframe.ui.onboarding.TourState,
 ) {
     Column(
@@ -493,6 +493,33 @@ private fun ManualKeySection(
                 Spacer(Modifier.width(8.dp))
             }
             Text(stringResource(R.string.test_connection))
+        }
+
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+        )
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            stringResource(R.string.generate_key_prompt),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        TextButton(
+            onClick = onSwitchToGenerate,
+            modifier = Modifier
+                .tourTarget("setup_generate_key", tourState),
+        ) {
+            Icon(
+                Icons.Default.AutoAwesome,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(stringResource(R.string.generate_key))
         }
     }
 }

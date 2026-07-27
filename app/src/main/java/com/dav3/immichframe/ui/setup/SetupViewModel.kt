@@ -44,7 +44,7 @@ data class SetupUiState(
     val domain: String = "",
     val apiKey: String = "",
     val step: SetupStep = SetupStep.DOMAIN,
-    val authMode: AuthMode = AuthMode.GENERATE,
+    val authMode: AuthMode = AuthMode.MANUAL_KEY,
     val email: String = "",
     val password: String = "",
     val connectionState: ConnectionState = ConnectionState.IDLE,

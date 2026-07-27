@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Voer hier de URL van je Immich-server in. Gebruik de notatie photos.example.com of 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Server valideren</string>
     <string name="tour_setup_validate_body">Na het invoeren van het serveradres, tik om de verbinding te controleren. De app detecteert de Immich-versie en beschikbare inlogmethoden.</string>
-    <string name="tour_setup_apikey_title">Sleutel genereren</string>
-    <string name="tour_setup_apikey_body">Log in met e-mail en wachtwoord om automatisch een API-sleutel te maken, of plak er handmatig een. Het wachtwoord wordt één keer gebruikt en nooit opgeslagen.</string>
+        <string name="tour_setup_generate_title">Sleutel automatisch genereren</string>
+    <string name="tour_setup_generate_body">Liever geen API-sleutels handmatig beheren? Tik hier en log in met e-mail en wachtwoord — de app maakt een sleutel voor je aan en verwijdert daarna je wachtwoord.</string>
+<string name="tour_setup_apikey_title">Sleutel genereren</string>
+    <string name="tour_setup_apikey_body">Een API-sleutel is een token waarmee deze app toegang krijgt tot je foto\'s op de Immich-server — zonder je wachtwoord te delen. Je kunt hier een bestaande sleutel plakken, of de knop hieronder gebruiken om er automatisch een te genereren.</string>
     <string name="tour_setup_connect_title">Verbinden</string>
     <string name="tour_setup_connect_body">Tik om de verbinding te testen en de diavoorstelling te starten.</string>
     <string name="tour_albums_select_title">Kies je albums</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Sleutel genereren</string>
     <string name="enter_manually">Handmatig invoeren</string>
+    <string name="generate_key_prompt">Geen API-sleutel? Genereer er automatisch een:</string>
     <string name="generate_key_title">API-sleutel genereren</string>
     <string name="generate_key_desc">Log in met je Immich-e-mailadres en wachtwoord. De app maakt automatisch een scoped API-sleutel aan — je wachtwoord wordt één keer gebruikt en nooit opgeslagen.</string>
+    <string name="generate_key_account_note">Gebruik het account dat bedoeld is voor dit fotolijstje — het bepaalt welke albums en foto\'s beschikbaar zijn. Dit hoeft niet je persoonlijke account te zijn.</string>
     <string name="email">E-mail</string>
     <string name="password">Wachtwoord</string>
     <string name="login_and_generate">Inloggen &amp; sleutel genereren</string>

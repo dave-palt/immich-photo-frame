@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Введите URL вашего сервера Immich. Формат: photos.example.com или 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Проверить сервер</string>
     <string name="tour_setup_validate_body">После ввода адреса сервера нажмите, чтобы проверить подключение. Приложение определит версию Immich и доступные методы входа.</string>
-    <string name="tour_setup_apikey_title">Создать ключ</string>
-    <string name="tour_setup_apikey_body">Войдите с электронной почтой и паролем, чтобы автоматически создать ключ API, или вставьте существующий вручную. Пароль используется один раз и никогда не сохраняется.</string>
+        <string name="tour_setup_generate_title">Сгенерировать ключ автоматически</string>
+    <string name="tour_setup_generate_body">Не хотите управлять API-ключами вручную? Нажмите здесь и войдите по электронной почте и паролю — приложение создаст ключ для вас, а затем удалит пароль.</string>
+<string name="tour_setup_apikey_title">Создать ключ</string>
+    <string name="tour_setup_apikey_body">API-ключ — это токен, который позволяет этому приложению получать доступ к вашим фотографиям на сервере Immich — без передачи пароля. Вы можете вставить существующий ключ здесь или использовать кнопку ниже для автоматической генерации.</string>
     <string name="tour_setup_connect_title">Подключиться</string>
     <string name="tour_setup_connect_body">Нажмите, чтобы проверить подключение и запустить слайд-шоу.</string>
     <string name="tour_albums_select_title">Выберите альбомы</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Создать ключ</string>
     <string name="enter_manually">Ввести вручную</string>
+    <string name="generate_key_prompt">Нет API-ключа? Сгенерируйте автоматически:</string>
     <string name="generate_key_title">Создать ключ API</string>
     <string name="generate_key_desc">Войдите с вашей электронной почтой и паролем Immich. Приложение автоматически создаст ключ API с ограниченными правами — ваш пароль используется один раз и никогда не сохраняется.</string>
+    <string name="generate_key_account_note">Используйте учётную запись, предназначенную для этой фоторамки — она определяет доступные альбомы и фото. Это не обязательно ваш личный аккаунт.</string>
     <string name="email">Эл. почта</string>
     <string name="password">Пароль</string>
     <string name="login_and_generate">Войти и создать ключ</string>

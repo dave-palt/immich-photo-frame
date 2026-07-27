@@ -153,7 +153,10 @@ constructor(
     // Setup / Key generation
     // ------------------------------------------------------------------
 
-    private val authJson = Json { ignoreUnknownKeys = true }
+    private val authJson = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     /**
      * Build an [ImmichAuthApi] for the given base URL. This Retrofit instance

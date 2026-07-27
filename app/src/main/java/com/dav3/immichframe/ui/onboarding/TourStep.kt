@@ -71,6 +71,13 @@ object TourSteps {
             targetKey = "setup_apikey",
         ),
         TourStep(
+            id = "setup_generate_key",
+            screen = TourScreen.SETUP,
+            titleRes = R.string.tour_setup_generate_title,
+            bodyRes = R.string.tour_setup_generate_body,
+            targetKey = "setup_generate_key",
+        ),
+        TourStep(
             id = "setup_connect",
             screen = TourScreen.SETUP,
             titleRes = R.string.tour_setup_connect_title,

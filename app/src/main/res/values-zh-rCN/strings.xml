@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">在此输入您的 Immich 服务器 URL。格式为 photos.example.com 或 192.168.1.100:2283。</string>
     <string name="tour_setup_validate_title">验证服务器</string>
     <string name="tour_setup_validate_body">输入服务器地址后，点击验证连接。应用会检测 Immich 版本和可用的登录方式。</string>
-    <string name="tour_setup_apikey_title">生成密钥</string>
-    <string name="tour_setup_apikey_body">使用邮箱和密码登录以自动创建 API 密钥，或手动粘贴已有密钥。密码仅使用一次，永不保存。</string>
+        <string name="tour_setup_generate_title">自动生成密钥</string>
+    <string name="tour_setup_generate_body">不想手动处理 API 密钥？点击此处，用邮箱和密码登录——应用会为您创建密钥，然后丢弃密码。</string>
+<string name="tour_setup_apikey_title">生成密钥</string>
+    <string name="tour_setup_apikey_body">API 密钥是一个令牌，让此应用可以访问您在 Immich 服务器上的照片——无需共享密码。您可以在此粘贴现有密钥，或使用下方按钮自动生成。</string>
     <string name="tour_setup_connect_title">连接</string>
     <string name="tour_setup_connect_body">点击测试连接并开始幻灯片放映。</string>
     <string name="tour_albums_select_title">选择您的相册</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">生成密钥</string>
     <string name="enter_manually">手动输入</string>
+    <string name="generate_key_prompt">没有 API 密钥？自动生成一个：</string>
     <string name="generate_key_title">生成 API 密钥</string>
     <string name="generate_key_desc">使用您的 Immich 邮箱和密码登录。应用会自动创建一个限定权限的 API 密钥 — 密码仅使用一次，永不保存。</string>
+    <string name="generate_key_account_note">请使用专为此相框准备的账户——它决定了可用的相册和照片。不必是您的个人账户。</string>
     <string name="email">邮箱</string>
     <string name="password">密码</string>
     <string name="login_and_generate">登录并生成密钥</string>

@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Gib hier die URL deines Immich-Servers ein. Verwende das Format photos.example.com oder 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Server überprüfen</string>
     <string name="tour_setup_validate_body">Nach der Eingabe der Serveradresse tippen, um die Verbindung zu prüfen. Die App erkennt die Immich-Version und verfügbare Anmeldemethoden.</string>
-    <string name="tour_setup_apikey_title">Schlüssel erstellen</string>
-    <string name="tour_setup_apikey_body">Mit E-Mail und Passwort anmelden, um automatisch einen API-Schlüssel zu erstellen, oder manuell einen bestehenden einfügen. Das Passwort wird einmal verwendet und nie gespeichert.</string>
+        <string name="tour_setup_generate_title">Schlüssel automatisch generieren</string>
+    <string name="tour_setup_generate_body">Möchtest du API-Schlüssel nicht manuell verwalten? Tippe hier und melde dich mit E-Mail und Passwort an — die App erstellt einen Schlüssel für dich und verwirft dann dein Passwort.</string>
+<string name="tour_setup_apikey_title">Schlüssel erstellen</string>
+    <string name="tour_setup_apikey_body">Ein API-Schlüssel ist ein Token, das dieser App den Zugriff auf deine Fotos auf dem Immich-Server ermöglicht — ohne dein Passwort zu teilen. Du kannst hier einen vorhandenen Schlüssel einfügen oder die Schaltfläche unten verwenden, um automatisch einen zu generieren.</string>
     <string name="tour_setup_connect_title">Verbinden</string>
     <string name="tour_setup_connect_body">Tippen, um die Verbindung zu testen und die Diashow zu starten.</string>
     <string name="tour_albums_select_title">Wähle deine Alben</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Schlüssel erstellen</string>
     <string name="enter_manually">Manuell eingeben</string>
+    <string name="generate_key_prompt">Kein API-Schlüssel? Automatisch generieren:</string>
     <string name="generate_key_title">API-Schlüssel erstellen</string>
     <string name="generate_key_desc">Melden Sie sich mit Ihrer Immich-E-Mail und Ihrem Passwort an. Die App erstellt automatisch einen bereichsbeschränkten API-Schlüssel — Ihr Passwort wird einmal verwendet und nie gespeichert.</string>
+    <string name="generate_key_account_note">Verwende das Konto, das für diesen Bilderrahmen gedacht ist — es bestimmt, welche Alben und Fotos verfügbar sind. Das muss nicht dein persönliches Konto sein.</string>
     <string name="email">E-Mail</string>
     <string name="password">Passwort</string>
     <string name="login_and_generate">Anmelden &amp; Schlüssel erstellen</string>

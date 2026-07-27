@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Wpisz adres URL serwera Immich. Użyj formatu photos.example.com lub 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Sprawdź serwer</string>
     <string name="tour_setup_validate_body">Po wpisaniu adresu serwera naciśnij, aby sprawdzić połączenie. Aplikacja wykryje wersję Immich i dostępne metody logowania.</string>
-    <string name="tour_setup_apikey_title">Wygeneruj klucz</string>
-    <string name="tour_setup_apikey_body">Zaloguj się adresem e-mail i hasłem, aby automatycznie utworzyć klucz API, lub wklej istniejący ręcznie. Hasło jest używane raz i nigdy nie jest zapisywane.</string>
+        <string name="tour_setup_generate_title">Wygeneruj klucz automatycznie</string>
+    <string name="tour_setup_generate_body">Wolisz nie zarządzać kluczami API ręcznie? Stuknij tutaj i zaloguj się e-mailem i hasłem — aplikacja utworzy klucz dla Ciebie, a następnie usunie hasło.</string>
+<string name="tour_setup_apikey_title">Wygeneruj klucz</string>
+    <string name="tour_setup_apikey_body">Klucz API to token, który pozwala tej aplikacji na dostęp do Twoich zdjęć na serwerze Immich — bez udostępniania hasła. Możesz wkleić istniejący klucz tutaj lub użyć przycisku poniżej, aby wygenerować go automatycznie.</string>
     <string name="tour_setup_connect_title">Połącz</string>
     <string name="tour_setup_connect_body">Naciśnij, aby przetestować połączenie i uruchomić pokaz slajdów.</string>
     <string name="tour_albums_select_title">Wybierz albumy</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Wygeneruj klucz</string>
     <string name="enter_manually">Wprowadź ręcznie</string>
+    <string name="generate_key_prompt">Nie masz klucza API? Wygeneruj go automatycznie:</string>
     <string name="generate_key_title">Wygeneruj klucz API</string>
     <string name="generate_key_desc">Zaloguj się adresem e-mail i hasłem Immich. Aplikacja automatycznie utworzy klucz API o ograniczonych uprawnieniach — hasło jest używane raz i nigdy nie jest zapisywane.</string>
+    <string name="generate_key_account_note">Użyj konta przeznaczonego dla tej ramki zdjęć — określa ono dostępne albumy i zdjęcia. Nie musi to być Twoje konto osobiste.</string>
     <string name="email">E-mail</string>
     <string name="password">Hasło</string>
     <string name="login_and_generate">Zaloguj się i wygeneruj klucz</string>

@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Saisissez l\'URL de votre serveur Immich ici. Format : photos.example.com ou 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Valider le serveur</string>
     <string name="tour_setup_validate_body">Après avoir saisi l\'adresse du serveur, appuyez pour vérifier la connexion. L\'app détectera la version d\'Immich et les méthodes de connexion disponibles.</string>
-    <string name="tour_setup_apikey_title">Générer votre clé</string>
-    <string name="tour_setup_apikey_body">Connectez-vous avec votre e-mail et mot de passe pour créer automatiquement une clé API, ou collez-en une manuellement. Le mot de passe est utilisé une fois et jamais stocké.</string>
+        <string name="tour_setup_generate_title">Générer une clé automatiquement</string>
+    <string name="tour_setup_generate_body">Préférez ne pas gérer les clés API manuellement ? Touchez ici et connectez-vous avec votre e-mail et mot de passe — l\'app crée une clé pour vous, puis supprime votre mot de passe.</string>
+<string name="tour_setup_apikey_title">Générer votre clé</string>
+    <string name="tour_setup_apikey_body">Une clé API est un jeton qui permet à cette app d\'accéder à vos photos sur le serveur Immich — sans partager votre mot de passe. Vous pouvez coller une clé existante ici, ou utiliser le bouton ci-dessous pour en générer une automatiquement.</string>
     <string name="tour_setup_connect_title">Se connecter</string>
     <string name="tour_setup_connect_body">Appuyez pour tester la connexion et démarrer le diaporama.</string>
     <string name="tour_albums_select_title">Choisissez vos albums</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Générer une clé</string>
     <string name="enter_manually">Saisir manuellement</string>
+    <string name="generate_key_prompt">Pas de clé API ? Générez-en une automatiquement :</string>
     <string name="generate_key_title">Générer une clé API</string>
     <string name="generate_key_desc">Connectez-vous avec votre e-mail et mot de passe Immich. L\'app créera automatiquement une clé API limitée — votre mot de passe est utilisé une fois et jamais stocké.</string>
+    <string name="generate_key_account_note">Utilisez le compte destiné à ce cadre photo — il détermine les albums et photos disponibles. Ce n\'est pas obligatoirement votre compte personnel.</string>
     <string name="email">E-mail</string>
     <string name="password">Mot de passe</string>
     <string name="login_and_generate">Se connecter &amp; générer la clé</string>

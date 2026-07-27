@@ -156,8 +156,10 @@
     <string name="tour_setup_server_body">Insira a URL do seu servidor Immich aqui. Use o formato photos.example.com ou 192.168.1.100:2283.</string>
     <string name="tour_setup_validate_title">Validar servidor</string>
     <string name="tour_setup_validate_body">Após inserir o endereço do servidor, toque para verificar a ligação. A app detetará a versão do Immich e os métodos de início de sessão disponíveis.</string>
-    <string name="tour_setup_apikey_title">Gerar a sua chave</string>
-    <string name="tour_setup_apikey_body">Inicie sessão com e-mail e palavra-passe para criar automaticamente uma chave API, ou cole uma manualmente. A palavra-passe é usada uma vez e nunca guardada.</string>
+        <string name="tour_setup_generate_title">Gerar chave automaticamente</string>
+    <string name="tour_setup_generate_body">Prefere não lidar com chaves de API manualmente? Toque aqui e entre com seu e-mail e senha — o app cria uma chave para você e depois descarta sua senha.</string>
+<string name="tour_setup_apikey_title">Gerar a sua chave</string>
+    <string name="tour_setup_apikey_body">Uma chave de API é um token que permite a este app acessar suas fotos no servidor Immich — sem compartilhar sua senha. Você pode colar uma chave existente aqui, ou usar o botão abaixo para gerar uma automaticamente.</string>
     <string name="tour_setup_connect_title">Ligar</string>
     <string name="tour_setup_connect_body">Toque para testar a ligação e iniciar a apresentação.</string>
     <string name="tour_albums_select_title">Escolha Seus Álbuns</string>
@@ -194,8 +196,10 @@
     <string name="server_version_label">Immich %1$s</string>
     <string name="generate_key">Gerar chave</string>
     <string name="enter_manually">Inserir manualmente</string>
+    <string name="generate_key_prompt">Não tem uma chave de API? Gere uma automaticamente:</string>
     <string name="generate_key_title">Gerar chave API</string>
     <string name="generate_key_desc">Inicie sessão com o seu e-mail e palavra-passe Immich. A app criará automaticamente uma chave API com permissões limitadas — a sua palavra-passe é usada uma vez e nunca guardada.</string>
+    <string name="generate_key_account_note">Use a conta destinada a esta moldura — determina quais álbuns e fotos estão disponíveis. Não precisa ser sua conta pessoal.</string>
     <string name="email">E-mail</string>
     <string name="password">Palavra-passe</string>
     <string name="login_and_generate">Iniciar sessão e gerar chave</string>

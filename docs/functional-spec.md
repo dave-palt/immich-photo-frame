@@ -12,14 +12,17 @@
      to detect the Immich version and available auth methods.
    - On failure: show error message (wrong URL, unreachable). Stay on domain step.
    - On success: display detected version (e.g. "Immich v1.135.0"), advance to auth step.
-3. **Step 2 — Authentication (three options):**
-   - **Generate Key** (default): User enters email + password. App calls
+3. **Step 2 — Authentication (manual paste is default):**
+   - **Enter Manually** (default): User pastes an existing API key, then taps
+     "Test Connection" (the legacy flow). Below the key field, a helper button
+     offers auto-generation for users who don't have a key yet.
+   - **Generate Key** (helper button): Email + password fields. App calls
      `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
      key with 5 permissions. Password is used once and never persisted.
-     A `?` icon next to the input opens a dialog explaining what an API key is,
-     why the app generates one, and that the password is discarded immediately.
-   - **Enter Manually**: User pastes an existing API key, then taps
-     "Test Connection" (the legacy flow).
+     A note reminds the user to log in with the account meant for this photo
+     frame (not necessarily their personal account).
+     A `?` icon opens a dialog explaining what an API key is, why the app
+     generates one, and that the password is discarded immediately.
    - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
      OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
      returns to the app → JWT obtained → key created.
@@ -332,11 +335,11 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (20 steps across 4 screens):**
+**Step inventory (21 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
-| Setup (5) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_connect` |
+| Setup (6) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_generate_key`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
 | Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |

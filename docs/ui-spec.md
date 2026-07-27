@@ -67,12 +67,14 @@ Shown on first launch or when credentials are missing/invalid.
 - URL field: protocol dropdown (`https://` / `http://`) + domain field. Auto-normalizes.
 - "Validate Server" calls `GET /server/version` + `GET /server/features` (no auth).
   On success, shows detected version and advances to the auth step.
-- Auth mode toggle (FilterChips): **Generate Key** or **Enter Manually**.
-- **Generate Key** mode: email + password fields. "Log In & Generate Key"
-  calls `POST /auth/login` → `POST /api-keys` to create a scoped key.
-  Password is never stored. `?` icon opens a dialog explaining API keys.
-- **Manual** mode: API key field (masked), "Test Connection" button (legacy flow).
+- Auth mode: **manual paste is the default**. API key field + Test Connection
+  are shown first. Below them, a divider + helper text + subtle TextButton
+  ("✨ Generate Key") offers auto-generation.
+- **Generate Key** mode (via helper button): email + password fields, with an
+  italic note: "Use the account meant for this photo frame — it doesn't have
+  to be your personal account." `?` icon opens a dialog explaining API keys.
 - **OAuth** button appears only when the server has OAuth enabled.
+- "Enter Manually" text link at the bottom switches back to paste mode.
 - Status area shows idle / connecting / success / error states.
 - On success, auto-navigates to album selection after brief delay.
 
