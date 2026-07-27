@@ -199,12 +199,16 @@ constructor(
      * Returns a display URL for an image asset. If the asset is cached
      * locally on disk, returns a `file://` URI (works offline). Otherwise
      * returns the network URL (requires server connectivity).
+     *
+     * GIFs are routed to the `/original` endpoint (via [ImmichRepository.imageUrl])
+     * so Coil's GifDecoder receives the raw animated bytes. Other images use
+     * the transcoded preview thumbnail.
      */
-    fun imageUrl(assetId: String): String {
-        localFilePaths[assetId]?.let { path ->
+    fun imageUrl(asset: Asset): String {
+        localFilePaths[asset.id]?.let { path ->
             if (File(path).exists()) return "file://$path"
         }
-        return immichRepo.imageUrl(assetId)
+        return immichRepo.imageUrl(asset.id, asset.originalMimeType)
     }
 
     fun videoUrl(assetId: String): String {
@@ -230,6 +234,7 @@ fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(
     id = id,
     type = type,
     lastModified = lastModified,
+    originalMimeType = originalMimeType,
 )
 
 /**

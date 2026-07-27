@@ -267,7 +267,7 @@ fun SlideshowScreen(
         if (s.adaptiveBackground && state.assets.isNotEmpty()) {
             val asset = state.assets[state.currentIndex]
             if (asset.type != AssetType.VIDEO) {
-                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset.id))
+                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset))
             }
         } else {
             dominantColor = Color.Black
@@ -327,9 +327,9 @@ fun SlideshowScreen(
                                     isVideoPaused = isVideoPaused,
                                     fillMode = s.fillMode,
                                 )
-                            } else {
+                            } else if (currentAsset != null) {
                                 KenBurnsImage(
-                                    url = viewModel.imageUrl(assetId),
+                                    url = viewModel.imageUrl(currentAsset),
                                     contentScale = scale,
                                     assetId = assetId,
                                     photoAnimations = s.photoAnimations,

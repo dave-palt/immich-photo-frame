@@ -28,6 +28,15 @@ Retrofit client), the API key is appended as a query parameter:
 > The `x-api-key` header used by Retrofit calls is unaffected and works on
 > both v1 and v3.
 
+## Media URL Routing
+
+| Asset type | Endpoint | Notes |
+|---|---|---|
+| Standard image | `GET /api/assets/{id}/thumbnail?size=preview` | Immich transcodes to JPEG preview; small and fast. Auth: `?apiKey=` query param. |
+| Animated GIF | `GET /api/assets/{id}/original` | The thumbnail endpoint re-encodes GIFs as JPEG, collapsing the animation. GIFs are detected by `originalMimeType == "image/gif"` (from the `/search/metadata` response) and routed to `/original` so Coil's `GifDecoder` receives the raw animated bytes. |
+| Video | `GET /api/assets/{id}/original` | Loaded by ExoPlayer. Auth: `?apiKey=` query param. |
+| Thumbnail (media-selection grid) | `GET /api/assets/{id}/thumbnail?size=thumbnail` | Always JPEG — Coil can't decode a video file into a still, and GIF thumbnails are fine as static images. |
+
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
 

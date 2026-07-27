@@ -3,6 +3,11 @@ package com.dav3.immichframe
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.gif.GifDecoder
+import coil3.request.crossfade
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +18,8 @@ import javax.inject.Inject
 @HiltAndroidApp
 class ImmichFrameApp :
     Application(),
-    Configuration.Provider {
+    Configuration.Provider,
+    SingletonImageLoader.Factory {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -35,4 +41,16 @@ class ImmichFrameApp :
             syncScheduler.schedulePeriodicSync()
         }
     }
+
+    /**
+     * Provides the global [ImageLoader] used by all `AsyncImage` composables.
+     * Registers [GifDecoder] so animated GIFs (loaded from the `/original`
+     * endpoint) are decoded frame-by-frame instead of collapsing to a still.
+     */
+    override fun newImageLoader(context: PlatformContext): ImageLoader = ImageLoader.Builder(context)
+        .components {
+            add(GifDecoder.Factory())
+        }
+        .crossfade(true)
+        .build()
 }
