@@ -19,6 +19,9 @@ local.env
 /app/release.jks
 app/local signing.properties
 debug.keystore
+# Exception: the shared debug keystore is committed so local and CI dev
+# builds produce interchangeable (same-signature) APKs.
+!app/debug.keystore
 release.jks
 # keymgr compiled binaries (CI compiles fresh per release)
 /scripts/keymgr
