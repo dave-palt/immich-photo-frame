@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
-import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 
 /** Downloads bitmap via Coil and extracts dominant color via Palette. */
@@ -14,7 +14,10 @@ suspend fun extractDominantColor(
     context: Context,
     url: String,
 ): Color = try {
-    val loader = ImageLoader(context)
+    // Use the singleton ImageLoader (registered in ImmichFrameApp) so that
+    // GIF-aware decoding is available. Creating a standalone ImageLoader
+    // here would miss the GifDecoder and fail on cached GIF files.
+    val loader = SingletonImageLoader.get(context)
     val request = ImageRequest.Builder(context)
         .data(url)
         .size(128)
