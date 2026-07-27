@@ -43,21 +43,15 @@ android {
             }
         }
         create("sharedDebug") {
-            // Use a shared debug keystore (base64 in CI secret DEBUG_KEYSTORE)
-            // so all dev builds share the same signature for clean upgrades.
-            // Falls back to the default debug keystore (~/.android/debug.keystore) locally.
-            val debugStorePath = providers.environmentVariable("DEBUG_KEYSTORE_PATH").orNull
-            if (debugStorePath != null) {
-                storeFile = file(debugStorePath)
-                storePassword = providers.environmentVariable("DEBUG_KEYSTORE_PASSWORD").get()
-                keyAlias = providers.environmentVariable("DEBUG_KEY_ALIAS").get()
-                keyPassword = providers.environmentVariable("DEBUG_KEY_PASSWORD").get()
-            } else {
-                storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
-            }
+            // A committed debug keystore so local and CI dev builds share the
+            // same signature — clean upgrades between local installs and GitHub
+            // dev releases without INSTALL_FAILED_UPDATE_INCOMPATIBLE.
+            // Safe to commit: debug credentials are public and this only signs
+            // the .debug applicationIdSuffix variant, never releases.
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
         }
     }
 

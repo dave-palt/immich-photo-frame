@@ -43,9 +43,8 @@ Two parallel jobs:
 - Lint reports uploaded as artifacts (7-day retention)
 
 #### Build job
-- Decodes shared debug keystore from `DEBUG_KEYSTORE` secret
 - Builds debug APK with `.debug` application ID suffix and `-dev` version name suffix
-- APK signed with shared debug keystore (all dev builds share the same signature for clean upgrades over each other)
+- APK signed with the committed `app/debug.keystore` — the same key used by local `assembleDebug` builds, so local and CI dev builds are interchangeable (clean upgrade-over-install in either direction)
 - Artifact: `immichframe-debug` (14-day retention)
 - **On push to develop** (not PR): publishes a GitHub pre-release:
   - Tag: `dev-{full sha}` (explicitly pinned via `--target ${{ github.sha }}`)
@@ -53,14 +52,7 @@ Two parallel jobs:
   - Prerelease flag set
 - **Auto-cleanup**: keeps only the 3 most recent dev releases, deletes older ones with `gh release delete --cleanup-tag`
 
-#### Required GitHub Secrets (dev)
-
-| Secret | Description |
-|---|---|
-| `DEBUG_KEYSTORE` | Shared debug keystore file, base64-encoded |
-| `DEBUG_KEYSTORE_PASSWORD` | Debug keystore password |
-| `DEBUG_KEY_ALIAS` | Debug key alias |
-| `DEBUG_KEY_PASSWORD` | Debug key password |
+No GitHub secrets are required for the dev build — the debug keystore is committed to the repo (see [Shared Debug Keystore](#shared-debug-keystore)).
 
 The release is created via `gh release create` (not `softprops/action-gh-release`) for full control over tag dates and target commit. The `--target ${{ github.sha }}` flag is critical — without it, GitHub Actions' detached HEAD checkout causes the tag to be created on the wrong commit.
 
@@ -171,7 +163,19 @@ All scripts are built from the same source of truth (`scripts/keymgr.ts`) to ens
 ./gradlew clean spotlessApply spotlessCheck lintDebug assembleDebug
 ```
 
-If no `DEBUG_KEYSTORE_PATH` env var is set, the build falls back to the default debug keystore at `~/.android/debug.keystore` (storepass: `android`, alias: `androiddebugkey`).
+Local debug builds are signed with the same committed `app/debug.keystore` used by CI, so a locally-built APK and a CI-built dev APK are interchangeable — you can install one over the other without uninstalling first.
+
+### Shared Debug Keystore
+
+`app/debug.keystore` is a standard Android debug keystore (storepass: `android`, alias: `androiddebugkey`, keypass: `android`) committed to the repo. It is shared between local and CI dev builds so both produce APKs with the same signature, enabling clean upgrade-over-install in either direction.
+
+This is safe because:
+
+- Android debug credentials are publicly documented and carry no secrecy.
+- It only ever signs the `com.dav3.immichframe.debug` application ID (the `.debug` suffix variant) — never a production release.
+- Release builds use a separate keystore (`SIGNING_KEYSTORE_BASE64` secret) that is never committed.
+
+Existing dev installs signed with the previous CI-only key will need a one-time uninstall before the first install of a build signed with this keystore.
 
 ### Self-Update (GitHub Releases)
 
