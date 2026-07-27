@@ -244,7 +244,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  │ ✗ asset.download     │    │ ← red if denied; card turns red if blocking missing
 │  └──────────────────────┘    │
 │                              │
-│  Reset All Settings          │ ← red text button
+│  Reset All Settings          │ ← red text button (preserves tour progress)
 │                              │
 │  Show Tour Again             │ ← replays Settings tour
 │  Reset All Tours             │ ← replays all screens' tours
