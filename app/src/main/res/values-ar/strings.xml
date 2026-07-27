@@ -9,6 +9,12 @@
     <string name="section_system">النظام</string>
     <string name="section_albums">الألبومات</string>
     <string name="section_connection">الاتصال</string>
+    <string name="api_key_permissions">أذونات مفتاح API</string>
+    <string name="recheck_permissions">إعادة فحص</string>
+    <string name="checking">جارٍ الفحص…</string>
+    <string name="missing_required_perms">أذونات مطلوبة مفقودة — بعض الميزات لن تعمل. أنشئ مفتاحاً جديداً أو حدثه في Immich.</string>
+    <string name="optional_perms_missing">بعض الميزات الاختيارية معطلة بسبب الأذونات المفقودة.</string>
+    <string name="skip_videos_locked_desc">مقفل — مفتاح API يفتقد إذن \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">الفاصل الزمني</string>
@@ -154,10 +160,14 @@
     <string name="tour_setup_welcome_body">اتصل بخادم Immich لعرض صورك. دعنا نمر بالإعداد.</string>
     <string name="tour_setup_server_title">عنوان الخادم</string>
     <string name="tour_setup_server_body">أدخل عنوان URL لخادم Immich هنا. استخدم التنسيق photos.example.com أو 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">مفتاح API</string>
-    <string name="tour_setup_apikey_body">أنشئ مفتاح API في Immich ضمن الإعدادات → مفاتيح API. يحتاج إلى أذونات قراءة الألبومات والأصول والمستخدم.</string>
-    <string name="tour_setup_connect_title">اختبار واتصال</string>
-    <string name="tour_setup_connect_body">اضغط على اختبار الاتصال للتحقق من بيانات الاعتماد. بمجرد الاتصال، ستختار الألبومات لعرضها.</string>
+    <string name="tour_setup_validate_title">تحقق من الخادم</string>
+    <string name="tour_setup_validate_body">بعد إدخال عنوان الخادم، اضغط للتحقق من الاتصال. سيكتشف التطبيق إصدار Immich وطرق تسجيل الدخول المتاحة.</string>
+        <string name="tour_setup_generate_title">إنشاء مفتاح تلقائياً</string>
+    <string name="tour_setup_generate_body">تفضل عدم التعامل مع مفاتيح API يدوياً؟ اضغط هنا وسجل الدخول ببريدك الإلكتروني وكلمة المرور — ينشئ التطبيق مفتاحاً لك، ثم يتخلص من كلمة المرور.</string>
+<string name="tour_setup_apikey_title">أنشئ مفتاحك</string>
+    <string name="tour_setup_apikey_body">مفتاح API هو رمز يسمح لهذا التطبيق بالوصول إلى صورك على خادم Immich — دون مشاركة كلمة المرور. يمكنك لصق مفتاح موجود هنا، أو استخدام الزر أدناه لإنشاء واحد تلقائياً.</string>
+    <string name="tour_setup_connect_title">اتصل</string>
+    <string name="tour_setup_connect_body">اضغط لاختبار الاتصال وبدء عرض الشرائح.</string>
     <string name="tour_albums_select_title">اختر ألبوماتك</string>
     <string name="tour_albums_select_body">اضغط على ألبوم أو أكثر لتضمينها في عرض الشرائح. الألبومات المحددة تظهر علامة اختيار.</string>
     <string name="tour_albums_start_title">ابدأ العرض</string>
@@ -188,4 +198,21 @@
     <string name="tour_settings_cache_body">يقوم المزامنة التلقائية بتنزيل الصور في الخلفية ليعمل العرض دون اتصال ويُحمّل فوراً.</string>
     <string name="tour_settings_connection_title">الاتصال</string>
     <string name="tour_settings_connection_body">حدّث عنوان URL للخادم أو مفتاح API هنا إذا تغير إعداد Immich الخاص بك.</string>
+    <string name="validate_server">التحقق من الخادم</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">إنشاء مفتاح</string>
+    <string name="enter_manually">إدخال يدوي</string>
+    <string name="generate_key_prompt">ليس لديك مفتاح API؟ أنشئ واحداً تلقائياً:</string>
+    <string name="generate_key_title">إنشاء مفتاح API</string>
+    <string name="generate_key_desc">سجّل الدخول ببريد Immich وكلمة المرور. سينشئ التطبيق مفتاح API تلقائيًا — تُستخدم كلمة المرور مرة واحدة ولا تُخزَّن أبدًا.</string>
+    <string name="generate_key_account_note">استخدم الحساب المخصص لهذا الإطار — يحدد الألبومات والصور المتاحة. لا يجب أن يكون حسابك الشخصي.</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="login_and_generate">تسجيل الدخول وإنشاء المفتاح</string>
+    <string name="sign_in_with_oauth">تسجيل الدخول عبر OAuth</string>
+    <string name="api_key_help">ما هو مفتاح API؟</string>
+    <string name="api_key_help_title">حول مفاتيح API</string>
+    <string name="api_key_help_what">مفتاح API هو رمز يسمح لهذا التطبيق بالوصول إلى صورك على خادم Immich — دون تخزين كلمة المرور.</string>
+    <string name="api_key_help_why">ينشئ التطبيق مفتاحًا محدود الصلاحيات بالأذونات التي يحتاجها فقط (قراءة الألبومات، عرض الصور). يمكنك إلغاؤه في أي وقت من إعدادات Immich → مفاتيح API.</string>
+    <string name="api_key_help_password">تُستخدم كلمة المرور مرة واحدة لإنشاء المفتاح، ثم تُحذف فورًا. لا تُحفظ على هذا الجهاز أبدًا.</string>
 </resources>

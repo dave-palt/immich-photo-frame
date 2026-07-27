@@ -174,4 +174,7 @@ dependencies {
 
     // Biometric authentication (fingerprint / face / device credential)
     implementation(libs.androidx.biometric)
+
+    // Custom Tabs (OAuth browser flow during setup)
+    implementation(libs.androidx.browser)
 }

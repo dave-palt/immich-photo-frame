@@ -9,6 +9,12 @@
     <string name="section_system">Система</string>
     <string name="section_albums">Альбомы</string>
     <string name="section_connection">Подключение</string>
+    <string name="api_key_permissions">Разрешения ключа API</string>
+    <string name="recheck_permissions">Перепроверить</string>
+    <string name="checking">Проверка…</string>
+    <string name="missing_required_perms">Отсутствуют обязательные разрешения — некоторые функции не будут работать. Создайте новый ключ или обновите его в Immich.</string>
+    <string name="optional_perms_missing">Некоторые дополнительные функции отключены из-за отсутствующих разрешений.</string>
+    <string name="skip_videos_locked_desc">Заблокировано — ключ API не имеет разрешения \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">Интервал</string>
@@ -154,10 +160,14 @@
     <string name="tour_setup_welcome_body">Подключитесь к серверу Immich для показа фото. Давайте пройдём настройку.</string>
     <string name="tour_setup_server_title">Адрес сервера</string>
     <string name="tour_setup_server_body">Введите URL вашего сервера Immich. Формат: photos.example.com или 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API-ключ</string>
-    <string name="tour_setup_apikey_body">Создайте API-ключ в Immich: Настройки → API-ключи. Нужны права на чтение альбомов, активов и пользователей.</string>
-    <string name="tour_setup_connect_title">Проверить и подключиться</string>
-    <string name="tour_setup_connect_body">Нажмите «Проверить соединение» для проверки учётных данных. После подключения выберите альбомы.</string>
+    <string name="tour_setup_validate_title">Проверить сервер</string>
+    <string name="tour_setup_validate_body">После ввода адреса сервера нажмите, чтобы проверить подключение. Приложение определит версию Immich и доступные методы входа.</string>
+        <string name="tour_setup_generate_title">Сгенерировать ключ автоматически</string>
+    <string name="tour_setup_generate_body">Не хотите управлять API-ключами вручную? Нажмите здесь и войдите по электронной почте и паролю — приложение создаст ключ для вас, а затем удалит пароль.</string>
+<string name="tour_setup_apikey_title">Создать ключ</string>
+    <string name="tour_setup_apikey_body">API-ключ — это токен, который позволяет этому приложению получать доступ к вашим фотографиям на сервере Immich — без передачи пароля. Вы можете вставить существующий ключ здесь или использовать кнопку ниже для автоматической генерации.</string>
+    <string name="tour_setup_connect_title">Подключиться</string>
+    <string name="tour_setup_connect_body">Нажмите, чтобы проверить подключение и запустить слайд-шоу.</string>
     <string name="tour_albums_select_title">Выберите альбомы</string>
     <string name="tour_albums_select_body">Нажмите один или несколько альбомов для слайд-шоу. Выбранные альбомы отмечены галочкой.</string>
     <string name="tour_albums_start_title">Начать показ</string>
@@ -188,4 +198,21 @@
     <string name="tour_settings_cache_body">Автосинхронизация скачивает фото в фоне, чтобы слайд-шоу работало офлайн и загружалось мгновенно.</string>
     <string name="tour_settings_connection_title">Подключение</string>
     <string name="tour_settings_connection_body">Обновите URL сервера или API-ключ здесь, если настройки Immich изменились.</string>
+    <string name="validate_server">Проверить сервер</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Создать ключ</string>
+    <string name="enter_manually">Ввести вручную</string>
+    <string name="generate_key_prompt">Нет API-ключа? Сгенерируйте автоматически:</string>
+    <string name="generate_key_title">Создать ключ API</string>
+    <string name="generate_key_desc">Войдите с вашей электронной почтой и паролем Immich. Приложение автоматически создаст ключ API с ограниченными правами — ваш пароль используется один раз и никогда не сохраняется.</string>
+    <string name="generate_key_account_note">Используйте учётную запись, предназначенную для этой фоторамки — она определяет доступные альбомы и фото. Это не обязательно ваш личный аккаунт.</string>
+    <string name="email">Эл. почта</string>
+    <string name="password">Пароль</string>
+    <string name="login_and_generate">Войти и создать ключ</string>
+    <string name="sign_in_with_oauth">Войти через OAuth</string>
+    <string name="api_key_help">Что такое ключ API?</string>
+    <string name="api_key_help_title">О ключах API</string>
+    <string name="api_key_help_what">Ключ API — это токен, который позволяет этому приложению получать доступ к вашим фото на вашем сервере Immich — без сохранения вашего пароля.</string>
+    <string name="api_key_help_why">Приложение создаёт ключ только с необходимыми разрешениями (чтение альбомов, просмотр фото). Вы можете отозвать его в любой момент в Настройках Immich → Ключи API.</string>
+    <string name="api_key_help_password">Ваш пароль используется один раз для создания ключа, а затем немедленно удаляется. Он никогда не сохраняется на этом устройстве.</string>
 </resources>

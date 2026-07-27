@@ -31,6 +31,11 @@ Retrofit client), the API key is appended as a query parameter:
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
 
+**In-app key generation**: during setup, the default is to paste an existing
+key manually. A **Generate Key** helper button lets the user auto-create a
+scoped key via email/password (or OAuth) — the app logs in, creates the key,
+and discards the password. See F1 in the functional spec for details.
+
 ### Required Permissions
 
 The API key needs 5 scoped permissions:
@@ -43,7 +48,70 @@ The API key needs 5 scoped permissions:
 | `asset.download` | Download original files (video playback via ExoPlayer) |
 | `user.read` | Validate API key (GET /users/me) |
 
-These permissions are the minimum required for ImmichFrame to function. You can create a key with these exact permissions using the provided `keymgr` tool (or the shell/PowerShell scripts). Requires Immich v1.135+ for scoped keys.
+These permissions are the minimum required for ImmichFrame to function.
+The in-app key generator creates a key with exactly these permissions
+(requires Immich v1.135+ for scoped keys). The external `keymgr` scripts
+are still available as a fallback.
+
+### Permission Verification
+
+After the API key is stored (whether generated in-app or pasted manually),
+the app probes each required endpoint to verify the key actually has the
+necessary scopes. This mirrors the external `scripts/check-api-key.sh`
+script. Probes run in dependency order:
+
+| Step | Endpoint | Permission Tested | Notes |
+|---|---|---|---|
+| 1 | `GET /api/users/me` | `user.read` | Also validates the key itself |
+| 2 | `GET /api/albums` | `album.read` | Returns album list |
+| 3 | `POST /api/search/metadata` | `asset.read` | Returns first asset ID for downstream probes |
+| 4 | `GET /api/assets/{id}/thumbnail` | `asset.view` | Uses asset ID from step 3 |
+| 5 | `GET /api/assets/{id}/original` | `asset.download` | Optional; gates video playback + media cache |
+
+If an upstream probe fails, downstream probes are skipped and marked
+"unknown" (not "denied"). Results are stored as `permission_status` (JSON)
+in DataStore and refreshed every time the Settings screen opens or the
+user taps "Re-check".
+
+## In-App Auth Endpoints
+
+These endpoints are used during setup by a separate Retrofit instance
+(`ImmichAuthApi`) that does NOT use the `x-api-key` header. Login and
+key-creation calls use `Bearer` tokens passed per-call via the
+`Authorization` header.
+
+### Server Probing (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/server/version` | Detect Immich version (scoped-key support check) |
+| GET | `/server/features` | Detect available auth methods (passwordLogin, oauth) |
+
+### Password Login (no auth)
+
+| Method | Endpoint | Request | Response |
+|---|---|---|---|
+| POST | `/auth/login` | `{ email, password }` | `{ accessToken, userId, userEmail, ... }` |
+
+### API Key Management (Bearer token)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api-keys` | List existing keys (metadata only, no secrets) |
+| POST | `/api-keys` | Create a new key: `{ name: "ImmichMediaFrame", permissions: [...] }` → returns `{ secret }` |
+| PUT | `/api-keys/{id}` | Update key name/permissions (metadata only) |
+
+### OAuth PKCE (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/oauth/authorize` | `{ redirectUri, codeChallenge, state }` → `{ url }` (open in browser) |
+| POST | `/oauth/callback` | `{ url, codeVerifier, state }` → `{ accessToken, ... }` (same as login) |
+
+The OAuth flow uses PKCE: the app generates a `code_verifier` + `code_challenge`
++ `state` locally (`PkceHelper.kt`), opens the authorization URL in a Custom
+Tab, and receives the callback via the `com.dav3.immichframe://oauth-callback`
+deep link.
 
 ## API Key Management Tools
 

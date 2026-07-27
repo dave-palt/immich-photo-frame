@@ -5,14 +5,43 @@
 ### F1: First-Run Setup
 
 1. App launches with no stored credentials.
-2. Setup screen prompts for:
-   - Immich Server URL (e.g. `https://photos.example.com` or `http://192.168.1.100:2283`)
-   - API Key
-3. User taps "Test Connection".
-4. App calls `GET /server/ping` then `GET /users/me` to validate.
-   - On failure: show error message (wrong URL, unreachable, invalid key). Stay on setup screen.
-   - On success: store credentials, proceed to album selection.
-5. Credentials persisted to encrypted on-device storage.
+2. **Step 1 — Domain Validation:**
+   - Setup screen prompts for Immich Server URL (protocol dropdown + domain field).
+   - User taps "Validate Server".
+   - App calls `GET /server/version` + `GET /server/features` (no auth required)
+     to detect the Immich version and available auth methods.
+   - On failure: show error message (wrong URL, unreachable). Stay on domain step.
+   - On success: display detected version (e.g. "Immich v1.135.0"), advance to auth step.
+3. **Step 2 — Authentication (manual paste is default):**
+   - **Enter Manually** (default): User pastes an existing API key, then taps
+     "Test Connection" (the legacy flow). Below the key field, a helper button
+     offers auto-generation for users who don't have a key yet.
+   - **Generate Key** (helper button): Email + password fields. App calls
+     `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
+     key with 5 permissions. Password is used once and never persisted.
+     A note reminds the user to log in with the account meant for this photo
+     frame (not necessarily their personal account).
+     A `?` icon opens a dialog explaining what an API key is, why the app
+     generates one, and that the password is discarded immediately.
+   - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
+     OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
+     returns to the app → JWT obtained → key created.
+4. App validates the key by calling `GET /users/me`.
+5. **Permission verification**: App probes all 5 required endpoints in
+   dependency order (user → albums → search → thumbnail → original) to verify
+   the key has the necessary scopes. Results are stored as `permission_status`
+   in DataStore.
+   - If a **blocking** permission is missing (`user.read`, `album.read`,
+     `asset.read`, `asset.view`), setup is blocked with an error showing
+     which permissions are missing and a shortcut to generate a properly-
+     scoped key.
+   - If only the **optional** permission (`asset.download`) is missing, setup
+     proceeds in degraded mode: video playback is locked off and the media
+     cache skips downloading originals. The user is informed which feature
+     is disabled and why.
+6. Credentials persisted: API key to encrypted on-device storage, server version
+   + key-scope flag + permission status to DataStore.
+7. On success, proceed to album selection.
 
 ### F2: Album Selection
 
@@ -240,8 +269,21 @@ Options:
     fingerprint / face / device-PIN authentication. If no screen lock
     is set up, a dialog prompts the user to create one.
   - Test Connection button
+  - **API Key Permissions** card (shown when a key is set):
+    - Lists all 5 required permissions with ✓ (granted), ✗ (denied),
+      or ? (unknown — couldn't probe) status icons.
+    - **Re-check** button re-probes all endpoints.
+    - Auto-refreshes every time Settings is opened.
+    - If blocking permissions are missing, the card uses an error-colored
+      background and shows guidance to regenerate the key.
+- **Feature gating based on permissions:**
+  - When `asset.download` is denied, the **Skip Videos** toggle is locked
+    ON (can't be turned off) with subtitle "Locked — API key lacks
+    'asset.download' permission". The media cache also skips downloading.
 - **Albums** — change album selection (returns to album picker)
-- **Reset All Settings** — clears everything, returns to setup screen
+- **Reset All Settings** — clears all settings, credentials, album selection,
+  and cached data, returns to setup screen. Tour completion is **preserved**
+  (use "Reset All Tours" to clear tour progress).
 
 ### F8: Media Selection
 
@@ -318,11 +360,11 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (19 steps across 4 screens):**
+**Step inventory (21 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
-| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Setup (6) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_generate_key`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
 | Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |

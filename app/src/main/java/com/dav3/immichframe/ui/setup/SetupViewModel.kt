@@ -2,7 +2,10 @@ package com.dav3.immichframe.ui.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.repository.ImmichRepository
+import com.dav3.immichframe.domain.repository.OAuthStartResult
+import com.dav3.immichframe.domain.repository.ServerInfo
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,13 +18,46 @@ import javax.inject.Inject
 
 enum class ConnectionState { IDLE, CONNECTING, SUCCESS, ERROR }
 
+/**
+ * Which auth method the user is using on the setup screen.
+ */
+enum class AuthMode {
+    /** Email/password login → key generation. */
+    GENERATE,
+
+    /** Manual API-key paste. */
+    MANUAL_KEY,
+}
+
+/**
+ * The setup sub-step — drives the UI layout.
+ */
+enum class SetupStep {
+    /** User is entering/validating the server domain. */
+    DOMAIN,
+
+    /** Server validated, now choosing auth method. */
+    AUTH,
+}
+
 data class SetupUiState(
     val useHttps: Boolean = true,
     val domain: String = "",
     val apiKey: String = "",
+    val step: SetupStep = SetupStep.DOMAIN,
+    val authMode: AuthMode = AuthMode.MANUAL_KEY,
+    val email: String = "",
+    val password: String = "",
     val connectionState: ConnectionState = ConnectionState.IDLE,
     val errorMessage: String? = null,
     val connectedEmail: String? = null,
+    val serverInfo: ServerInfo? = null,
+    val serverVersionDisplay: String? = null,
+    val showOAuthButton: Boolean = false,
+    /** Transient: PKCE state retained for the OAuth callback. */
+    val pendingOAuth: OAuthStartResult? = null,
+    /** Result of the permission check run after key validation. */
+    val permissionCheck: PermissionCheckResult? = null,
 ) {
     val serverUrl: String get() = "${if (useHttps) "https" else "http"}://$domain".removeSuffix("/")
 }
@@ -58,8 +94,15 @@ constructor(
         viewModelScope.launch {
             val url = settingsRepo.serverUrl.first()
             val key = settingsRepo.apiKey.first()
-            val (https, domain) = parseUrl(url)
-            _uiState.value = _uiState.value.copy(useHttps = https, domain = domain, apiKey = key)
+            if (url.isNotBlank() || key.isNotBlank()) {
+                val (https, domain) = parseUrl(url)
+                _uiState.value = _uiState.value.copy(
+                    useHttps = https,
+                    domain = domain,
+                    apiKey = key,
+                    authMode = AuthMode.MANUAL_KEY,
+                )
+            }
         }
     }
 
@@ -68,9 +111,9 @@ constructor(
     }
 
     fun updateDomain(input: String) {
-        // Parse pasted URLs that include protocol — strip it, set dropdown accordingly
         val (https, domain) = parseUrl(input)
-        _uiState.value = _uiState.value.copy(useHttps = https, domain = domain, connectionState = ConnectionState.IDLE)
+        _uiState.value =
+            _uiState.value.copy(useHttps = https, domain = domain, connectionState = ConnectionState.IDLE)
     }
 
     private fun parseUrl(input: String): Pair<Boolean, String> {
@@ -86,39 +129,176 @@ constructor(
         _uiState.value = _uiState.value.copy(apiKey = key, connectionState = ConnectionState.IDLE)
     }
 
-    fun testConnection() {
+    fun updateEmail(email: String) {
+        _uiState.value = _uiState.value.copy(email = email, connectionState = ConnectionState.IDLE)
+    }
+
+    fun updatePassword(password: String) {
+        _uiState.value = _uiState.value.copy(password = password, connectionState = ConnectionState.IDLE)
+    }
+
+    fun setAuthMode(mode: AuthMode) {
+        _uiState.value = _uiState.value.copy(authMode = mode, connectionState = ConnectionState.IDLE)
+    }
+
+    fun backToDomainStep() {
+        _uiState.value = _uiState.value.copy(step = SetupStep.DOMAIN, connectionState = ConnectionState.IDLE)
+    }
+
+    /**
+     * Step 1: validate the server — ping it, fetch version + features.
+     * On success, advance to the AUTH step and show server info.
+     */
+    fun validateServer() {
         val state = _uiState.value
-        if (state.domain.isBlank() || state.apiKey.isBlank()) {
+        if (state.domain.isBlank()) {
+            _uiState.value =
+                state.copy(connectionState = ConnectionState.ERROR, errorMessage = "Server URL is required")
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value =
+                _uiState.value.copy(connectionState = ConnectionState.CONNECTING, errorMessage = null)
+
+            val infoResult = immichRepo.getServerInfo(state.serverUrl)
+            if (infoResult.isFailure) {
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = ConnectionState.ERROR,
+                        errorMessage = infoResult.exceptionOrNull()?.message ?: "Server unreachable",
+                    )
+                return@launch
+            }
+
+            val info = infoResult.getOrThrow()
+            _uiState.value =
+                _uiState.value.copy(
+                    step = SetupStep.AUTH,
+                    connectionState = ConnectionState.IDLE,
+                    serverInfo = info,
+                    serverVersionDisplay = info.version.formatted(),
+                    showOAuthButton = info.oauthEnabled,
+                )
+        }
+    }
+
+    /**
+     * Step 2a: login with email/password and generate a scoped API key.
+     * The password is discarded after this call — never persisted.
+     */
+    fun generateKey() {
+        val state = _uiState.value
+        if (state.email.isBlank() || state.password.isBlank()) {
             _uiState.value =
                 state.copy(
                     connectionState = ConnectionState.ERROR,
-                    errorMessage = "Server URL and API key are required",
+                    errorMessage = "Email and password are required",
                 )
             return
         }
 
         viewModelScope.launch {
             _uiState.value =
-                _uiState.value.copy(
-                    connectionState = ConnectionState.CONNECTING,
-                    errorMessage = null,
-                )
+                _uiState.value.copy(connectionState = ConnectionState.CONNECTING, errorMessage = null)
 
-            settingsRepo.setServerUrl(state.serverUrl)
-            settingsRepo.setApiKey(state.apiKey.trim())
-
-            // Invalidate repo cache so it picks up new credentials
-            immichRepo.invalidateCache()
-
-            val pingResult = immichRepo.ping()
-            if (pingResult.isFailure) {
+            val keyResult = immichRepo.generateApiKey(state.serverUrl, state.email, state.password)
+            if (keyResult.isFailure) {
                 _uiState.value =
                     _uiState.value.copy(
                         connectionState = ConnectionState.ERROR,
-                        errorMessage = pingResult.exceptionOrNull()?.message ?: "Server unreachable",
+                        errorMessage = keyResult.exceptionOrNull()?.message ?: "Login or key creation failed",
                     )
                 return@launch
             }
+
+            val key = keyResult.getOrThrow()
+            val info = state.serverInfo
+            completeConnection(key, info?.supportsScopedKeys == true, info?.version?.formatted() ?: "")
+        }
+    }
+
+    /**
+     * Step 2b: start OAuth flow. Opens the IdP login page in a browser.
+     * The callback is handled by [handleOAuthCallback].
+     */
+    fun startOAuth() {
+        val state = _uiState.value
+        viewModelScope.launch {
+            _uiState.value =
+                _uiState.value.copy(connectionState = ConnectionState.CONNECTING, errorMessage = null)
+
+            val result = immichRepo.startOAuth(state.serverUrl)
+            if (result.isFailure) {
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = ConnectionState.ERROR,
+                        errorMessage = result.exceptionOrNull()?.message ?: "OAuth setup failed",
+                    )
+                return@launch
+            }
+
+            val oauth = result.getOrThrow()
+            _uiState.value = _uiState.value.copy(pendingOAuth = oauth)
+        }
+    }
+
+    /**
+     * Handle the OAuth callback deep-link. Exchanges the authorization code
+     * for a session token and creates the API key.
+     */
+    fun handleOAuthCallback(callbackUrl: String) {
+        val state = _uiState.value
+        val oauth = state.pendingOAuth ?: return
+
+        viewModelScope.launch {
+            _uiState.value =
+                _uiState.value.copy(connectionState = ConnectionState.CONNECTING, errorMessage = null)
+
+            val result =
+                immichRepo.finishOAuth(
+                    state.serverUrl,
+                    callbackUrl,
+                    oauth.codeVerifier,
+                    oauth.state,
+                )
+            if (result.isFailure) {
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = ConnectionState.ERROR,
+                        errorMessage = result.exceptionOrNull()?.message ?: "OAuth callback failed",
+                        pendingOAuth = null,
+                    )
+                return@launch
+            }
+
+            val key = result.getOrThrow()
+            val info = state.serverInfo
+            completeConnection(key, info?.supportsScopedKeys == true, info?.version?.formatted() ?: "")
+        }
+    }
+
+    /**
+     * Step 2c: test connection with a manually-entered API key.
+     */
+    fun testConnection() {
+        val state = _uiState.value
+        if (state.apiKey.isBlank()) {
+            _uiState.value =
+                state.copy(
+                    connectionState = ConnectionState.ERROR,
+                    errorMessage = "API key is required",
+                )
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value =
+                _uiState.value.copy(connectionState = ConnectionState.CONNECTING, errorMessage = null)
+
+            settingsRepo.setServerUrl(state.serverUrl)
+            settingsRepo.setApiKey(state.apiKey.trim())
+            immichRepo.invalidateCache()
 
             val userResult = immichRepo.validateApiKey()
             if (userResult.isFailure) {
@@ -130,11 +310,77 @@ constructor(
                 return@launch
             }
 
+            completeConnection(state.apiKey.trim(), scoped = false, version = "")
+        }
+    }
+
+    /**
+     * Common path for key generation (password + OAuth): store the key, persist
+     * version/scope metadata, then validate and surface success.
+     */
+    private suspend fun completeConnection(key: String, scoped: Boolean, version: String) {
+        settingsRepo.setServerUrl(_uiState.value.serverUrl)
+        settingsRepo.setApiKey(key)
+        settingsRepo.setApiKeyScoped(scoped)
+        if (version.isNotBlank()) settingsRepo.setServerVersion(version)
+        immichRepo.invalidateCache()
+
+        val userResult = immichRepo.validateApiKey()
+        if (userResult.isFailure) {
             _uiState.value =
                 _uiState.value.copy(
-                    connectionState = ConnectionState.SUCCESS,
-                    connectedEmail = userResult.getOrThrow(),
+                    connectionState = ConnectionState.ERROR,
+                    errorMessage = "Key created but validation failed: ${userResult.exceptionOrNull()?.message}",
                 )
+            return
+        }
+
+        // Run full permission probe — blocks setup if mandatory permissions
+        // are missing, or proceeds in degraded mode if only optional ones are.
+        val permResult = immichRepo.checkPermissions()
+        val permCheck = permResult.getOrNull()
+        if (permCheck != null) {
+            settingsRepo.setPermissionStatus(permCheck)
+            if (!permCheck.canProceed) {
+                val missing = permCheck.missingBlocking.joinToString(", ") { it.scope }
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = ConnectionState.ERROR,
+                        errorMessage = "API key is missing required permissions: $missing. " +
+                            "Please generate a new key or update it in Immich to include all required permissions.",
+                    )
+                return
+            }
+        }
+
+        // Apply degraded settings for any missing optional permissions
+        if (permCheck != null) {
+            enforceDegradedSettings(permCheck)
+        }
+
+        _uiState.value =
+            _uiState.value.copy(
+                connectionState = ConnectionState.SUCCESS,
+                connectedEmail = userResult.getOrThrow(),
+                pendingOAuth = null,
+                permissionCheck = permCheck,
+            )
+    }
+
+    /**
+     * Force-off any setting gated by a missing optional permission.
+     * E.g. if asset.download is denied, set skipVideos=true.
+     */
+    private suspend fun enforceDegradedSettings(result: PermissionCheckResult) {
+        val currentSettings = settingsRepo.slideshowSettings.first()
+        var newSettings = currentSettings
+        for (perm in result.missingOptional) {
+            when (perm.gatedSettingKey) {
+                "skip_videos" -> newSettings = newSettings.copy(skipVideos = true)
+            }
+        }
+        if (newSettings != currentSettings) {
+            settingsRepo.setSlideshowSettings(newSettings)
         }
     }
 }

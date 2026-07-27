@@ -9,6 +9,12 @@
     <string name="section_system">시스템</string>
     <string name="section_albums">앨범</string>
     <string name="section_connection">연결</string>
+    <string name="api_key_permissions">API 키 권한</string>
+    <string name="recheck_permissions">재확인</string>
+    <string name="checking">확인 중…</string>
+    <string name="missing_required_perms">필수 권한 누락 — 일부 기능이 작동하지 않습니다. Immich에서 새 키를 생성하거나 업데이트하세요.</string>
+    <string name="optional_perms_missing">권한 누락으로 인해 일부 선택적 기능이 비활성화되었습니다.</string>
+    <string name="skip_videos_locked_desc">잠김 — API 키에 \'asset.download\' 권한이 없습니다</string>
 
     <!-- Playback -->
     <string name="interval">간격</string>
@@ -154,10 +160,14 @@
     <string name="tour_setup_welcome_body">사진을 표시하려면 Immich 서버에 연결하세요. 설정을 안내해 드리겠습니다.</string>
     <string name="tour_setup_server_title">서버 주소</string>
     <string name="tour_setup_server_body">여기에 Immich 서버 URL을 입력하세요. photos.example.com 또는 192.168.1.100:2283 형식을 사용하세요.</string>
-    <string name="tour_setup_apikey_title">API 키</string>
-    <string name="tour_setup_apikey_body">Immich 설정 → API 키에서 API 키를 만드세요. 앨범, 에셋, 사용자 읽기 권한이 필요합니다.</string>
-    <string name="tour_setup_connect_title">테스트 및 연결</string>
-    <string name="tour_setup_connect_body">연결 테스트를 탭하여 자격 증명을 확인하세요. 연결되면 표시할 앨범을 선택합니다.</string>
+    <string name="tour_setup_validate_title">서버 확인</string>
+    <string name="tour_setup_validate_body">서버 주소를 입력한 후 눌러 연결을 확인하세요. 앱이 Immich 버전과 사용 가능한 로그인 방법을 감지합니다.</string>
+        <string name="tour_setup_generate_title">키 자동 생성</string>
+    <string name="tour_setup_generate_body">API 키를 수동으로 관리하고 싶지 않으신가요? 여기를 탭하고 이메일과 비밀번호로 로그인하세요 — 앱이 키를 생성한 후 비밀번호를 폐기합니다.</string>
+<string name="tour_setup_apikey_title">키 생성</string>
+    <string name="tour_setup_apikey_body">API 키는 Immich 서버의 사진에 접근할 수 있게 해주는 토큰입니다 — 비밀번호를 공유하지 않습니다. 여기에 기존 키를 붙여넣거나, 아래 버튼으로 자동 생성할 수 있습니다.</string>
+    <string name="tour_setup_connect_title">연결</string>
+    <string name="tour_setup_connect_body">눌러서 연결을 테스트하고 슬라이드쇼를 시작하세요.</string>
     <string name="tour_albums_select_title">앨범 선택</string>
     <string name="tour_albums_select_body">슬라이드 쇼에 포함할 앨범을 하나 이상 탭하세요. 선택된 앨범에 체크 표시가 나타납니다.</string>
     <string name="tour_albums_start_title">쇼 시작</string>
@@ -188,4 +198,21 @@
     <string name="tour_settings_cache_body">자동 동기화가 백그라운드에서 사진을 다운로드하여 슬라이드 쇼가 오프라인으로 작동하고 즉시 로드됩니다.</string>
     <string name="tour_settings_connection_title">연결</string>
     <string name="tour_settings_connection_body">Immich 설정이 변경되면 여기서 서버 URL 또는 API 키를 업데이트하세요.</string>
+    <string name="validate_server">서버 확인</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">키 생성</string>
+    <string name="enter_manually">수동 입력</string>
+    <string name="generate_key_prompt">API 키가 없으신가요? 자동으로 생성하세요:</string>
+    <string name="generate_key_title">API 키 생성</string>
+    <string name="generate_key_desc">Immich 이메일과 비밀번호로 로그인하세요. 앱이 범위가 지정된 API 키를 자동으로 생성합니다 — 비밀번호는 한 번만 사용되고 저장되지 않습니다.</string>
+    <string name="generate_key_account_note">이 사진 액자용 계정을 사용하세요 — 사용 가능한 앨범과 사진이 결정됩니다. 개인 계정일 필요는 없습니다.</string>
+    <string name="email">이메일</string>
+    <string name="password">비밀번호</string>
+    <string name="login_and_generate">로그인 및 키 생성</string>
+    <string name="sign_in_with_oauth">OAuth로 로그인</string>
+    <string name="api_key_help">API 키란?</string>
+    <string name="api_key_help_title">API 키 정보</string>
+    <string name="api_key_help_what">API 키는 이 앱이 Immich 서버의 사진에 접근할 수 있게 하는 토큰입니다 — 비밀번호를 저장하지 않습니다.</string>
+    <string name="api_key_help_why">앱은 필요한 권한(앨범 읽기, 사진 보기)만 가진 키를 생성합니다. Immich 설정 → API 키에서 언제든지 취소할 수 있습니다.</string>
+    <string name="api_key_help_password">비밀번호는 키 생성을 위해 한 번만 사용되고 즉시 폐기됩니다. 이 기기에 저장되지 않습니다.</string>
 </resources>

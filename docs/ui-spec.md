@@ -9,41 +9,74 @@ look better against dark background). Light theme available as a setting.
 
 Shown on first launch or when credentials are missing/invalid.
 
+**Step 1: Domain Validation**
+
 ```
 ┌──────────────────────────────┐
 │                              │
-│         [App Logo]           │ ← app logo vector (120dp, no background fill)
+│         [App Logo]           │ ← app logo vector (120dp)
 │                              │
-│   Immich Server URL          │
-│   ┌────────────────────────┐ │
-│   │ https://...            │ │
-│   └────────────────────────┘ │
+│   ImmichFrame                │
+│   Connect to your server     │
 │                              │
-│   API Key                    │
-│   ┌────────────────────────┐ │
-│   │ ••••••••••••••••••     │ │
-│   └────────────────────────┘ │
+│   [https:// ▼] [domain.....] │ ← protocol dropdown + URL field
+│   photos.example.com         │
 │                              │
 │   ┌──────────────────────┐   │
-│   │   Test Connection    │   │
+│   │   Validate Server    │   │
 │   └──────────────────────┘   │
 │                              │
 │   Status: [idle/connecting/  │
-│            success/error]    │
+│            error]            │
 │                              │
+│   [Show Tour Again]          │
 └──────────────────────────────┘
 ```
 
-- URL field auto-normalizes: strips trailing slashes, auto-adds `http://`
-  if no scheme present.
-- API key field is masked (password input).
-- "Test Connection" button validates URL format, then calls the API.
-- Status area shows:
-  - Idle: "Enter your Immich server details"
-  - Connecting: spinner + "Connecting to {url}..."
-  - Success: checkmark + "Connected as {user email}"
-  - Error: red text with specific error (timeout, 401, DNS failure, etc.)
-- On success, "Continue" button appears (or auto-navigates after 1s delay).
+**Step 2: Authentication (after domain validated)**
+
+```
+┌──────────────────────────────┐
+│         [App Logo]           │
+│                              │
+│   Immich v1.135.0            │ ← detected server version
+│   photos.example.com         │
+│                              │
+│   [Generate Key] [Manual]    │ ← auth mode toggle chips
+│                              │
+│   ── Generate Key mode ──    │
+│   Generate API Key      [?]  │ ← help icon → dialog
+│   Log in with email/password │
+│   ┌────────────────────────┐ │
+│   │ Email                  │ │
+│   └────────────────────────┘ │
+│   ┌────────────────────────┐ │
+│   │ Password          [👁] │ │
+│   └────────────────────────┘ │
+│   ┌──────────────────────┐   │
+│   │ Log In & Generate    │   │
+│   └──────────────────────┘   │
+│   ┌──────────────────────┐   │
+│   │ Sign in with OAuth   │   │ ← only if OAuth enabled
+│   └──────────────────────┘   │
+│                              │
+│   [← Back]                   │
+└──────────────────────────────┘
+```
+
+- URL field: protocol dropdown (`https://` / `http://`) + domain field. Auto-normalizes.
+- "Validate Server" calls `GET /server/version` + `GET /server/features` (no auth).
+  On success, shows detected version and advances to the auth step.
+- Auth mode: **manual paste is the default**. API key field + Test Connection
+  are shown first. Below them, a divider + helper text + subtle TextButton
+  ("✨ Generate Key") offers auto-generation.
+- **Generate Key** mode (via helper button): email + password fields, with an
+  italic note: "Use the account meant for this photo frame — it doesn't have
+  to be your personal account." `?` icon opens a dialog explaining API keys.
+- **OAuth** button appears only when the server has OAuth enabled.
+- "Enter Manually" text link at the bottom switches back to paste mode.
+- Status area shows idle / connecting / success / error states.
+- On success, auto-navigates to album selection after brief delay.
 
 ### 2. Album Selection Screen
 
@@ -202,7 +235,16 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  │ [Test Connection]    │    │
 │  └──────────────────────┘    │
 │                              │
-│  Reset All Settings          │ ← red text button
+│  API KEY PERMISSIONS [Re-✓]  │ ← permission status card
+│  ┌──────────────────────┐    │
+│  │ ✓ user.read          │    │
+│  │ ✓ album.read         │    │
+│  │ ✓ asset.read         │    │
+│  │ ✓ asset.view         │    │
+│  │ ✗ asset.download     │    │ ← red if denied; card turns red if blocking missing
+│  └──────────────────────┘    │
+│                              │
+│  Reset All Settings          │ ← red text button (preserves tour progress)
 │                              │
 │  Show Tour Again             │ ← replays Settings tour
 │  Reset All Tours             │ ← replays all screens' tours
@@ -210,9 +252,14 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection.
+- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection, Permissions.
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
+- **API Key Permissions card** (below Connection): shows ✓/✗/? for each of the 5
+  required permissions. Auto-refreshes when Settings opens; "Re-check" button
+  re-probes. Card background turns error-colored if blocking permissions are
+  missing. When `asset.download` is denied, the Skip Videos toggle in the
+  Slideshow section is locked ON with an explanatory subtitle.
 - Back arrow returns to previous screen.
 - **System section** includes a version string in the top bar (`Settings vX.Y.Z`)
   and two tour replay buttons: **"Show Tour Again"** (replays only the Settings

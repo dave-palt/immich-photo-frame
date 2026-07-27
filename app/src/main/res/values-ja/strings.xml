@@ -9,6 +9,12 @@
     <string name="section_system">システム</string>
     <string name="section_albums">アルバム</string>
     <string name="section_connection">接続</string>
+    <string name="api_key_permissions">APIキーの権限</string>
+    <string name="recheck_permissions">再確認</string>
+    <string name="checking">確認中…</string>
+    <string name="missing_required_perms">必要な権限が不足しています — 一部の機能は使用できません。Immichで新しいキーを生成するか更新してください。</string>
+    <string name="optional_perms_missing">権限不足のため、一部のオプション機能が無効になっています。</string>
+    <string name="skip_videos_locked_desc">ロック中 — APIキーに\'asset.download\'権限がありません</string>
 
     <!-- Playback -->
     <string name="interval">間隔</string>
@@ -154,10 +160,14 @@
     <string name="tour_setup_welcome_body">写真を表示するにはImmichサーバーに接続します。セットアップをご案内します。</string>
     <string name="tour_setup_server_title">サーバーアドレス</string>
     <string name="tour_setup_server_body">ここにImmichサーバーのURLを入力します。photos.example.comまたは192.168.1.100:2283の形式を使用してください。</string>
-    <string name="tour_setup_apikey_title">APIキー</string>
-    <string name="tour_setup_apikey_body">Immichの設定→APIキーでAPIキーを作成します。アルバム、アセット、ユーザーの読み取り権限が必要です。</string>
-    <string name="tour_setup_connect_title">テストして接続</string>
-    <string name="tour_setup_connect_body">接続をテストをタップして認証情報を確認します。接続すると、表示するアルバムを選択します。</string>
+    <string name="tour_setup_validate_title">サーバーを確認</string>
+    <string name="tour_setup_validate_body">サーバーアドレスを入力したら、タップして接続を確認します。アプリがImmichのバージョンと利用可能なログイン方法を検出します。</string>
+        <string name="tour_setup_generate_title">キーを自動生成</string>
+    <string name="tour_setup_generate_body">APIキーを手動で扱いたくないですか？ここをタップしてメールとパスワードでログインしてください — アプリがキーを作成し、パスワードは破棄されます。</string>
+<string name="tour_setup_apikey_title">キーを生成</string>
+    <string name="tour_setup_apikey_body">APIキーとは、Immichサーバー上の写真にこのアプリがアクセスするためのトークンです — パスワードを共有しません。ここに既存のキーを貼り付けるか、下のボタンで自動的に生成できます。</string>
+    <string name="tour_setup_connect_title">接続</string>
+    <string name="tour_setup_connect_body">タップして接続をテストし、スライドショーを開始します。</string>
     <string name="tour_albums_select_title">アルバムを選択</string>
     <string name="tour_albums_select_body">スライドショーに含めるアルバムを1つ以上タップします。選択したアルバムにチェックマークが表示されます。</string>
     <string name="tour_albums_start_title">ショーを開始</string>
@@ -188,4 +198,21 @@
     <string name="tour_settings_cache_body">自動同期がバックグラウンドで写真をダウンロードし、スライドショーがオフラインで動作し、瞬時に読み込めます。</string>
     <string name="tour_settings_connection_title">接続</string>
     <string name="tour_settings_connection_body">Immichの設定が変更された場合は、ここでサーバーURLまたはAPIキーを更新します。</string>
+    <string name="validate_server">サーバーを確認</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">キーを生成</string>
+    <string name="enter_manually">手動で入力</string>
+    <string name="generate_key_prompt">APIキーをお持ちでないですか？自動で生成できます：</string>
+    <string name="generate_key_title">APIキーを生成</string>
+    <string name="generate_key_desc">Immichのメールとパスワードでログインしてください。アプリがスコープ付きAPIキーを自動作成します — パスワードは一度だけ使用され、保存されません。</string>
+    <string name="generate_key_account_note">このフォトフレーム用のアカウントを使用してください — 利用可能なアルバムと写真が決まります。個人アカウントである必要はありません。</string>
+    <string name="email">メール</string>
+    <string name="password">パスワード</string>
+    <string name="login_and_generate">ログインしてキーを生成</string>
+    <string name="sign_in_with_oauth">OAuthでログイン</string>
+    <string name="api_key_help">APIキーとは？</string>
+    <string name="api_key_help_title">APIキーについて</string>
+    <string name="api_key_help_what">APIキーは、このアプリがImmichサーバー上の写真にアクセスするためのトークンです — パスワードを保存しません。</string>
+    <string name="api_key_help_why">アプリは必要な権限（アルバムの読み取り、写真の表示）のみを持つキーを作成します。Immich設定 → APIキーからいつでも取り消せます。</string>
+    <string name="api_key_help_password">パスワードはキー作成のために一度だけ使用され、すぐに破棄されます。このデバイスに保存されることはありません。</string>
 </resources>

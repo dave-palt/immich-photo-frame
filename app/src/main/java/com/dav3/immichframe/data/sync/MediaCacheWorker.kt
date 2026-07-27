@@ -43,6 +43,28 @@ class MediaCacheWorker @AssistedInject constructor(
     }
 
     private suspend fun performFullSync(albumIds: List<String>) {
+        // If the API key lacks asset.download, skip the entire download phase —
+        // the cache can't fetch originals without it. Metadata sync still runs
+        // so the asset list stays current; images just won't be available offline.
+        val permStatus = settingsRepository.permissionStatus.first()
+        val downloadDenied = permStatus?.statuses?.get(
+            com.dav3.immichframe.domain.model.RequiredPermission.ASSET_DOWNLOAD,
+        ) == com.dav3.immichframe.domain.model.PermissionStatus.Denied
+
+        if (downloadDenied) {
+            mediaCacheRepository.updateSyncProgress(
+                SyncProgress(
+                    albumIds = albumIds,
+                    currentAlbum = "",
+                    phase = SyncProgress.Phase.COMPLETE,
+                    totalAssets = 0,
+                    processedAssets = 0,
+                    currentAsset = "Skipped — API key lacks asset.download permission",
+                ),
+            )
+            return
+        }
+
         mediaCacheRepository.updateSyncProgress(
             SyncProgress(
                 albumIds = albumIds,
