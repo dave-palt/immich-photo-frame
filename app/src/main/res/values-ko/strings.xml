@@ -60,6 +60,8 @@
     <string name="show_clock">시계 표시</string>
     <string name="clock_size">시계 크기</string>
     <string name="drag_clock_hint">슬라이드쇼 화면에서 시계를 드래그하여 위치 변경</string>
+    <string name="clock_seconds">초 표시</string>
+    <string name="clock_seconds_desc">시계에 초 표시 (매초 업데이트)</string>
     <string name="snap_to_grid">그리드에 스냅</string>
     <string name="snap_to_grid_desc">놓을 때 크기에 따라 시계를 그리드에 정렬</string>
 

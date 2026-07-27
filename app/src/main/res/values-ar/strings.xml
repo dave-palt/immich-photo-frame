@@ -60,6 +60,8 @@
     <string name="show_clock">إظهار الساعة</string>
     <string name="clock_size">حجم الساعة</string>
     <string name="drag_clock_hint">اسحب الساعة على شاشة العرض لإعادة وضعها</string>
+    <string name="clock_seconds">إظهار الثواني</string>
+    <string name="clock_seconds_desc">عرض الثواني في الساعة (تحديث كل ثانية)</string>
     <string name="snap_to_grid">محاذاة إلى الشبكة</string>
     <string name="snap_to_grid_desc">محاذاة الساعة إلى الشبكة بناءً على حجمها عند الإفلات</string>
 

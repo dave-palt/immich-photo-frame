@@ -370,8 +370,9 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
+                        val clockPreviewFmt = if (s.clockSeconds) "HH:mm:ss" else "HH:mm"
                         Text(
-                            SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date()),
+                            SimpleDateFormat(clockPreviewFmt, LocalLocale.current.platformLocale).format(Date()),
                             color = Color.White,
                             fontSize = s.clockSize.sp,
                             fontWeight = FontWeight.Light,
@@ -388,6 +389,12 @@ fun SettingsScreen(
                         stringResource(R.string.drag_clock_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    SwitchItem(
+                        title = stringResource(R.string.clock_seconds),
+                        subtitle = stringResource(R.string.clock_seconds_desc),
+                        checked = s.clockSeconds,
+                        onToggle = { viewModel.toggleClockSeconds() },
                     )
                     SwitchItem(
                         title = stringResource(R.string.snap_to_grid),

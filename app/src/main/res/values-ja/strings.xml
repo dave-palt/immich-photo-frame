@@ -60,6 +60,8 @@
     <string name="show_clock">時計を表示</string>
     <string name="clock_size">時計のサイズ</string>
     <string name="drag_clock_hint">スライドショー画面で時計をドラッグして位置を変更</string>
+    <string name="clock_seconds">秒を表示</string>
+    <string name="clock_seconds_desc">時計に秒を表示（毎秒更新）</string>
     <string name="snap_to_grid">グリッドにスナップ</string>
     <string name="snap_to_grid_desc">離した際にサイズに基づいて時計をグリッドに合わせる</string>
 

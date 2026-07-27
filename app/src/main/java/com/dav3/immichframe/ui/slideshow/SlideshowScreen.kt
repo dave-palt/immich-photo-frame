@@ -148,9 +148,12 @@ fun SlideshowScreen(
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
-    // Night Mode active state — polled every minute, used to:
+    // Night Mode active state — polled every few seconds, used to:
     // 1) pause the auto-advance timer below, and
     // 2) render a black screen instead of photo/video content.
+    // A short poll interval keeps the transition snappy when settings change
+    // or when crossing the window boundary. The 60s tick used previously meant
+    // up to a full minute of latency after returning from Settings.
     var nightActive by remember { mutableStateOf(false) }
     LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
         if (!s.nightMode) {
@@ -162,7 +165,7 @@ fun SlideshowScreen(
             val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
                 cal.get(java.util.Calendar.MINUTE)
             nightActive = s.isNightModeActive(nowMin)
-            kotlinx.coroutines.delay(60_000L)
+            kotlinx.coroutines.delay(5_000L)
         }
     }
 
@@ -240,10 +243,14 @@ fun SlideshowScreen(
     // Clock
     var currentTime by remember { mutableStateOf("") }
     if (s.showClock) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(s.clockSeconds) {
             while (true) {
-                currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                delay(30_000)
+                val pattern = if (s.clockSeconds) "HH:mm:ss" else "HH:mm"
+                currentTime = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
+                // With seconds: update every 1s. Without: every 10s is enough
+                // (the minute changes at most once per 60s, and the 10s tick
+                // ensures we roll over promptly without drifting).
+                delay(if (s.clockSeconds) 1_000L else 10_000L)
             }
         }
     }
@@ -273,7 +280,7 @@ fun SlideshowScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(if (s.adaptiveBackground) dominantColor else Color.Black)
+                    .background(if (s.adaptiveBackground && !nightActive) dominantColor else Color.Black)
                     .onSizeChanged { containerSize = it }
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { controlsVisible = !controlsVisible })

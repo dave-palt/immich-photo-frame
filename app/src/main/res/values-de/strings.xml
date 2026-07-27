@@ -60,6 +60,8 @@
     <string name="show_clock">Uhr anzeigen</string>
     <string name="clock_size">Uhrgröße</string>
     <string name="drag_clock_hint">Ziehen Sie die Uhr auf der Diashow-Anzeige, um sie zu verschieben</string>
+    <string name="clock_seconds">Sekunden anzeigen</string>
+    <string name="clock_seconds_desc">Sekunden in der Uhr anzeigen (aktualisiert jede Sekunde)</string>
     <string name="snap_to_grid">Am Raster ausrichten</string>
     <string name="snap_to_grid_desc">Uhr beim Loslassen anhand ihrer Größe am Raster ausrichten</string>
 

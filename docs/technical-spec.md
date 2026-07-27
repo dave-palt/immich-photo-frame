@@ -124,13 +124,14 @@ UI (Compose) → ViewModel → Repository → Retrofit → Immich API
   Immich API call automatically.
 - **Night Mode** dims the screen during configured hours via per-window
   brightness (`WindowManager.LayoutParams.screenBrightness`). A
-  `LaunchedEffect` in `SlideshowScreen` re-evaluates the current time every
-  minute and sets `screenBrightness` to the configured percentage when inside
+  `LaunchedEffect` in `SlideshowScreen` re-evaluates the current time every 5
+  seconds and sets `screenBrightness` to the configured percentage when inside
   the night window, or `BRIGHTNESS_OVERRIDE_NONE` (defer to system) outside it.
-  While active, the slideshow is fully hidden behind a black overlay and the
-  auto-advance timer is paused (no photo/video fetching or rendering). The
-  screen is never turned off at the hardware level — this is a brightness-based
-  fallback for devices without built-in scheduled power on/off.
+  While active, the slideshow is fully hidden behind a black overlay, the
+  adaptive background is forced to pure black, and the auto-advance timer is
+  paused (no photo/video fetching or rendering). The screen is never turned off
+  at the hardware level — this is a brightness-based fallback for devices
+  without built-in scheduled power on/off.
 
 ## Package Naming
 
@@ -264,6 +265,7 @@ Setup → Albums → Slideshow
 | Transition duration | DataStore | `transition_sec` | Float (0–3) |
 | Image fill mode | DataStore | `fill_mode` | String enum (CONTAIN/COVER) |
 | Show clock | DataStore | `show_clock` | String bool |
+| Clock seconds | DataStore | `clock_seconds` | String bool (default false) |
 | Clock size | DataStore | `clock_size` | Float (24–96 sp) |
 | Clock X position | DataStore | `clock_x` | Float (0.0–1.0 normalized, -1 = default) |
 | Clock Y position | DataStore | `clock_y` | Float (0.0–1.0 normalized, -1 = default) |

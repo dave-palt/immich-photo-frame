@@ -148,6 +148,8 @@ constructor(
 
     fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
 
+    fun toggleClockSeconds() = update { it.copy(clockSeconds = !it.clockSeconds) }
+
     fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
 
     fun toggleFullscreen() = update { it.copy(fullscreen = !it.fullscreen) }

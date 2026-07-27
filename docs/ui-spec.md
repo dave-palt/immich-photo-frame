@@ -230,6 +230,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  └────────────────────────┘  │
 │  Clock Size: 48sp       [───]│ ← slider 24-96
 │  "Drag clock to reposition"  │ ← helper text
+│  Show Seconds           [○]  │ ← toggle
 │  Snap to Grid           [●]  │ ← toggle
 │                              │
 │  ALBUMS                      │

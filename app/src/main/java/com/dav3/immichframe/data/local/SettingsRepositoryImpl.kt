@@ -41,6 +41,7 @@ constructor(
         val TRANSITION = floatPreferencesKey("transition_sec")
         val FILL_MODE = stringPreferencesKey("fill_mode")
         val SHOW_CLOCK = stringPreferencesKey("show_clock")
+        val CLOCK_SECONDS = stringPreferencesKey("clock_seconds")
         val CLOCK_SIZE = floatPreferencesKey("clock_size")
         val CLOCK_X = floatPreferencesKey("clock_x")
         val CLOCK_Y = floatPreferencesKey("clock_y")
@@ -118,6 +119,7 @@ constructor(
                 transitionSeconds = prefs[Keys.TRANSITION] ?: 1f,
                 fillMode = FillMode.valueOf(prefs[Keys.FILL_MODE] ?: FillMode.CONTAIN.name),
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
+                clockSeconds = prefs[Keys.CLOCK_SECONDS]?.toBoolean() ?: false,
                 clockSize = prefs[Keys.CLOCK_SIZE] ?: 48f,
                 clockPosition = ClockPosition(
                     x = prefs[Keys.CLOCK_X] ?: -1f,
@@ -211,6 +213,7 @@ constructor(
             it[Keys.TRANSITION] = settings.transitionSeconds
             it[Keys.FILL_MODE] = settings.fillMode.name
             it[Keys.SHOW_CLOCK] = settings.showClock.toString()
+            it[Keys.CLOCK_SECONDS] = settings.clockSeconds.toString()
             it[Keys.CLOCK_SIZE] = settings.clockSize
             it[Keys.CLOCK_X] = settings.clockPosition.x
             it[Keys.CLOCK_Y] = settings.clockPosition.y

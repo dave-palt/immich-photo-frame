@@ -18,14 +18,18 @@
      offers auto-generation for users who don't have a key yet.
    - **Generate Key** (helper button): Email + password fields. App calls
      `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
-     key with 5 permissions. Password is used once and never persisted.
+     key with 5 permissions → `POST /auth/logout` to invalidate the session.
+     Password is used once and never persisted; the login session is closed
+     immediately after key creation so the device does not appear in the
+     server's "Authorized Devices" list. The API key is independent of the
+     session and remains valid.
      A note reminds the user to log in with the account meant for this photo
      frame (not necessarily their personal account).
      A `?` icon opens a dialog explaining what an API key is, why the app
      generates one, and that the password is discarded immediately.
    - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
      OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
-     returns to the app → JWT obtained → key created.
+     returns to the app → JWT obtained → key created → session logged out.
 4. App validates the key by calling `GET /users/me`.
 5. **Permission verification**: App probes all 5 required endpoints in
    dependency order (user → albums → search → thumbnail → original) to verify
@@ -272,6 +276,7 @@ Options:
 - **Clock** section:
   - **Show Clock** — display time overlay (default off)
   - **Clock Size** — slider 24–96 sp (default 48)
+  - **Show Seconds** — display seconds in the clock; updates every second (default off)
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline

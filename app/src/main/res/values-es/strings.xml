@@ -60,6 +60,8 @@
     <string name="show_clock">Mostrar reloj</string>
     <string name="clock_size">Tamaño del reloj</string>
     <string name="drag_clock_hint">Arrastra el reloj en la pantalla de presentación para reposicionarlo</string>
+    <string name="clock_seconds">Mostrar segundos</string>
+    <string name="clock_seconds_desc">Mostrar segundos en el reloj (se actualiza cada segundo)</string>
     <string name="snap_to_grid">Ajustar a la cuadrícula</string>
     <string name="snap_to_grid_desc">Alinear el reloj a la cuadrícula según su tamaño al soltarlo</string>
 

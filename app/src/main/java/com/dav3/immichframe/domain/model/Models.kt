@@ -25,6 +25,7 @@ data class SlideshowSettings(
     val transitionSeconds: Float = 1f,
     val fillMode: FillMode = FillMode.CONTAIN,
     val showClock: Boolean = false,
+    val clockSeconds: Boolean = false,
     val clockSize: Float = 48f, // sp
     val clockPosition: ClockPosition = ClockPosition(),
     val keepScreenOn: Boolean = true,

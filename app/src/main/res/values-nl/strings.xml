@@ -60,6 +60,8 @@
     <string name="show_clock">Klok tonen</string>
     <string name="clock_size">Klok grootte</string>
     <string name="drag_clock_hint">Sleep de klok op de diavoorstelling om te verplaatsen</string>
+    <string name="clock_seconds">Seconden weergeven</string>
+    <string name="clock_seconds_desc">Seconden in de klok weergeven (elke seconde bijgewerkt)</string>
     <string name="snap_to_grid">Uitlijnen op raster</string>
     <string name="snap_to_grid_desc">Klok bij loslaten uitlijnen op raster op basis van grootte</string>
 

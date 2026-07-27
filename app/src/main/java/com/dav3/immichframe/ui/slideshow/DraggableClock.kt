@@ -38,10 +38,11 @@ import com.dav3.immichframe.domain.model.ClockPosition
 import kotlin.math.round
 
 /**
- * Draggable clock overlay with snap-to-grid and optional burn-in drift.
+ * Draggable clock overlay with snap-to-grid and optional orbital burn-in motion.
  *
- * @param clockDrift when true, the clock slowly drifts ±4px/±3px to reduce
- *   OLED burn-in. Tied to the photo-animations toggle by the caller.
+ * @param clockDrift when true, the clock slowly revolves in a small circle
+ *   (~8px radius, one revolution / 3 min) to reduce OLED burn-in. Tied to the
+ *   photo-animations toggle by the caller.
  */
 @Composable
 internal fun DraggableClock(
@@ -100,24 +101,29 @@ internal fun DraggableClock(
         }
     }
 
-    // Clock drift to reduce burn-in (gated on photoAnimations at call site)
-    val driftX = if (clockDrift) {
-        rememberInfiniteTransition(label = "clockDriftX").animateFloat(
-            -4f,
-            4f,
-            infiniteRepeatable(tween(30_000, easing = LinearEasing), RepeatMode.Reverse),
-            label = "driftX",
+    // Clock orbital motion to reduce burn-in (gated on photoAnimations at call site).
+    // The clock revolves in a small circle around its theoretical center, so no
+    // pixel stays stationary. One full revolution every 3 minutes; orbit radius
+    // ~8px (subtle enough to be barely perceptible but enough to shift pixels).
+    val orbitAngle = if (clockDrift) {
+        rememberInfiniteTransition(label = "clockOrbit").animateFloat(
+            0f,
+            360f,
+            infiniteRepeatable(tween(180_000, easing = LinearEasing), RepeatMode.Restart),
+            label = "orbitAngle",
         ).value
     } else {
         0f
     }
+    val driftX = if (clockDrift) {
+        val rad = Math.toRadians(orbitAngle.toDouble())
+        (kotlin.math.cos(rad) * 8f).toFloat()
+    } else {
+        0f
+    }
     val driftY = if (clockDrift) {
-        rememberInfiniteTransition(label = "clockDriftY").animateFloat(
-            -3f,
-            3f,
-            infiniteRepeatable(tween(45_000, easing = LinearEasing), RepeatMode.Reverse),
-            label = "driftY",
-        ).value
+        val rad = Math.toRadians(orbitAngle.toDouble())
+        (kotlin.math.sin(rad) * 8f).toFloat()
     } else {
         0f
     }

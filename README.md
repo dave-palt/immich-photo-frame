@@ -26,7 +26,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Fullscreen slideshow with crossfade transitions
 - Configurable interval, transition speed, fill mode (Contain/Cover)
 - Video playback with mute and skip options (Media3/ExoPlayer)
-- Draggable clock overlay with configurable size and snap-to-grid
+- Draggable clock overlay with configurable size, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Shuffle mode for randomized image order

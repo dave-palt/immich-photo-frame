@@ -60,6 +60,8 @@
     <string name="show_clock">Mostrar relógio</string>
     <string name="clock_size">Tamanho do relógio</string>
     <string name="drag_clock_hint">Arraste o relógio no ecrã de apresentação para o reposicionar</string>
+    <string name="clock_seconds">Mostrar segundos</string>
+    <string name="clock_seconds_desc">Mostrar segundos no relógio (atualiza a cada segundo)</string>
     <string name="snap_to_grid">Ajustar à grelha</string>
     <string name="snap_to_grid_desc">Alinhar o relógio à grelha conforme o seu tamanho ao soltar</string>
 

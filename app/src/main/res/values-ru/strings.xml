@@ -60,6 +60,8 @@
     <string name="show_clock">Показывать часы</string>
     <string name="clock_size">Размер часов</string>
     <string name="drag_clock_hint">Перетащите часы на экране слайд-шоу, чтобы изменить их положение</string>
+    <string name="clock_seconds">Показывать секунды</string>
+    <string name="clock_seconds_desc">Отображать секунды в часах (обновление каждую секунду)</string>
     <string name="snap_to_grid">Выровнять по сетке</string>
     <string name="snap_to_grid_desc">Выровнять часы по сетке в зависимости от их размера при отпускании</string>
 
