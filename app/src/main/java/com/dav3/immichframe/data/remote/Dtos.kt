@@ -30,6 +30,7 @@ data class AssetDto(
     val id: String,
     val type: String = "IMAGE",
     val updatedAt: String? = null,
+    val originalMimeType: String? = null,
 )
 
 // --- Search endpoint (POST /search/metadata) ---

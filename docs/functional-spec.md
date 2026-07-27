@@ -83,13 +83,19 @@
 4. If **Skip Videos** is enabled (default on), video assets are filtered out.
    When disabled, video assets are played inline via ExoPlayer (Media3), with
    optional mute and automatic advance on completion.
-5. Slideshow displays each image fullscreen for the configured interval (default 30s).
-6. Transition between images is a crossfade (default 1s).
-7. Next image is pre-fetched and cached so transitions are instant.
-8. When the last image is reached, the slideshow loops back to the first.
-9. Screen stays on (wake lock) while slideshow is active (toggleable).
-10. A progress bar at the bottom shows time remaining for the current image.
-11. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
+5. **Animated GIFs** are rendered as animated images (not videos). They are
+   detected by `originalMimeType == "image/gif"` from the search response and
+   loaded from the `/original` endpoint (the `/thumbnail` transcode would
+   collapse the animation to a single JPEG frame). Coil's `GifDecoder`
+   decodes the frames; the slideshow interval timer advances as normal
+   (GIFs don't drive their own duration the way videos do).
+6. Slideshow displays each image fullscreen for the configured interval (default 30s).
+7. Transition between images is a crossfade (default 1s).
+8. Next image is pre-fetched and cached so transitions are instant.
+9. When the last image is reached, the slideshow loops back to the first.
+10. Screen stays on (wake lock) while slideshow is active (toggleable).
+11. A progress bar at the bottom shows time remaining for the current image.
+12. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
     style animation (zoom/pan). The animation is chosen randomly from the
     set of individually-enabled animation types. Available types: Zoom In,
     Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks

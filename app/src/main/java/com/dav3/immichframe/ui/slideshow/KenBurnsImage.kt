@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 import com.dav3.immichframe.domain.model.PhotoAnimation
 
 /**
@@ -31,6 +32,7 @@ internal fun KenBurnsImage(
     photoAnimations: Boolean,
     enabledAnims: List<PhotoAnimation>,
     durationMs: Long,
+    onImageLoaded: () -> Unit = {},
 ) {
     // Deterministic pick from enabled set
     val anim = remember(assetId, enabledAnims) {
@@ -46,6 +48,11 @@ internal fun KenBurnsImage(
             model = url,
             contentDescription = null,
             contentScale = contentScale,
+            onState = { state ->
+                if (state is AsyncImagePainter.State.Success || state is AsyncImagePainter.State.Error) {
+                    onImageLoaded()
+                }
+            },
             modifier = Modifier.fillMaxSize(),
         )
         return
@@ -102,6 +109,11 @@ internal fun KenBurnsImage(
         model = url,
         contentDescription = null,
         contentScale = contentScale,
+        onState = { state ->
+            if (state is AsyncImagePainter.State.Success || state is AsyncImagePainter.State.Error) {
+                onImageLoaded()
+            }
+        },
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer {

@@ -11,7 +11,11 @@ data class Asset(
     val id: String,
     val type: AssetType,
     val lastModified: Long = 0,
-)
+    val originalMimeType: String? = null,
+) {
+    /** Whether this asset is an animated GIF (needs the /original endpoint for Coil's GifDecoder). */
+    val isGif: Boolean get() = originalMimeType?.equals("image/gif", ignoreCase = true) == true
+}
 
 enum class AssetType { IMAGE, VIDEO }
 
@@ -111,6 +115,7 @@ data class CachedAsset(
     val checksum: String?,
     val lastModified: Long,
     val cachedAt: Long,
+    val originalMimeType: String? = null,
 )
 
 data class AlbumSyncState(

@@ -172,13 +172,24 @@ fun SlideshowScreen(
     }
 
     // Auto-advance with progress tracking
-    // For images: fixed timer. For videos: VideoPlayer drives advancing
-    // (advances when the video ends, not on the interval timer).
+    // For images: the timer starts only once the image has finished decoding
+    // (coil onState = Success/Error). This prevents the timer from counting
+    // down during a slow decode (e.g. a 77MB GIF) — the user sees the photo
+    // for the full interval, not whatever's left after decode.
+    // For videos: VideoPlayer drives advancing (calls viewModel.next() when
+    // the video ends, not the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive) {
+    // false = image still decoding; true = video or image ready.
+    // Reset to false on every index change so the timer waits for decode.
+    var imageReady by remember { mutableStateOf(false) }
+    LaunchedEffect(state.currentIndex) {
+        // Videos are immediately "ready" — ExoPlayer handles its own timeline.
+        imageReady = state.assets.getOrNull(state.currentIndex)?.type == AssetType.VIDEO
+    }
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady) {
         progress = 0f
-        if (!isPaused && !nightActive && state.assets.isNotEmpty()) {
+        if (!isPaused && !nightActive && imageReady && state.assets.isNotEmpty()) {
             val currentAsset = state.assets[state.currentIndex]
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
@@ -266,9 +277,10 @@ fun SlideshowScreen(
     LaunchedEffect(state.currentIndex, s.adaptiveBackground, state.assets.size) {
         if (s.adaptiveBackground && state.assets.isNotEmpty()) {
             val asset = state.assets[state.currentIndex]
-            if (asset.type != AssetType.VIDEO) {
-                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset.id))
-            }
+            // Always extract from the small JPEG thumbnail — it's fast for
+            // all asset types (GIFs, videos, regular images) since Coil only
+            // needs a 128px bitmap for Palette.
+            dominantColor = extractDominantColor(context, viewModel.thumbnailUrl(asset.id))
         } else {
             dominantColor = Color.Black
         }
@@ -327,14 +339,15 @@ fun SlideshowScreen(
                                     isVideoPaused = isVideoPaused,
                                     fillMode = s.fillMode,
                                 )
-                            } else {
+                            } else if (currentAsset != null) {
                                 KenBurnsImage(
-                                    url = viewModel.imageUrl(assetId),
+                                    url = viewModel.imageUrl(currentAsset),
                                     contentScale = scale,
                                     assetId = assetId,
                                     photoAnimations = s.photoAnimations,
                                     enabledAnims = s.enabledAnimations,
                                     durationMs = s.intervalSeconds * 1000L,
+                                    onImageLoaded = { imageReady = true },
                                 )
                             }
                         }

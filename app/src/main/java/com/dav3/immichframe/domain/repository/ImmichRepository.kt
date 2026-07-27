@@ -16,7 +16,12 @@ interface ImmichRepository {
 
     suspend fun getAlbumAssets(albumId: String, cursor: String?): Result<List<Asset>>
 
-    fun imageUrl(assetId: String): String
+    /**
+     * Display URL for an image asset. GIFs are routed to the `/original`
+     * endpoint (raw bytes for Coil's GifDecoder); all other images use the
+     * `/thumbnail?size=preview` transcoded JPEG.
+     */
+    fun imageUrl(assetId: String, mimeType: String? = null): String
 
     fun thumbnailUrl(assetId: String): String
 

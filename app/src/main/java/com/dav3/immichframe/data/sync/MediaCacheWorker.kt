@@ -289,6 +289,7 @@ class MediaCacheWorker @AssistedInject constructor(
                     checksum = null,
                     lastModified = System.currentTimeMillis(),
                     cachedAt = System.currentTimeMillis(),
+                    originalMimeType = asset.originalMimeType,
                 ),
             )
         } catch (e: Exception) {

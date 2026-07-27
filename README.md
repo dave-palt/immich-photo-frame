@@ -26,6 +26,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Fullscreen slideshow with crossfade transitions
 - Configurable interval, transition speed, fill mode (Contain/Cover)
 - Video playback with mute and skip options (Media3/ExoPlayer)
+- Animated GIF playback in the slideshow (Coil GifDecoder; GIFs load from `/original` to preserve animation)
 - Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's dominant color)
@@ -110,7 +111,7 @@ To verify an existing key's permissions against the app's endpoints:
 
 ## Tech Stack
 
-Kotlin 2.1 · Jetpack Compose · Retrofit 2 · Coil 3 · Media3 ExoPlayer · Hilt · DataStore · Palette
+Kotlin 2.1 · Jetpack Compose · Retrofit 2 · Coil 3 (+ GifDecoder) · Media3 ExoPlayer · Hilt · DataStore · Palette
 
 ## Requirements
 

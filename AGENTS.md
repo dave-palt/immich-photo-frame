@@ -142,6 +142,29 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-28** — Animated GIF playback support. Two compounding gaps
+  prevented GIFs from playing: (1) no `coil-gif` dependency and no
+  `GifDecoder` registered with Coil's `ImageLoader`, so GIFs decoded as a
+  single static frame; (2) image URLs pointed at `/thumbnail?size=preview`,
+  which Immich transcodes to JPEG — collapsing GIF animation regardless of
+  decoder. Fix: added `io.coil-kt.coil3:coil-gif` dependency (same version
+  as coil, pinned in version catalog). `ImmichFrameApp` now implements
+  `SingletonImageLoader.Factory` and registers `GifDecoder.Factory()` +
+  crossfade in `newImageLoader()`. The `AssetDto` gained
+  `originalMimeType` (returned by `POST /search/metadata`), carried through
+  `Asset` model → `CachedAsset` → Room (`original_mime_type` column, DB
+  version bumped 1→2 with `fallbackToDestructiveMigration`).
+  `ImmichRepositoryImpl.imageUrl()` now branches: GIFs route to
+  `/original?apiKey=`, all other images stay on
+  `/thumbnail?size=preview&apiKey=`. `SlideshowViewModel.imageUrl()`
+  changed signature from `(assetId: String)` to `(asset: Asset)` so the
+  mime type is available at the call site. The media-selection grid
+  thumbnails are unaffected (they use `size=thumbnail`, always JPEG —
+  fine for GIFs as a static preview). Updated: functional-spec (F3 step
+  5 — GIF playback), technical-spec (tech stack, image caching strategy,
+  media cache schema, persistence note), api-reference (new Media URL
+  Routing section), README (feature list + tech stack).
+
 - **2026-07-27** — Night Mode feature (brightness-based display schedule).
   Unlike a true screen-off or device power-off, this dims the screen to a
   configurable brightness level during set hours via per-window

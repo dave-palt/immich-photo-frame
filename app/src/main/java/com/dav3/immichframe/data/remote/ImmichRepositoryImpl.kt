@@ -270,6 +270,7 @@ constructor(
                     dto.id,
                     if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
                     dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
+                    dto.originalMimeType,
                 )
             }
     }
@@ -289,14 +290,23 @@ constructor(
                     dto.id,
                     if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
                     dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
+                    dto.originalMimeType,
                 )
             }
     }
 
-    override fun imageUrl(assetId: String): String {
+    override fun imageUrl(assetId: String, mimeType: String?): String {
         val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }
         val apiKey = runBlocking { settings.apiKey.first() }
-        return "${base.trimEnd('/')}/api/assets/$assetId/thumbnail?size=preview&apiKey=$apiKey"
+        // GIFs must load from /original — the thumbnail endpoint transcodes to
+        // JPEG, which collapses the animation to a single frame.
+        val suffix = if (mimeType?.equals("image/gif", ignoreCase = true) == true) {
+            "/original"
+        } else {
+            "/thumbnail?size=preview"
+        }
+        val sep = if (suffix.contains("?")) "&" else "?"
+        return "${base.trimEnd('/')}/api/assets/$assetId$suffix${sep}apiKey=$apiKey"
     }
 
     override fun thumbnailUrl(assetId: String): String {
