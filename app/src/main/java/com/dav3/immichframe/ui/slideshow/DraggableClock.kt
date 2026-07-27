@@ -40,9 +40,9 @@ import kotlin.math.round
 /**
  * Draggable clock overlay with snap-to-grid and optional orbital burn-in motion.
  *
- * @param clockDrift when true, the clock slowly revolves in a small circle
- *   (~8px radius, one revolution / 3 min) to reduce OLED burn-in. Tied to the
- *   photo-animations toggle by the caller.
+ * @param clockDrift when true, the clock revolves in a small circle
+ *   (~15px radius, one revolution / 5 min) to reduce OLED burn-in. Always on at
+ *   the call site — the clock is static and needs its own protection.
  */
 @Composable
 internal fun DraggableClock(
@@ -101,15 +101,15 @@ internal fun DraggableClock(
         }
     }
 
-    // Clock orbital motion to reduce burn-in (gated on photoAnimations at call site).
-    // The clock revolves in a small circle around its theoretical center, so no
-    // pixel stays stationary. One full revolution every 3 minutes; orbit radius
-    // ~8px (subtle enough to be barely perceptible but enough to shift pixels).
+    // Clock orbital motion to reduce burn-in (always on — the clock is a static
+    // element unaffected by photo animations, so it needs its own protection).
+    // One full revolution every 5 minutes; orbit radius ~15px — slow enough not
+    // to distract, but continuously shifting pixels to prevent OLED burn-in.
     val orbitAngle = if (clockDrift) {
         rememberInfiniteTransition(label = "clockOrbit").animateFloat(
             0f,
             360f,
-            infiniteRepeatable(tween(180_000, easing = LinearEasing), RepeatMode.Restart),
+            infiniteRepeatable(tween(300_000, easing = LinearEasing), RepeatMode.Restart),
             label = "orbitAngle",
         ).value
     } else {
@@ -117,13 +117,13 @@ internal fun DraggableClock(
     }
     val driftX = if (clockDrift) {
         val rad = Math.toRadians(orbitAngle.toDouble())
-        (kotlin.math.cos(rad) * 8f).toFloat()
+        (kotlin.math.cos(rad) * 15f).toFloat()
     } else {
         0f
     }
     val driftY = if (clockDrift) {
         val rad = Math.toRadians(orbitAngle.toDouble())
-        (kotlin.math.sin(rad) * 8f).toFloat()
+        (kotlin.math.sin(rad) * 15f).toFloat()
     } else {
         0f
     }

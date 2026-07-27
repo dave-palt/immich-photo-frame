@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -350,7 +351,7 @@ fun SlideshowScreen(
                             fontSize = s.clockSize,
                             position = s.clockPosition,
                             containerSize = containerSize,
-                            clockDrift = s.photoAnimations,
+                            clockDrift = true,
                             snapToGrid = s.clockSnapToGrid,
                             onPositionChanged = { normX, normY ->
                                 viewModel.setClockPosition(ClockPosition(normX, normY))
@@ -387,8 +388,10 @@ fun SlideshowScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0x80000000))
+                            .displayCutoutPadding()
                             .statusBarsPadding()
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
@@ -508,7 +511,10 @@ fun SlideshowScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.navigationBarsPadding(),
+                        modifier = Modifier
+                            .navigationBarsPadding()
+                            .displayCutoutPadding()
+                            .padding(vertical = 24.dp),
                     ) {
                         IconButton(
                             onClick = { isPaused = !isPaused },

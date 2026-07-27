@@ -51,7 +51,7 @@ constructor(
 
     /**
      * Asset ID → local cached file path. Populated in [load] so that
-     * [thumbnailUrl] can serve offline `file://` URIs for the grid.
+     * [thumbnailUrl] can serve offline `file://` thumbnail URIs for the grid.
      */
     private val localFilePaths = mutableMapOf<String, String>()
 
@@ -90,9 +90,12 @@ constructor(
                     )
                 }
             } else {
-                // Cache hit — resolve local file paths for offline thumbnails
+                // Cache hit — resolve local thumbnail paths for offline grid
+                // previews. We use the _thumb files (not the full-res files)
+                // because thumbnails are always JPEG images regardless of asset
+                // type — Coil can't decode a video file into a bitmap.
                 localFilePaths.clear()
-                localFilePaths.putAll(cacheRepo.getAssetFilePaths(assets.map { it.id }))
+                localFilePaths.putAll(cacheRepo.getAssetThumbnailPaths(assets.map { it.id }))
             }
 
             _uiState.value = MediaSelectionUiState(
