@@ -2,6 +2,7 @@ package com.dav3.immichframe.ui.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.OAuthStartResult
 import com.dav3.immichframe.domain.repository.ServerInfo
@@ -55,6 +56,8 @@ data class SetupUiState(
     val showOAuthButton: Boolean = false,
     /** Transient: PKCE state retained for the OAuth callback. */
     val pendingOAuth: OAuthStartResult? = null,
+    /** Result of the permission check run after key validation. */
+    val permissionCheck: PermissionCheckResult? = null,
 ) {
     val serverUrl: String get() = "${if (useHttps) "https" else "http"}://$domain".removeSuffix("/")
 }
@@ -307,11 +310,7 @@ constructor(
                 return@launch
             }
 
-            _uiState.value =
-                _uiState.value.copy(
-                    connectionState = ConnectionState.SUCCESS,
-                    connectedEmail = userResult.getOrThrow(),
-                )
+            completeConnection(state.apiKey.trim(), scoped = false, version = "")
         }
     }
 
@@ -336,11 +335,52 @@ constructor(
             return
         }
 
+        // Run full permission probe — blocks setup if mandatory permissions
+        // are missing, or proceeds in degraded mode if only optional ones are.
+        val permResult = immichRepo.checkPermissions()
+        val permCheck = permResult.getOrNull()
+        if (permCheck != null) {
+            settingsRepo.setPermissionStatus(permCheck)
+            if (!permCheck.canProceed) {
+                val missing = permCheck.missingBlocking.joinToString(", ") { it.scope }
+                _uiState.value =
+                    _uiState.value.copy(
+                        connectionState = ConnectionState.ERROR,
+                        errorMessage = "API key is missing required permissions: $missing. " +
+                            "Please generate a new key or update it in Immich to include all required permissions.",
+                    )
+                return
+            }
+        }
+
+        // Apply degraded settings for any missing optional permissions
+        if (permCheck != null) {
+            enforceDegradedSettings(permCheck)
+        }
+
         _uiState.value =
             _uiState.value.copy(
                 connectionState = ConnectionState.SUCCESS,
                 connectedEmail = userResult.getOrThrow(),
                 pendingOAuth = null,
+                permissionCheck = permCheck,
             )
+    }
+
+    /**
+     * Force-off any setting gated by a missing optional permission.
+     * E.g. if asset.download is denied, set skipVideos=true.
+     */
+    private suspend fun enforceDegradedSettings(result: PermissionCheckResult) {
+        val currentSettings = settingsRepo.slideshowSettings.first()
+        var newSettings = currentSettings
+        for (perm in result.missingOptional) {
+            when (perm.gatedSettingKey) {
+                "skip_videos" -> newSettings = newSettings.copy(skipVideos = true)
+            }
+        }
+        if (newSettings != currentSettings) {
+            settingsRepo.setSlideshowSettings(newSettings)
+        }
     }
 }

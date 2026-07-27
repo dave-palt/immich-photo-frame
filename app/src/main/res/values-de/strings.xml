@@ -9,6 +9,12 @@
     <string name="section_system">System</string>
     <string name="section_albums">Alben</string>
     <string name="section_connection">Verbindung</string>
+    <string name="api_key_permissions">API-Schlüssel-Berechtigungen</string>
+    <string name="recheck_permissions">Erneut prüfen</string>
+    <string name="checking">Prüfen…</string>
+    <string name="missing_required_perms">Erforderliche Berechtigungen fehlen — einige Funktionen werden nicht verfügbar sein. Erstellen Sie einen neuen Schlüssel oder aktualisieren Sie ihn in Immich.</string>
+    <string name="optional_perms_missing">Einige optionale Funktionen sind aufgrund fehlender Berechtigungen deaktiviert.</string>
+    <string name="skip_videos_locked_desc">Gesperrt — API-Schlüssel fehlt \'asset.download\'-Berechtigung</string>
 
     <!-- Playback -->
     <string name="interval">Intervall</string>

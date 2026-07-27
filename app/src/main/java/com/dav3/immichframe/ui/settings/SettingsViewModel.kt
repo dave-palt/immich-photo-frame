@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.sync.SyncScheduler
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
@@ -14,6 +15,7 @@ import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
 import com.dav3.immichframe.ui.onboarding.TourSteps
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -28,6 +30,8 @@ data class SettingsUiState(
     val settings: SlideshowSettings = SlideshowSettings(),
     val serverUrl: String = "",
     val apiKey: String = "",
+    val permissionStatus: PermissionCheckResult? = null,
+    val permissionCheckInProgress: Boolean = false,
 )
 
 @HiltViewModel
@@ -38,13 +42,17 @@ constructor(
     private val immichRepo: ImmichRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
+    private val permissionCheckingFlow = MutableStateFlow(false)
+
     val uiState: StateFlow<SettingsUiState> =
         combine(
             settingsRepo.slideshowSettings,
             settingsRepo.serverUrl,
             settingsRepo.apiKey,
-        ) { slideshow, url, key ->
-            SettingsUiState(slideshow, url, key)
+            settingsRepo.permissionStatus,
+            permissionCheckingFlow,
+        ) { slideshow, url, key, perms, checking ->
+            SettingsUiState(slideshow, url, key, perms, checking)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
     val onboardingSteps: StateFlow<Set<String>> =
@@ -63,6 +71,40 @@ constructor(
 
     fun resetOnboarding() {
         viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
+    /**
+     * Re-probe all API endpoints and update the stored permission status.
+     * Called when the Settings screen opens and via the "Re-check" button.
+     */
+    fun recheckPermissions() {
+        viewModelScope.launch {
+            permissionCheckingFlow.value = true
+            immichRepo.checkPermissions().onSuccess { result ->
+                settingsRepo.setPermissionStatus(result)
+                enforceDegradedSettings(result)
+            }.onFailure {
+                // Network error — keep the previous status, don't wipe it
+            }
+            permissionCheckingFlow.value = false
+        }
+    }
+
+    /**
+     * Force-off any setting gated by a missing optional permission.
+     * Mirrors the logic in SetupViewModel.
+     */
+    private suspend fun enforceDegradedSettings(result: PermissionCheckResult) {
+        val currentSettings = settingsRepo.slideshowSettings.first()
+        var newSettings = currentSettings
+        for (perm in result.missingOptional) {
+            when (perm.gatedSettingKey) {
+                "skip_videos" -> newSettings = newSettings.copy(skipVideos = true)
+            }
+        }
+        if (newSettings != currentSettings) {
+            settingsRepo.setSlideshowSettings(newSettings)
+        }
     }
 
     fun resetOnboardingForSettings() {

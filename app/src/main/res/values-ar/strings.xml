@@ -9,6 +9,12 @@
     <string name="section_system">النظام</string>
     <string name="section_albums">الألبومات</string>
     <string name="section_connection">الاتصال</string>
+    <string name="api_key_permissions">أذونات مفتاح API</string>
+    <string name="recheck_permissions">إعادة فحص</string>
+    <string name="checking">جارٍ الفحص…</string>
+    <string name="missing_required_perms">أذونات مطلوبة مفقودة — بعض الميزات لن تعمل. أنشئ مفتاحاً جديداً أو حدثه في Immich.</string>
+    <string name="optional_perms_missing">بعض الميزات الاختيارية معطلة بسبب الأذونات المفقودة.</string>
+    <string name="skip_videos_locked_desc">مقفل — مفتاح API يفتقد إذن \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">الفاصل الزمني</string>

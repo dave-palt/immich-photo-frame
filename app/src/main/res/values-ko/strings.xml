@@ -9,6 +9,12 @@
     <string name="section_system">시스템</string>
     <string name="section_albums">앨범</string>
     <string name="section_connection">연결</string>
+    <string name="api_key_permissions">API 키 권한</string>
+    <string name="recheck_permissions">재확인</string>
+    <string name="checking">확인 중…</string>
+    <string name="missing_required_perms">필수 권한 누락 — 일부 기능이 작동하지 않습니다. Immich에서 새 키를 생성하거나 업데이트하세요.</string>
+    <string name="optional_perms_missing">권한 누락으로 인해 일부 선택적 기능이 비활성화되었습니다.</string>
+    <string name="skip_videos_locked_desc">잠김 — API 키에 \'asset.download\' 권한이 없습니다</string>
 
     <!-- Playback -->
     <string name="interval">간격</string>

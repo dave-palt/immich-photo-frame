@@ -40,6 +40,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Adaptive launcher icon with day/night variants and Android 13+ monochrome (themed icon) support; dedicated debug-build variant (amber background); separate background-free logo drawable for the Setup screen
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
 - **In-app API key generation** — log in with email/password or OAuth; the app auto-creates a scoped key (no external scripts needed)
+- **Permission verification** — after setup, the app probes all 5 required endpoints to verify the key works; missing permissions are shown in Settings with per-feature impact (e.g., video playback locked off if `asset.download` is missing)
 - Scoped API key (5 permissions: album.read, asset.read, asset.view, asset.download, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
 - Biometric-protected API key reveal & copy (fingerprint / face / PIN)
@@ -48,16 +49,17 @@ lets you pick which album(s) to display, and remembers your choice.
 ## Setup
 
 1. Enter your Immich server URL — the app validates it and detects the version
-2. Generate an API key in-app (email/password or OAuth), or paste an existing one
+2. Paste an existing API key, or generate one in-app (email/password or OAuth)
 3. Select album(s)
 4. Slideshow starts
 
 ### API key
 
-The app can **auto-generate a scoped API key** during setup — just enter your
-email and password, and the app handles the rest. Your password is used once
-to create the key, then immediately discarded (never stored). OAuth is also
-supported for servers that have it enabled.
+You can **paste an existing API key** from Immich (User Settings → API Keys),
+or use the **Generate Key** button during setup to auto-create one — just
+enter your email and password. Your password is used once to create the key,
+then immediately discarded (never stored). OAuth is also supported for
+servers that have it enabled.
 
 Alternatively, you can create a key manually in Immich under
 **User Settings → API Keys**. The key needs 5 permissions:

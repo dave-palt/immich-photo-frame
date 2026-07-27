@@ -9,6 +9,12 @@
     <string name="section_system">Système</string>
     <string name="section_albums">Albums</string>
     <string name="section_connection">Connexion</string>
+    <string name="api_key_permissions">Autorisations de la clé API</string>
+    <string name="recheck_permissions">Revérifier</string>
+    <string name="checking">Vérification…</string>
+    <string name="missing_required_perms">Autorisations requises manquantes — certaines fonctionnalités ne seront pas disponibles. Générez une nouvelle clé ou mettez-la à jour dans Immich.</string>
+    <string name="optional_perms_missing">Certaines fonctionnalités optionnelles sont désactivées en raison d\'autorisations manquantes.</string>
+    <string name="skip_videos_locked_desc">Verrouillé — la clé API n\'a pas l\'autorisation \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">Intervalle</string>

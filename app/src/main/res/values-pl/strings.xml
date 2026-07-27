@@ -9,6 +9,12 @@
     <string name="section_system">System</string>
     <string name="section_albums">Albumy</string>
     <string name="section_connection">Połączenie</string>
+    <string name="api_key_permissions">Uprawnienia klucza API</string>
+    <string name="recheck_permissions">Sprawdź ponownie</string>
+    <string name="checking">Sprawdzanie…</string>
+    <string name="missing_required_perms">Brak wymaganych uprawnień — niektóre funkcje nie będą działać. Wygeneruj nowy klucz lub zaktualizuj go w Immich.</string>
+    <string name="optional_perms_missing">Niektóre funkcje opcjonalne są wyłączone z powodu brakujących uprawnień.</string>
+    <string name="skip_videos_locked_desc">Zablokowane — klucz API nie ma uprawnienia \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">Interwał</string>

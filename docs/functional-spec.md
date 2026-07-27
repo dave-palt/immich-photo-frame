@@ -26,10 +26,22 @@
    - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
      OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
      returns to the app → JWT obtained → key created.
-4. App validates the resulting key by calling `GET /users/me`.
-5. Credentials persisted: API key to encrypted on-device storage, server version
-   + key-scope flag to DataStore.
-6. On success, proceed to album selection.
+4. App validates the key by calling `GET /users/me`.
+5. **Permission verification**: App probes all 5 required endpoints in
+   dependency order (user → albums → search → thumbnail → original) to verify
+   the key has the necessary scopes. Results are stored as `permission_status`
+   in DataStore.
+   - If a **blocking** permission is missing (`user.read`, `album.read`,
+     `asset.read`, `asset.view`), setup is blocked with an error showing
+     which permissions are missing and a shortcut to generate a properly-
+     scoped key.
+   - If only the **optional** permission (`asset.download`) is missing, setup
+     proceeds in degraded mode: video playback is locked off and the media
+     cache skips downloading originals. The user is informed which feature
+     is disabled and why.
+6. Credentials persisted: API key to encrypted on-device storage, server version
+   + key-scope flag + permission status to DataStore.
+7. On success, proceed to album selection.
 
 ### F2: Album Selection
 
@@ -257,6 +269,17 @@ Options:
     fingerprint / face / device-PIN authentication. If no screen lock
     is set up, a dialog prompts the user to create one.
   - Test Connection button
+  - **API Key Permissions** card (shown when a key is set):
+    - Lists all 5 required permissions with ✓ (granted), ✗ (denied),
+      or ? (unknown — couldn't probe) status icons.
+    - **Re-check** button re-probes all endpoints.
+    - Auto-refreshes every time Settings is opened.
+    - If blocking permissions are missing, the card uses an error-colored
+      background and shows guidance to regenerate the key.
+- **Feature gating based on permissions:**
+  - When `asset.download` is denied, the **Skip Videos** toggle is locked
+    ON (can't be turned off) with subtitle "Locked — API key lacks
+    'asset.download' permission". The media cache also skips downloading.
 - **Albums** — change album selection (returns to album picker)
 - **Reset All Settings** — clears everything, returns to setup screen
 

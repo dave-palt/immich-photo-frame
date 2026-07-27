@@ -9,6 +9,12 @@
     <string name="section_system">システム</string>
     <string name="section_albums">アルバム</string>
     <string name="section_connection">接続</string>
+    <string name="api_key_permissions">APIキーの権限</string>
+    <string name="recheck_permissions">再確認</string>
+    <string name="checking">確認中…</string>
+    <string name="missing_required_perms">必要な権限が不足しています — 一部の機能は使用できません。Immichで新しいキーを生成するか更新してください。</string>
+    <string name="optional_perms_missing">権限不足のため、一部のオプション機能が無効になっています。</string>
+    <string name="skip_videos_locked_desc">ロック中 — APIキーに\'asset.download\'権限がありません</string>
 
     <!-- Playback -->
     <string name="interval">間隔</string>

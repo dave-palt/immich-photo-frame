@@ -63,6 +63,8 @@ immich-android/
 │   │   │   └── (repository/ is in di/)
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
+│   │   │   │   ├── Models.kt            # Album, Asset, SlideshowSettings, SyncProgress
+│   │   │   │   └── RequiredPermission.kt # Permission registry + PermissionCheckResult
 │   │   │   ├── repository/      # Repository interfaces
 │   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
@@ -273,6 +275,7 @@ Setup → Albums → Slideshow
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 | Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |
 | API Key Scoped | DataStore | `api_key_scoped` | String bool (key created with scoped permissions) |
+| Permission Status | DataStore | `permission_status` | String JSON (serialized `PermissionCheckResult` — per-endpoint probe results) |
 | Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
 
 All settings flow through a single shared DataStore instance

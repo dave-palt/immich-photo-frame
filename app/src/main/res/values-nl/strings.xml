@@ -9,6 +9,12 @@
     <string name="section_system">Systeem</string>
     <string name="section_albums">Albums</string>
     <string name="section_connection">Verbinding</string>
+    <string name="api_key_permissions">API-sleutel machtigingen</string>
+    <string name="recheck_permissions">Opnieuw controleren</string>
+    <string name="checking">Controleren…</string>
+    <string name="missing_required_perms">Vereiste machtigingen ontbreken — sommige functies werken niet. Genereer een nieuwe sleutel of werk hem bij in Immich.</string>
+    <string name="optional_perms_missing">Sommige optionele functies zijn uitgeschakeld wegens ontbrekende machtigingen.</string>
+    <string name="skip_videos_locked_desc">Vergrendeld — API-sleutel mist \'asset.download\'-machtiging</string>
 
     <!-- Playback -->
     <string name="interval">Interval</string>

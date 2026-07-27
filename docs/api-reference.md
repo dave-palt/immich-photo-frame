@@ -31,11 +31,10 @@ Retrofit client), the API key is appended as a query parameter:
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
 
-**In-app key generation** (recommended): the app can auto-generate a scoped key
-during setup — the user enters their email/password, the app logs in via
-`POST /auth/login`, creates a key via `POST /api-keys` with the 5 required
-permissions, then discards the password. OAuth/PKCE is also supported for
-servers with OAuth enabled. See F1 in the functional spec for details.
+**In-app key generation**: during setup, the default is to paste an existing
+key manually. A **Generate Key** helper button lets the user auto-create a
+scoped key via email/password (or OAuth) — the app logs in, creates the key,
+and discards the password. See F1 in the functional spec for details.
 
 ### Required Permissions
 
@@ -53,6 +52,26 @@ These permissions are the minimum required for ImmichFrame to function.
 The in-app key generator creates a key with exactly these permissions
 (requires Immich v1.135+ for scoped keys). The external `keymgr` scripts
 are still available as a fallback.
+
+### Permission Verification
+
+After the API key is stored (whether generated in-app or pasted manually),
+the app probes each required endpoint to verify the key actually has the
+necessary scopes. This mirrors the external `scripts/check-api-key.sh`
+script. Probes run in dependency order:
+
+| Step | Endpoint | Permission Tested | Notes |
+|---|---|---|---|
+| 1 | `GET /api/users/me` | `user.read` | Also validates the key itself |
+| 2 | `GET /api/albums` | `album.read` | Returns album list |
+| 3 | `POST /api/search/metadata` | `asset.read` | Returns first asset ID for downstream probes |
+| 4 | `GET /api/assets/{id}/thumbnail` | `asset.view` | Uses asset ID from step 3 |
+| 5 | `GET /api/assets/{id}/original` | `asset.download` | Optional; gates video playback + media cache |
+
+If an upstream probe fails, downstream probes are skipped and marked
+"unknown" (not "denied"). Results are stored as `permission_status` (JSON)
+in DataStore and refreshed every time the Settings screen opens or the
+user taps "Re-check".
 
 ## In-App Auth Endpoints
 

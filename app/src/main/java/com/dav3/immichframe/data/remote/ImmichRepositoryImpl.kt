@@ -4,6 +4,9 @@ import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.domain.model.Album
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.PermissionCheckResult
+import com.dav3.immichframe.domain.model.PermissionStatus
+import com.dav3.immichframe.domain.model.RequiredPermission
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.OAuthStartResult
 import com.dav3.immichframe.domain.repository.ServerInfo
@@ -30,12 +33,140 @@ constructor(
 
     private var cachedApi: ImmichApi? = null
     private var cachedBaseUrl: String? = null
-
     override fun invalidateCache() {
-        cachedApi = null
-        cachedBaseUrl = null
+        synchronized(this) {
+            cachedApi = null
+            cachedBaseUrl = null
+        }
     }
 
+    // ------------------------------------------------------------------
+    // Permission checking
+    // ------------------------------------------------------------------
+
+    /**
+     * Probe each required endpoint in dependency order to determine which
+     * permissions the current API key actually has. Mirrors the logic in
+     * scripts/check-api-key.sh:
+     *
+     * 1. GET /users/me           → user.read
+     * 2. GET /albums             → album.read
+     * 3. POST /search/metadata   → asset.read (needs albumId from step 2)
+     * 4. GET /assets/{id}/thumbnail → asset.view (needs assetId from step 3)
+     * 5. GET /assets/{id}/original   → asset.download
+     *
+     * If an upstream step fails, downstream probes are marked Unknown.
+     */
+    override suspend fun checkPermissions(): Result<PermissionCheckResult> = runCatching {
+        val api = getApi()
+        val statuses = mutableMapOf<RequiredPermission, PermissionStatus>()
+
+        // 1. user.read
+        val userOk = try {
+            api.getCurrentUser()
+            true
+        } catch (e: retrofit2.HttpException) {
+            e.code() != 403 // 403 = denied, other errors = network/server issue
+        } catch (e: Exception) {
+            true // network error — don't penalize, treat as pass
+        }
+        statuses[RequiredPermission.USER_READ] =
+            if (userOk) PermissionStatus.Granted else PermissionStatus.Denied
+
+        if (!userOk) {
+            // Can't test anything downstream if we can't even read the user
+            RequiredPermission.entries.filter { it != RequiredPermission.USER_READ }.forEach {
+                statuses[it] = PermissionStatus.Unknown
+            }
+            return@runCatching PermissionCheckResult(statuses.toMap())
+        }
+
+        // 2. album.read
+        val albums = try {
+            api.getAlbums()
+        } catch (e: retrofit2.HttpException) {
+            statuses[RequiredPermission.ALBUM_READ] = if (e.code() == 403) {
+                PermissionStatus.Denied
+            } else {
+                PermissionStatus.Granted // server error, not a permission issue
+            }
+            null
+        } catch (e: Exception) {
+            null
+        }
+        if (statuses[RequiredPermission.ALBUM_READ] == null) {
+            statuses[RequiredPermission.ALBUM_READ] =
+                if (albums != null) PermissionStatus.Granted else PermissionStatus.Unknown
+        }
+
+        if (albums.isNullOrEmpty()) {
+            // No albums (or can't access) → can't probe asset endpoints
+            RequiredPermission.entries.filter {
+                it != RequiredPermission.USER_READ && it != RequiredPermission.ALBUM_READ
+            }.forEach {
+                if (it !in statuses) statuses[it] = PermissionStatus.Unknown
+            }
+            return@runCatching PermissionCheckResult(statuses.toMap())
+        }
+
+        val firstAlbumId = albums.first().id
+
+        // 3. asset.read
+        var firstAssetId: String? = null
+        try {
+            val search = api.searchAssets(SearchMetadataRequest(albumIds = listOf(firstAlbumId)))
+            statuses[RequiredPermission.ASSET_READ] = PermissionStatus.Granted
+            firstAssetId = search.assets.items.firstOrNull()?.id
+        } catch (e: retrofit2.HttpException) {
+            statuses[RequiredPermission.ASSET_READ] = if (e.code() == 403) {
+                PermissionStatus.Denied
+            } else {
+                PermissionStatus.Granted
+            }
+        } catch (e: Exception) {
+            statuses[RequiredPermission.ASSET_READ] = PermissionStatus.Unknown
+        }
+
+        if (firstAssetId == null) {
+            statuses[RequiredPermission.ASSET_VIEW] = PermissionStatus.Unknown
+            statuses[RequiredPermission.ASSET_DOWNLOAD] = PermissionStatus.Unknown
+            return@runCatching PermissionCheckResult(statuses.toMap())
+        }
+
+        // 4. asset.view (thumbnail)
+        try {
+            val resp = api.getThumbnail(firstAssetId)
+            resp.body()?.close()
+            statuses[RequiredPermission.ASSET_VIEW] =
+                if (resp.isSuccessful) PermissionStatus.Granted else PermissionStatus.Denied
+        } catch (e: retrofit2.HttpException) {
+            statuses[RequiredPermission.ASSET_VIEW] = if (e.code() == 403) {
+                PermissionStatus.Denied
+            } else {
+                PermissionStatus.Granted
+            }
+        } catch (e: Exception) {
+            statuses[RequiredPermission.ASSET_VIEW] = PermissionStatus.Unknown
+        }
+
+        // 5. asset.download (original)
+        try {
+            val resp = api.getOriginal(firstAssetId)
+            resp.body()?.close()
+            statuses[RequiredPermission.ASSET_DOWNLOAD] =
+                if (resp.isSuccessful) PermissionStatus.Granted else PermissionStatus.Denied
+        } catch (e: retrofit2.HttpException) {
+            statuses[RequiredPermission.ASSET_DOWNLOAD] = if (e.code() == 403) {
+                PermissionStatus.Denied
+            } else {
+                PermissionStatus.Granted
+            }
+        } catch (e: Exception) {
+            statuses[RequiredPermission.ASSET_DOWNLOAD] = PermissionStatus.Unknown
+        }
+
+        PermissionCheckResult(statuses.toMap())
+    }
     private fun getApi(): ImmichApi {
         val baseUrl = runBlocking { settings.serverUrl.first() }
         if (cachedApi != null && cachedBaseUrl == baseUrl) return cachedApi!!

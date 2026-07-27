@@ -8,16 +8,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -42,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +72,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PermissionStatus
 import com.dav3.immichframe.domain.model.PhotoAnimation
+import com.dav3.immichframe.domain.model.RequiredPermission
 import com.dav3.immichframe.domain.system.hasOverlayPermission
 import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
@@ -148,6 +156,11 @@ fun SettingsScreen(
     val completedSteps by viewModel.onboardingSteps.collectAsState()
     val scrollState = rememberScrollState()
 
+    // Refresh permission status every time the Settings screen is opened
+    LaunchedEffect(Unit) {
+        if (state.apiKey.isNotBlank()) viewModel.recheckPermissions()
+    }
+
     TourHost(
         screen = TourScreen.SETTINGS,
         completedSteps = completedSteps,
@@ -220,11 +233,20 @@ fun SettingsScreen(
                     checked = s.shuffle,
                     onToggle = { viewModel.toggleShuffle() },
                 )
+                val videoDownloadDenied = state.permissionStatus
+                    ?.let { it.statuses[RequiredPermission.ASSET_DOWNLOAD] == PermissionStatus.Denied }
+                    ?: false
+
                 SwitchItem(
                     title = stringResource(R.string.skip_videos),
-                    subtitle = stringResource(R.string.skip_videos_desc),
+                    subtitle = if (videoDownloadDenied) {
+                        stringResource(R.string.skip_videos_locked_desc)
+                    } else {
+                        stringResource(R.string.skip_videos_desc)
+                    },
                     checked = s.skipVideos,
                     onToggle = { viewModel.toggleSkipVideos() },
+                    enabled = !videoDownloadDenied,
                 )
                 SwitchItem(
                     title = stringResource(R.string.muted),
@@ -654,6 +676,16 @@ fun SettingsScreen(
                     }
                 }
 
+                // ============================= PERMISSIONS =============================
+                val permStatus = state.permissionStatus
+                if (permStatus != null) {
+                    PermissionStatusCard(
+                        status = permStatus,
+                        checking = state.permissionCheckInProgress,
+                        onRecheck = { viewModel.recheckPermissions() },
+                    )
+                }
+
                 HorizontalDivider()
 
                 // ============================= DANGER ZONE =============================
@@ -753,16 +785,117 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
+private fun PermissionStatusCard(
+    status: com.dav3.immichframe.domain.model.PermissionCheckResult,
+    checking: Boolean,
+    onRecheck: () -> Unit,
+) {
+    val missingBlocking = status.missingBlocking
+    val missingOptional = status.missingOptional
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (missingBlocking.isNotEmpty()) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        ),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(R.string.api_key_permissions),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                TextButton(onClick = onRecheck, enabled = !checking) {
+                    Text(
+                        if (checking) {
+                            stringResource(R.string.checking)
+                        } else {
+                            stringResource(R.string.recheck_permissions)
+                        },
+                    )
+                }
+            }
+
+            if (missingBlocking.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.missing_required_perms),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+
+            // List each permission with its status icon
+            RequiredPermission.entries.forEach { perm ->
+                val st = status.statuses[perm]
+                val (icon, tint) = when (st) {
+                    PermissionStatus.Granted -> Icons.Default.Check to androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                    PermissionStatus.Denied -> Icons.Default.Close to MaterialTheme.colorScheme.error
+                    PermissionStatus.Unknown -> Icons.Default.Help to androidx.compose.ui.graphics.Color.Gray
+                    null -> Icons.Default.Help to androidx.compose.ui.graphics.Color.Gray
+                }
+                Row(
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            perm.scope,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            perm.featureName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        )
+                    }
+                }
+            }
+
+            if (missingOptional.isNotEmpty()) {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                Text(
+                    stringResource(R.string.optional_perms_missing),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun SwitchItem(
     title: String,
     checked: Boolean,
     onToggle: () -> Unit,
     subtitle: String? = null,
+    enabled: Boolean = true,
 ) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = subtitle?.let { { Text(it) } },
-        trailingContent = { Switch(checked = checked, onCheckedChange = { onToggle() }) },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = { onToggle() },
+                enabled = enabled,
+            )
+        },
     )
 }
 

@@ -9,6 +9,12 @@
     <string name="section_system">系统</string>
     <string name="section_albums">相册</string>
     <string name="section_connection">连接</string>
+    <string name="api_key_permissions">API 密钥权限</string>
+    <string name="recheck_permissions">重新检查</string>
+    <string name="checking">检查中…</string>
+    <string name="missing_required_perms">缺少必需权限 — 部分功能将不可用。请在 Immich 中生成新密钥或更新现有密钥。</string>
+    <string name="optional_perms_missing">由于缺少权限，部分可选功能已被禁用。</string>
+    <string name="skip_videos_locked_desc">已锁定 — API 密钥缺少 \'asset.download\' 权限</string>
 
     <!-- Playback -->
     <string name="interval">间隔</string>

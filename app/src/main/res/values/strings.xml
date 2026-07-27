@@ -10,6 +10,11 @@
     <string name="section_system">System</string>
     <string name="section_albums">Albums</string>
     <string name="section_connection">Connection</string>
+    <string name="api_key_permissions">API Key Permissions</string>
+    <string name="recheck_permissions">Re-check</string>
+    <string name="checking">Checking…</string>
+    <string name="missing_required_perms">Missing required permissions — some features will not work. Generate a new key or update it in Immich.</string>
+    <string name="optional_perms_missing">Some optional features are disabled due to missing permissions.</string>
 
     <!-- Playback -->
     <string name="interval">Interval</string>
@@ -17,6 +22,7 @@
     <string name="shuffle_desc">Randomize image order</string>
     <string name="skip_videos">Skip Videos</string>
     <string name="skip_videos_desc">Only show photos</string>
+    <string name="skip_videos_locked_desc">Locked — API key lacks \'asset.download\' permission</string>
     <string name="muted">Muted</string>
     <string name="muted_desc">Silence video audio</string>
     <string name="photo_animations">Photo Animations</string>

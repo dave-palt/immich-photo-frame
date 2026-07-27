@@ -235,6 +235,15 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  │ [Test Connection]    │    │
 │  └──────────────────────┘    │
 │                              │
+│  API KEY PERMISSIONS [Re-✓]  │ ← permission status card
+│  ┌──────────────────────┐    │
+│  │ ✓ user.read          │    │
+│  │ ✓ album.read         │    │
+│  │ ✓ asset.read         │    │
+│  │ ✓ asset.view         │    │
+│  │ ✗ asset.download     │    │ ← red if denied; card turns red if blocking missing
+│  └──────────────────────┘    │
+│                              │
 │  Reset All Settings          │ ← red text button
 │                              │
 │  Show Tour Again             │ ← replays Settings tour
@@ -243,9 +252,14 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection.
+- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection, Permissions.
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
+- **API Key Permissions card** (below Connection): shows ✓/✗/? for each of the 5
+  required permissions. Auto-refreshes when Settings opens; "Re-check" button
+  re-probes. Card background turns error-colored if blocking permissions are
+  missing. When `asset.download` is denied, the Skip Videos toggle in the
+  Slideshow section is locked ON with an explanatory subtitle.
 - Back arrow returns to previous screen.
 - **System section** includes a version string in the top bar (`Settings vX.Y.Z`)
   and two tour replay buttons: **"Show Tour Again"** (replays only the Settings

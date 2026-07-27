@@ -1,5 +1,6 @@
 package com.dav3.immichframe.domain.repository
 
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import kotlinx.coroutines.flow.Flow
 
@@ -25,6 +26,12 @@ interface SettingsRepository {
     /** Whether the stored API key was created with scoped permissions. */
     val apiKeyScoped: Flow<Boolean>
 
+    /**
+     * Last permission check result (serialized as JSON). Null if never checked
+     * or if the key was changed since the last check.
+     */
+    val permissionStatus: Flow<PermissionCheckResult?>
+
     suspend fun setServerUrl(url: String)
 
     suspend fun setApiKey(key: String)
@@ -32,6 +39,8 @@ interface SettingsRepository {
     suspend fun setServerVersion(version: String)
 
     suspend fun setApiKeyScoped(scoped: Boolean)
+
+    suspend fun setPermissionStatus(status: PermissionCheckResult?)
 
     suspend fun setSelectedAlbumIds(ids: List<String>)
 

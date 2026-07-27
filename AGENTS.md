@@ -142,6 +142,29 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-27** — Per-endpoint permission verification. After key generation
+  or manual paste, the app probes all 5 required endpoints (mirroring
+  `scripts/check-api-key.sh`) in dependency order: `GET /users/me` →
+  `GET /albums` → `POST /search/metadata` → `GET /assets/{id}/thumbnail` →
+  `GET /assets/{id}/original`. Results stored as `permission_status` (JSON)
+  in DataStore, refreshed on Settings open + "Re-check" button. Blocking
+  permissions (user/album/asset read/view) missing → setup blocked with
+  error. Optional permission (`asset.download`) missing → degraded mode:
+  Skip Videos toggle locked ON, media cache skips downloading. New
+  `RequiredPermission` enum in `domain/model/` is the single source of truth
+  (scope string, feature name, blocking flag, gated setting key). New model
+  types: `PermissionStatus` (sealed: Granted/Denied/Unknown),
+  `PermissionCheckResult` (map + computed `canProceed`/`missingBlocking`/
+  `missingOptional`). New DataStore key: `permission_status`. New repo
+  method: `ImmichRepository.checkPermissions()` returning Result. New
+  Settings UI: `PermissionStatusCard` composable with ✓/✗/? icons per
+  permission + error-colored background when blocking missing. `SwitchItem`
+  gained `enabled` param for locked toggles. Updated: functional-spec (F1
+  permission verification step, F6 permission card + feature gating),
+  technical-spec (persistence table), ui-spec (permission card mockup +
+  description), api-reference (permission verification section), README
+  (feature list).
+
 - **2026-07-27** — In-app API key generation feature. Eliminated the need for
   external `keymgr.ts` scripts. Setup screen restructured into a two-step flow:
   (1) Domain Validation — user enters server URL, app calls `GET /server/version`

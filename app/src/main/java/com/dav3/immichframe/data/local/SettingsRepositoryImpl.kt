@@ -10,11 +10,21 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PermissionCheckResult
+import com.dav3.immichframe.domain.model.PermissionStatus
+import com.dav3.immichframe.domain.model.RequiredPermission
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -58,6 +68,7 @@ constructor(
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
         val SERVER_VERSION = stringPreferencesKey("server_version")
         val API_KEY_SCOPED = stringPreferencesKey("api_key_scoped")
+        val PERMISSION_STATUS = stringPreferencesKey("permission_status")
         val ONBOARDING_COMPLETED_STEPS = stringSetPreferencesKey("onboarding_completed_steps")
     }
 
@@ -149,6 +160,13 @@ constructor(
             it[Keys.API_KEY_SCOPED]?.toBoolean() ?: false
         }
 
+    override val permissionStatus: Flow<PermissionCheckResult?> =
+        context.appDataStore.data.map { prefs ->
+            prefs[Keys.PERMISSION_STATUS]?.let { json ->
+                runCatching { deserializePermissionStatus(json) }.getOrNull()
+            }
+        }
+
     override suspend fun setServerUrl(url: String) {
         context.appDataStore.edit { it[Keys.SERVER_URL] = url }
     }
@@ -163,6 +181,16 @@ constructor(
 
     override suspend fun setApiKeyScoped(scoped: Boolean) {
         context.appDataStore.edit { it[Keys.API_KEY_SCOPED] = scoped.toString() }
+    }
+
+    override suspend fun setPermissionStatus(status: PermissionCheckResult?) {
+        context.appDataStore.edit { prefs ->
+            if (status == null) {
+                prefs.remove(Keys.PERMISSION_STATUS)
+            } else {
+                prefs[Keys.PERMISSION_STATUS] = serializePermissionStatus(status)
+            }
+        }
     }
 
     override suspend fun setSelectedAlbumIds(ids: List<String>) {
@@ -236,5 +264,48 @@ constructor(
     override suspend fun clearAll() {
         context.appDataStore.edit { it.clear() }
         encPrefs.edit().clear().apply()
+    }
+
+    private val statusJson = Json { ignoreUnknownKeys = true }
+
+    private fun serializePermissionStatus(status: PermissionCheckResult): String {
+        val arr = buildJsonArray {
+            status.statuses.forEach { (perm, st) ->
+                add(
+                    buildJsonObject {
+                        put("scope", JsonPrimitive(perm.scope))
+                        put(
+                            "status",
+                            JsonPrimitive(
+                                when (st) {
+                                    PermissionStatus.Granted -> "granted"
+                                    PermissionStatus.Denied -> "denied"
+                                    PermissionStatus.Unknown -> "unknown"
+                                },
+                            ),
+                        )
+                    },
+                )
+            }
+        }
+        return statusJson.encodeToString(JsonArray.serializer(), arr)
+    }
+
+    private fun deserializePermissionStatus(json: String): PermissionCheckResult {
+        val arr = statusJson.decodeFromString(JsonArray.serializer(), json)
+        val statuses = mutableMapOf<RequiredPermission, PermissionStatus>()
+        for (element in arr) {
+            val obj = element.jsonObject
+            val scope = obj["scope"]!!.jsonPrimitive.content
+            val statusStr = obj["status"]!!.jsonPrimitive.content
+            val perm = RequiredPermission.entries.find { it.scope == scope } ?: continue
+            val st = when (statusStr) {
+                "granted" -> PermissionStatus.Granted
+                "denied" -> PermissionStatus.Denied
+                else -> PermissionStatus.Unknown
+            }
+            statuses[perm] = st
+        }
+        return PermissionCheckResult(statuses.toMap())
     }
 }

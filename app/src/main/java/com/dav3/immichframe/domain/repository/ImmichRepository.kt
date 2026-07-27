@@ -3,6 +3,7 @@ package com.dav3.immichframe.domain.repository
 import com.dav3.immichframe.data.remote.ServerVersionDto
 import com.dav3.immichframe.domain.model.Album
 import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 
 interface ImmichRepository {
     suspend fun ping(): Result<Unit>
@@ -23,6 +24,16 @@ interface ImmichRepository {
 
     /** Invalidate cached API/client so new credentials take effect. */
     fun invalidateCache()
+
+    /**
+     * Probe all required API endpoints to determine which permissions the
+     * current API key has. Tests endpoints in dependency order (user → albums
+     * → assets → thumbnail → download); if an upstream call fails, downstream
+     * probes are marked Unknown rather than Denied.
+     *
+     * Called during setup and when the Settings screen opens.
+     */
+    suspend fun checkPermissions(): Result<PermissionCheckResult>
 
     // --- Setup / key generation ---
 
