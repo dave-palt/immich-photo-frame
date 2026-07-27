@@ -159,8 +159,12 @@ fun SettingsScreen(
     val completedSteps by viewModel.onboardingSteps.collectAsState()
     val scrollState = rememberScrollState()
 
-    // Refresh permission status every time the Settings screen is opened
-    LaunchedEffect(Unit) {
+    // Refresh permission status when the Settings screen is opened and whenever
+    // the API key changes. Keying on state.apiKey (instead of Unit) ensures the
+    // check fires once the real key has been collected from DataStore — on the
+    // very first composition state.apiKey is still the default "" and the check
+    // would otherwise be skipped entirely.
+    LaunchedEffect(state.apiKey) {
         if (state.apiKey.isNotBlank()) viewModel.recheckPermissions()
     }
 

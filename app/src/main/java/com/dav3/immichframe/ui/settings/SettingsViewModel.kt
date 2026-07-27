@@ -11,6 +11,7 @@ import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
+import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
@@ -41,6 +42,7 @@ class SettingsViewModel
 constructor(
     private val settingsRepo: SettingsRepository,
     private val immichRepo: ImmichRepository,
+    private val mediaCacheRepo: MediaCacheRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
     private val permissionCheckingFlow = MutableStateFlow(false)
@@ -236,6 +238,11 @@ constructor(
     }
 
     fun resetAll() = viewModelScope.launch {
+        // Wipe the media cache BEFORE settings so a rapid re-login can't
+        // serve cached files from a previous account. Without this, the
+        // cache-first slideshow loader shows the old account's photos even
+        // after DataStore + EncryptedSharedPreferences are cleared.
+        mediaCacheRepo.clearAll()
         settingsRepo.clearAll()
     }
 
