@@ -172,6 +172,11 @@ fi
 
 # --- Done ---
 
+# Invalidate the login session so this device doesn't linger in Immich's
+# "Authorized Devices". The API key is independent of the session and survives.
+curl -sf -o /dev/null -X POST "${SERVER_URL}/api/auth/logout" \
+    -H "Authorization: Bearer ${ACCESS_TOKEN}" 2>/dev/null || true
+
 echo ""
 echo "================================================"
 echo "  ${KEY_NAME} API Key (save this now)"

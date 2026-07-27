@@ -51,12 +51,22 @@ function Test-Endpoint {
         [string]$Method = "GET",
         [string]$Body,
         [string]$Permission,
-        [string]$Description
+        [string]$Description,
+        [switch]$UseQueryAuth
     )
-    
-    $headers = @{
-        "Content-Type" = "application/json"
-        "x-api-key"    = $ApiKey
+
+    # When -UseQueryAuth is set, append the API key as ?apiKey= instead of
+    # using the x-api-key header. This mirrors how the app loads media via
+    # Coil/ExoPlayer. See check-api-key.sh for the same logic.
+    if ($UseQueryAuth) {
+        $sep = if ($Path.Contains("?")) { "&" } else { "?" }
+        $Path = "${Path}${sep}apiKey=$ApiKey"
+        $headers = @{ "Content-Type" = "application/json" }
+    } else {
+        $headers = @{
+            "Content-Type" = "application/json"
+            "x-api-key"    = $ApiKey
+        }
     }
     
     try {
@@ -140,9 +150,9 @@ if ($search.ok) {
     if ($assetCount -gt 0) {
         $firstAssetId = $search.data.assets.items[0].id
         
-        # --- 5. Thumbnail ---
-        Write-Step "Testing thumbnail: GET /assets/$firstAssetId/thumbnail?size=preview ..."
-        $thumb = Test-Endpoint -Path "/assets/$firstAssetId/thumbnail?size=preview" -Permission "asset.view" -Description "Download thumbnail"
+        # --- 5. Thumbnail (?apiKey= query param — same as Coil image loading) ---
+        Write-Step "Testing thumbnail: GET /assets/$firstAssetId/thumbnail?size=preview&apiKey=*** ..."
+        $thumb = Test-Endpoint -Path "/assets/$firstAssetId/thumbnail?size=preview" -Permission "asset.view" -Description "Download thumbnail" -UseQueryAuth
         if ($thumb.ok) {
             Write-Success "Thumbnail loaded (HTTP 200)"
         } else {
@@ -150,9 +160,9 @@ if ($search.ok) {
             if ($thumb.status -eq 403) { Write-Host "  → Key is missing 'asset.view' permission" -ForegroundColor Yellow }
         }
 
-        # --- 6. Download original (video playback) ---
-        Write-Step "Testing download: GET /assets/$firstAssetId/original ..."
-        $download = Test-Endpoint -Path "/assets/$firstAssetId/original" -Permission "asset.download" -Description "Download original"
+        # --- 6. Download original (?apiKey= query param — same as ExoPlayer video loading) ---
+        Write-Step "Testing download: GET /assets/$firstAssetId/original?apiKey=*** ..."
+        $download = Test-Endpoint -Path "/assets/$firstAssetId/original" -Permission "asset.download" -Description "Download original" -UseQueryAuth
         if ($download.ok) {
             Write-Success "Original download OK (HTTP 200)"
         } else {
