@@ -44,7 +44,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -312,6 +314,45 @@ fun SettingsScreen(
                     checked = s.keepScreenOn,
                     onToggle = { viewModel.toggleKeepScreenOn() },
                 )
+
+                HorizontalDivider()
+
+                // ============================= NIGHT MODE =============================
+                SectionHeader(stringResource(R.string.section_night_mode))
+                SwitchItem(
+                    title = stringResource(R.string.night_mode),
+                    subtitle = stringResource(R.string.night_mode_desc),
+                    checked = s.nightMode,
+                    onToggle = { viewModel.toggleNightMode() },
+                )
+                if (s.nightMode) {
+                    Text(
+                        stringResource(R.string.night_mode_alt_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    NightModeTimePicker(
+                        label = stringResource(R.string.night_mode_start),
+                        minutes = s.nightModeStart,
+                        onTimeSelected = { viewModel.updateNightModeStart(it) },
+                    )
+                    NightModeTimePicker(
+                        label = stringResource(R.string.night_mode_end),
+                        minutes = s.nightModeEnd,
+                        onTimeSelected = { viewModel.updateNightModeEnd(it) },
+                    )
+                    Text("${stringResource(R.string.night_mode_brightness)}: ${s.nightModeBrightness}%")
+                    Slider(
+                        value = s.nightModeBrightness.toFloat(),
+                        onValueChange = { viewModel.updateNightModeBrightness(it.toInt()) },
+                        valueRange = 0f..100f,
+                    )
+                    Text(
+                        stringResource(R.string.night_mode_brightness_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
 
                 HorizontalDivider()
 
@@ -949,6 +990,56 @@ private fun FilterChip(
         onClick = onClick,
         label = { Text(label) },
     )
+}
+
+/**
+ * Row showing a time label (e.g. "22:00") that opens a Material3 TimePicker
+ * dialog when tapped. [minutes] is minutes-since-midnight (0–1439).
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun NightModeTimePicker(
+    label: String,
+    minutes: Int,
+    onTimeSelected: (Int) -> Unit,
+) {
+    var showPicker by remember { mutableStateOf(false) }
+    val locale = LocalLocale.current.platformLocale
+    val hour = (minutes / 60) % 24
+    val minute = minutes % 60
+    val display = String.format(locale, "%02d:%02d", hour, minute)
+
+    ListItem(
+        headlineContent = { Text(label) },
+        supportingContent = { Text(display) },
+        trailingContent = {
+            TextButton(onClick = { showPicker = true }) {
+                Text(stringResource(R.string.edit))
+            }
+        },
+    )
+
+    if (showPicker) {
+        val state = rememberTimePickerState(
+            initialHour = hour,
+            initialMinute = minute,
+            is24Hour = true,
+        )
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text(label) },
+            text = { TimePicker(state = state) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onTimeSelected(state.hour * 60 + state.minute)
+                    showPicker = false
+                }) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPicker = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
 }
 
 @Composable

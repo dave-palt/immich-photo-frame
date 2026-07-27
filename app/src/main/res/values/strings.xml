@@ -47,6 +47,16 @@
     <string name="fullscreen_desc">Hide system bars</string>
     <string name="keep_screen_on">Keep Screen On</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Night Mode</string>
+    <string name="night_mode">Night Mode</string>
+    <string name="night_mode_desc">Dim the screen during set hours to reduce power consumption and screen wear at night</string>
+    <string name="night_mode_alt_hint">For best results, prefer your device\'s built-in scheduled power on/off (in system settings) if available. This in-app option is a fallback.</string>
+    <string name="night_mode_start">Dim screen at</string>
+    <string name="night_mode_end">Brighten screen at</string>
+    <string name="night_mode_brightness">Night brightness</string>
+    <string name="night_mode_brightness_hint">Screen brightness level during night hours. 0%% is darkest, but not fully off.</string>
+
     <!-- Clock -->
     <string name="show_clock">Show Clock</string>
     <string name="clock_size">Clock Size</string>

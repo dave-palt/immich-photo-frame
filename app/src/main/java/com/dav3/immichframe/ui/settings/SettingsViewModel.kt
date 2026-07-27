@@ -179,6 +179,14 @@ constructor(
 
     fun updateSyncInterval(minutes: Int) = update { it.copy(syncIntervalMinutes = minutes) }
 
+    fun toggleNightMode() = update { it.copy(nightMode = !it.nightMode) }
+
+    fun updateNightModeStart(minutes: Int) = update { it.copy(nightModeStart = minutes) }
+
+    fun updateNightModeEnd(minutes: Int) = update { it.copy(nightModeEnd = minutes) }
+
+    fun updateNightModeBrightness(percent: Int) = update { it.copy(nightModeBrightness = percent.coerceIn(0, 100)) }
+
     fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
 
     fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }

@@ -199,6 +199,16 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  Fullscreen             [●]  │ ← toggle
 │  Keep Screen On         [●]  │ ← toggle
+│                              │
+│  NIGHT MODE                  │ ← section
+│  Night Mode             [○]  │ ← toggle
+│  "Prefer device's built-in   │ ← helper text (last-resort note)
+│   scheduled power on/off"    │
+│  Dim screen at          22:00│ ← time picker dialog
+│  Brighten screen at     07:00│ ← time picker dialog
+│  Night brightness: 0%       │
+│  [●─────────────────────]   │ ← slider 0-100%
+│                              │
 │  Start on Boot          [○]  │ ← toggle (+ overlay & OEM autostart prompts)
 │  Launcher Mode          [○]  │ ← toggle (+ Open Launcher Settings button)
 │  Auto-Update            [●]  │ ← toggle (hidden if Play Store)
@@ -252,7 +262,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Slideshow, Image, Media Cache, Clock, Albums, Connection, Permissions.
+- Organized into sections: Slideshow, Image, Media Cache, Night Mode, Clock, Albums, Connection, Permissions.
 - Changes saved immediately to DataStore (no save button needed).
 - "Test Connection" works same as setup screen.
 - **API Key Permissions card** (below Connection): shows ✓/✗/? for each of the 5

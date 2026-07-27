@@ -46,6 +46,16 @@
     <string name="fullscreen_desc">Systemleisten ausblenden</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Nachtmodus</string>
+    <string name="night_mode">Nachtmodus</string>
+    <string name="night_mode_desc">Bildschirm während festgelegter Stunden dimmen, um Stromverbrauch und Bildschirmverschleiß nachts zu reduzieren</string>
+    <string name="night_mode_alt_hint">Für beste Ergebnisse bevorzugen Sie die integrierte zeitgesteuerte Ein-/Ausschaltung Ihres Geräts (in den Systemeinstellungen), falls verfügbar. Diese In-App-Option ist eine Alternative.</string>
+    <string name="night_mode_start">Dimmen um</string>
+    <string name="night_mode_end">Aufhellen um</string>
+    <string name="night_mode_brightness">Nachthelligkeit</string>
+    <string name="night_mode_brightness_hint">Bildschirmhelligkeit während der Nachtstunden. 0%% ist am dunkelsten, aber nicht komplett aus.</string>
+
     <!-- Clock -->
     <string name="show_clock">Uhr anzeigen</string>
     <string name="clock_size">Uhrgröße</string>

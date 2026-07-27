@@ -46,6 +46,16 @@
     <string name="fullscreen_desc">隐藏系统栏</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">夜间模式</string>
+    <string name="night_mode">夜间模式</string>
+    <string name="night_mode_desc">在设定的时间段内调暗屏幕，以减少夜间耗电和屏幕损耗</string>
+    <string name="night_mode_alt_hint">为获得最佳效果，如果设备支持，请优先使用系统设置中的内置定时开关机功能。此应用内选项是备选方案。</string>
+    <string name="night_mode_start">调暗时间</string>
+    <string name="night_mode_end">调亮时间</string>
+    <string name="night_mode_brightness">夜间亮度</string>
+    <string name="night_mode_brightness_hint">夜间时段的屏幕亮度级别。0%%最暗，但不会完全关闭。</string>
+
     <!-- Clock -->
     <string name="show_clock">显示时钟</string>
     <string name="clock_size">时钟大小</string>

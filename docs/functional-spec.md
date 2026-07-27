@@ -244,6 +244,19 @@ Options:
   and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
+- **Night Mode** section (brightness-based display schedule, for devices
+  without built-in scheduled power on/off):
+  - **Night Mode** toggle (default off). When on, the screen brightness is
+    reduced during configured night hours. A helper text notes that the
+    device's native scheduled power on/off (if available in system settings)
+    is preferable — this in-app option is a fallback.
+  - **Dim screen at** — 24h time picker (default 22:00). When the clock
+    crosses this time, brightness drops to the night level.
+  - **Brighten screen at** — 24h time picker (default 07:00). When the clock
+    crosses this time, brightness restores to the system level.
+  - **Night brightness** — slider 0–100% (default 0%). Screen brightness
+    during night hours. 0% is darkest (near-black on OLED), but the screen is
+    never fully turned off.
 - **Start on Boot** — launch on device boot (default off). Requires the "Display over other apps" permission (Android 10+ BAL exemption); on Chinese OEMs, also shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Launcher Mode** — register as a Home launcher (default off; only visible when Start on Boot is enabled). The most reliable autostart method; the system always launches the Home app on boot, bypassing BOOT_COMPLETED and OEM autostart blocks entirely. Shows an "Open Launcher Settings" button to switch launchers or re-select this app; the same action is available in the slideshow hover UI.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play

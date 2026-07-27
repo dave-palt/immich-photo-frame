@@ -192,6 +192,46 @@ fun SlideshowScreen(
         view.keepScreenOn = s.keepScreenOn
     }
 
+    // Night Mode — dim the screen during configured off-hours.
+    // Uses per-window brightness (WindowManager.LayoutParams.screenBrightness).
+    // BRIGHTNESS_OVERRIDE_NONE (-1f) = defer to the system/user brightness.
+    var nightActive by remember { mutableStateOf(false) }
+    LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
+        if (!s.nightMode) {
+            nightActive = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            val cal = java.util.Calendar.getInstance()
+            val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                cal.get(java.util.Calendar.MINUTE)
+            nightActive = s.isNightModeActive(nowMin)
+            kotlinx.coroutines.delay(60_000L)
+        }
+    }
+    DisposableEffect(nightActive, s.nightModeBrightness) {
+        val window = (view.context as? Activity)?.window
+        if (window != null) {
+            val params = window.attributes
+            params.screenBrightness = if (nightActive) {
+                s.nightModeBrightness / 100f
+            } else {
+                android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            }
+            window.attributes = params
+        }
+        onDispose {
+            // Restore system brightness when leaving the slideshow
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                val params = window.attributes
+                params.screenBrightness =
+                    android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                window.attributes = params
+            }
+        }
+    }
+
     // Clock
     var currentTime by remember { mutableStateOf("") }
     if (s.showClock) {

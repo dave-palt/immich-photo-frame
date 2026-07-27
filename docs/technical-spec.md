@@ -122,6 +122,13 @@ UI (Compose) → ViewModel → Repository → Retrofit → Immich API
   background (letterbox fill).
 - **Retrofit OkHttp interceptor** injects the `x-api-key` header on every
   Immich API call automatically.
+- **Night Mode** dims the screen during configured hours via per-window
+  brightness (`WindowManager.LayoutParams.screenBrightness`). A
+  `LaunchedEffect` in `SlideshowScreen` re-evaluates the current time every
+  minute and sets `screenBrightness` to the configured percentage when inside
+  the night window, or `BRIGHTNESS_OVERRIDE_NONE` (defer to system) outside it.
+  The screen is never fully turned off — this is a brightness-based fallback
+  for devices without built-in scheduled power on/off.
 
 ## Package Naming
 
@@ -271,6 +278,10 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Night Mode | DataStore | `night_mode` | String bool (default false) |
+| Night Mode Start | DataStore | `night_mode_start` | Int (minutes since midnight, default 1320 = 22:00) |
+| Night Mode End | DataStore | `night_mode_end` | Int (minutes since midnight, default 420 = 07:00) |
+| Night Mode Brightness | DataStore | `night_mode_brightness` | Int (0–100 percent, default 0) |
 | Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 | Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |

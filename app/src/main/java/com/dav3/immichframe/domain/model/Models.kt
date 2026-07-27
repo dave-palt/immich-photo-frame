@@ -49,7 +49,27 @@ data class SlideshowSettings(
     // Media Cache
     val autoSync: Boolean = true,
     val syncIntervalMinutes: Int = 30,
+    // Night Mode (brightness-based display schedule)
+    val nightMode: Boolean = false,
+    val nightModeStart: Int = 1320, // minutes since midnight (22:00)
+    val nightModeEnd: Int = 420, // minutes since midnight (07:00)
+    val nightModeBrightness: Int = 0, // 0-100 percent
 ) {
+    /**
+     * Whether the current wall-clock time falls inside the configured night-mode
+     * window. Handles wrap-around (start > end means overnight, e.g. 22:00→07:00).
+     */
+    fun isNightModeActive(hourMinute: Int): Boolean {
+        val now = hourMinute
+        return if (nightModeStart <= nightModeEnd) {
+            // Same-day window, e.g. 09:00→17:00
+            now in nightModeStart until nightModeEnd
+        } else {
+            // Overnight window, e.g. 22:00→07:00
+            now >= nightModeStart || now < nightModeEnd
+        }
+    }
+
     /** Non-random enabled animations. Empty = no animation. */
     val enabledAnimations: List<PhotoAnimation>
         get() = PhotoAnimation.entries.filter { anim ->

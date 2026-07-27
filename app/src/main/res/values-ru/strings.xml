@@ -46,6 +46,16 @@
     <string name="fullscreen_desc">Скрыть системные панели</string>
     <string name="keep_screen_on">Не выключать экран</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Ночной режим</string>
+    <string name="night_mode">Ночной режим</string>
+    <string name="night_mode_desc">Затемнять экран в заданные часы для снижения энергопотребления и износа экрана ночью</string>
+    <string name="night_mode_alt_hint">Для наилучшего результата предпочитайте встроенное в устройство плановое включение/выключение (в настройках системы), если доступно. Эта опция в приложении — запасной вариант.</string>
+    <string name="night_mode_start">Затемнить экран в</string>
+    <string name="night_mode_end">Осветить экран в</string>
+    <string name="night_mode_brightness">Ночная яркость</string>
+    <string name="night_mode_brightness_hint">Уровень яркости экрана в ночные часы. 0%% — самый тёмный, но не полностью выключенный.</string>
+
     <!-- Clock -->
     <string name="show_clock">Показывать часы</string>
     <string name="clock_size">Размер часов</string>
