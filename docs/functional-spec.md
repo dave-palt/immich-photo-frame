@@ -256,7 +256,8 @@ Options:
     crosses this time, brightness restores to the system level.
   - **Night brightness** — slider 0–100% (default 0%). Screen brightness
     during night hours. 0% is darkest (near-black on OLED), but the screen is
-    never fully turned off.
+    never fully turned off. While night mode is active, the slideshow is
+    hidden behind a black overlay and the auto-advance timer is paused.
 - **Start on Boot** — launch on device boot (default off). Requires the "Display over other apps" permission (Android 10+ BAL exemption); on Chinese OEMs, also shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Launcher Mode** — register as a Home launcher (default off; only visible when Start on Boot is enabled). The most reliable autostart method; the system always launches the Home app on boot, bypassing BOOT_COMPLETED and OEM autostart blocks entirely. Shows an "Open Launcher Settings" button to switch launchers or re-select this app; the same action is available in the slideshow hover UI.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play

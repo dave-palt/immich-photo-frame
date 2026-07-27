@@ -127,8 +127,10 @@ UI (Compose) → ViewModel → Repository → Retrofit → Immich API
   `LaunchedEffect` in `SlideshowScreen` re-evaluates the current time every
   minute and sets `screenBrightness` to the configured percentage when inside
   the night window, or `BRIGHTNESS_OVERRIDE_NONE` (defer to system) outside it.
-  The screen is never fully turned off — this is a brightness-based fallback
-  for devices without built-in scheduled power on/off.
+  While active, the slideshow is fully hidden behind a black overlay and the
+  auto-advance timer is paused (no photo/video fetching or rendering). The
+  screen is never turned off at the hardware level — this is a brightness-based
+  fallback for devices without built-in scheduled power on/off.
 
 ## Package Naming
 
@@ -158,6 +160,13 @@ Image and video URLs are constructed with the API key appended as a query
 parameter (`?apiKey=<key>`) for Coil and ExoPlayer to fetch without custom
 HTTP clients. API calls (Retrofit) use the `x-api-key` header via an
 OkHttp interceptor instead.
+
+**Permission probes use the same auth path as the feature they test**:
+steps 1–3 (`user.read`, `album.read`, `asset.read`) go through the Retrofit
+header path, but steps 4–5 (`asset.view`, `asset.download`) are probed via
+raw OkHttp with the `?apiKey=` query param — exactly how Coil/ExoPlayer
+load media. This ensures the probe reflects what the app actually does,
+not a code path it never uses.
 
 > **Note**: Immich v3 deprecated the `apiKey` query parameter in favor of
 > `key`. The app currently uses `apiKey` for image/video URLs and may need

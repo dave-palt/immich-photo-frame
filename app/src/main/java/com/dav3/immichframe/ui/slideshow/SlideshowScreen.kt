@@ -148,14 +148,32 @@ fun SlideshowScreen(
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
+    // Night Mode active state — polled every minute, used to:
+    // 1) pause the auto-advance timer below, and
+    // 2) render a black screen instead of photo/video content.
+    var nightActive by remember { mutableStateOf(false) }
+    LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
+        if (!s.nightMode) {
+            nightActive = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            val cal = java.util.Calendar.getInstance()
+            val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                cal.get(java.util.Calendar.MINUTE)
+            nightActive = s.isNightModeActive(nowMin)
+            kotlinx.coroutines.delay(60_000L)
+        }
+    }
+
     // Auto-advance with progress tracking
     // For images: fixed timer. For videos: VideoPlayer drives advancing
     // (advances when the video ends, not on the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds) {
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive) {
         progress = 0f
-        if (!isPaused && state.assets.isNotEmpty()) {
+        if (!isPaused && !nightActive && state.assets.isNotEmpty()) {
             val currentAsset = state.assets[state.currentIndex]
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
@@ -192,23 +210,10 @@ fun SlideshowScreen(
         view.keepScreenOn = s.keepScreenOn
     }
 
-    // Night Mode — dim the screen during configured off-hours.
+    // Night Mode brightness application — dim the screen when nightActive.
     // Uses per-window brightness (WindowManager.LayoutParams.screenBrightness).
     // BRIGHTNESS_OVERRIDE_NONE (-1f) = defer to the system/user brightness.
-    var nightActive by remember { mutableStateOf(false) }
-    LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
-        if (!s.nightMode) {
-            nightActive = false
-            return@LaunchedEffect
-        }
-        while (true) {
-            val cal = java.util.Calendar.getInstance()
-            val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
-                cal.get(java.util.Calendar.MINUTE)
-            nightActive = s.isNightModeActive(nowMin)
-            kotlinx.coroutines.delay(60_000L)
-        }
-    }
+    // nightActive is declared + polled above, alongside the auto-advance timer.
     DisposableEffect(nightActive, s.nightModeBrightness) {
         val window = (view.context as? Activity)?.window
         if (window != null) {
@@ -276,6 +281,10 @@ fun SlideshowScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 when {
+                    // Night Mode active — black screen, no photo/video rendering.
+                    // The timer (above) is also paused via the nightActive flag.
+                    nightActive -> { /* pure black surface, nothing to render */ }
+
                     state.isLoading -> CircularProgressIndicator()
 
                     state.error != null -> Text(state.error!!, color = Color.White)

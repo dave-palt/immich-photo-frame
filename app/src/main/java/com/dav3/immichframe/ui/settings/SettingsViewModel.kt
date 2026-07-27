@@ -181,9 +181,25 @@ constructor(
 
     fun toggleNightMode() = update { it.copy(nightMode = !it.nightMode) }
 
-    fun updateNightModeStart(minutes: Int) = update { it.copy(nightModeStart = minutes) }
+    /**
+     * Move the night-mode start time, preserving the window duration. The end
+     * time shifts by the same delta so a 22:00→07:00 window moved to 23:00
+     * becomes 23:00→08:00. Prevents degenerate windows where start >= end.
+     */
+    fun updateNightModeStart(minutes: Int) = update {
+        val newStart = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newEnd = (newStart + duration) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
 
-    fun updateNightModeEnd(minutes: Int) = update { it.copy(nightModeEnd = minutes) }
+    /** Move the night-mode end time, preserving the window duration. */
+    fun updateNightModeEnd(minutes: Int) = update {
+        val newEnd = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newStart = (newEnd - duration + 1440) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
 
     fun updateNightModeBrightness(percent: Int) = update { it.copy(nightModeBrightness = percent.coerceIn(0, 100)) }
 
