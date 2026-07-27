@@ -142,6 +142,27 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-27** — Night Mode feature (brightness-based display schedule).
+  Unlike a true screen-off or device power-off, this dims the screen to a
+  configurable brightness level during set hours via per-window
+  `WindowManager.LayoutParams.screenBrightness`. The screen stays on — this
+  is explicitly a fallback for devices that lack built-in scheduled power
+  on/off. The Settings UI includes a helper text under the toggle stating
+  that the device's native scheduled power on/off (if available) is
+  preferable. New settings: `night_mode` (bool, default false),
+  `night_mode_start` (int minutes, default 1320 = 22:00), `night_mode_end`
+  (int minutes, default 420 = 07:00), `night_mode_brightness` (int 0–100,
+  default 0). `SlideshowSettings.isNightModeActive(hourMinute)` handles
+  overnight wrap-around. `SlideshowScreen` has a `LaunchedEffect` polling
+  every 60s + a `DisposableEffect` applying/restoring brightness. New
+  Settings UI section "Night Mode" with toggle, two `TimePicker` dialogs
+  (24h), brightness slider, and the last-resort helper text. New strings
+  (EN + 12 locales): section_night_mode, night_mode, night_mode_desc,
+  night_mode_alt_hint, night_mode_start, night_mode_end, night_mode_brightness,
+  night_mode_brightness_hint. Updated: functional-spec (F6 settings list),
+  technical-spec (persistence table + data flow), ui-spec (mockup + section
+  list), overview (goals), README (feature list).
+
 - **2026-07-27** — Per-endpoint permission verification. After key generation
   or manual paste, the app probes all 5 required endpoints (mirroring
   `scripts/check-api-key.sh`) in dependency order: `GET /users/me` →

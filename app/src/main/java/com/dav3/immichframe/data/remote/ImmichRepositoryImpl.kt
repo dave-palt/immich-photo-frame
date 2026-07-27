@@ -12,8 +12,10 @@ import com.dav3.immichframe.domain.repository.OAuthStartResult
 import com.dav3.immichframe.domain.repository.ServerInfo
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -33,10 +35,12 @@ constructor(
 
     private var cachedApi: ImmichApi? = null
     private var cachedBaseUrl: String? = null
+    private var cachedOkHttp: OkHttpClient? = null
     override fun invalidateCache() {
         synchronized(this) {
             cachedApi = null
             cachedBaseUrl = null
+            cachedOkHttp = null
         }
     }
 
@@ -134,38 +138,65 @@ constructor(
         }
 
         // 4. asset.view (thumbnail)
-        try {
-            val resp = api.getThumbnail(firstAssetId)
-            resp.body()?.close()
-            statuses[RequiredPermission.ASSET_VIEW] =
-                if (resp.isSuccessful) PermissionStatus.Granted else PermissionStatus.Denied
-        } catch (e: retrofit2.HttpException) {
-            statuses[RequiredPermission.ASSET_VIEW] = if (e.code() == 403) {
-                PermissionStatus.Denied
-            } else {
-                PermissionStatus.Granted
-            }
-        } catch (e: Exception) {
-            statuses[RequiredPermission.ASSET_VIEW] = PermissionStatus.Unknown
-        }
+        // Probe via the SAME auth path Coil uses for image loading:
+        // ?apiKey= query parameter, NOT the x-api-key header. The app never
+        // sends media requests with the header, so probing with it can report
+        // a false denial when the server treats the two auth methods
+        // differently for scoped keys.
+        statuses[RequiredPermission.ASSET_VIEW] = probeAssetPermission(
+            assetId = firstAssetId,
+            suffix = "/thumbnail?size=preview",
+        )
 
         // 5. asset.download (original)
-        try {
-            val resp = api.getOriginal(firstAssetId)
-            resp.body()?.close()
-            statuses[RequiredPermission.ASSET_DOWNLOAD] =
-                if (resp.isSuccessful) PermissionStatus.Granted else PermissionStatus.Denied
-        } catch (e: retrofit2.HttpException) {
-            statuses[RequiredPermission.ASSET_DOWNLOAD] = if (e.code() == 403) {
-                PermissionStatus.Denied
-            } else {
-                PermissionStatus.Granted
-            }
-        } catch (e: Exception) {
-            statuses[RequiredPermission.ASSET_DOWNLOAD] = PermissionStatus.Unknown
-        }
+        // Same as above — ExoPlayer loads videos via ?apiKey= query param.
+        statuses[RequiredPermission.ASSET_DOWNLOAD] = probeAssetPermission(
+            assetId = firstAssetId,
+            suffix = "/original",
+        )
 
         PermissionCheckResult(statuses.toMap())
+    }
+
+    /**
+     * Probe a media endpoint using the [apiKey] query parameter, the same auth
+     * mechanism Coil/ExoPlayer use. Returns:
+     * - [Granted] on HTTP 200
+     * - [Denied] only on HTTP 403 (Immich's real "missing scoped permission"
+     *   signal — see auth-service.ts; 401 means the key itself wasn't accepted,
+     *   not a permission gap)
+     * - [Unknown] on 401/4xx/5xx/network errors (don't penalize transient issues)
+     */
+    private suspend fun probeAssetPermission(
+        assetId: String,
+        suffix: String,
+    ): PermissionStatus = withContext(Dispatchers.IO) {
+        val base = cachedBaseUrl ?: settings.serverUrl.first()
+        val apiKey = settings.apiKey.first()
+        val sep = if (suffix.contains("?")) "&" else "?"
+        val url = "${base.trimEnd('/')}/api/assets/$assetId$suffix${sep}apiKey=$apiKey"
+        val client = synchronized(this@ImmichRepositoryImpl) {
+            cachedOkHttp ?: buildProbeClient().also { cachedOkHttp = it }
+        }
+        runCatching {
+            client.newCall(
+                okhttp3.Request.Builder().url(url).get().build(),
+            ).execute().use { resp ->
+                resp.body?.close()
+                when (resp.code) {
+                    200 -> PermissionStatus.Granted
+                    403 -> PermissionStatus.Denied
+                    else -> PermissionStatus.Unknown
+                }
+            }
+        }.getOrDefault(PermissionStatus.Unknown)
+    }
+
+    private fun buildProbeClient(): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+        }
+        return OkHttpClient.Builder().addInterceptor(logging).build()
     }
     private fun getApi(): ImmichApi {
         val baseUrl = runBlocking { settings.serverUrl.first() }
@@ -328,7 +359,13 @@ constructor(
     ): Result<String> = runCatching {
         val api = buildAuthApi(baseUrl)
         val bearer = "Bearer ${api.login(LoginRequestDto(email, password)).accessToken}"
-        createOrUpdateKey(api, bearer)
+        try {
+            createOrUpdateKey(api, bearer)
+        } finally {
+            // Invalidate the login session so this device doesn't linger in
+            // Immich's "Authorized Devices". The API key survives logout.
+            runCatching { api.logout(bearer) }
+        }
     }
 
     override suspend fun startOAuth(baseUrl: String): Result<OAuthStartResult> = runCatching {
@@ -365,7 +402,11 @@ constructor(
             ),
         )
         val bearer = "Bearer ${loginResponse.accessToken}"
-        createOrUpdateKey(api, bearer)
+        try {
+            createOrUpdateKey(api, bearer)
+        } finally {
+            runCatching { api.logout(bearer) }
+        }
     }
 
     /**

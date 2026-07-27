@@ -18,14 +18,18 @@
      offers auto-generation for users who don't have a key yet.
    - **Generate Key** (helper button): Email + password fields. App calls
      `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
-     key with 5 permissions. Password is used once and never persisted.
+     key with 5 permissions → `POST /auth/logout` to invalidate the session.
+     Password is used once and never persisted; the login session is closed
+     immediately after key creation so the device does not appear in the
+     server's "Authorized Devices" list. The API key is independent of the
+     session and remains valid.
      A note reminds the user to log in with the account meant for this photo
      frame (not necessarily their personal account).
      A `?` icon opens a dialog explaining what an API key is, why the app
      generates one, and that the password is discarded immediately.
    - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
      OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
-     returns to the app → JWT obtained → key created.
+     returns to the app → JWT obtained → key created → session logged out.
 4. App validates the key by calling `GET /users/me`.
 5. **Permission verification**: App probes all 5 required endpoints in
    dependency order (user → albums → search → thumbnail → original) to verify
@@ -244,6 +248,20 @@ Options:
   and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
+- **Night Mode** section (brightness-based display schedule, for devices
+  without built-in scheduled power on/off):
+  - **Night Mode** toggle (default off). When on, the screen brightness is
+    reduced during configured night hours. A helper text notes that the
+    device's native scheduled power on/off (if available in system settings)
+    is preferable — this in-app option is a fallback.
+  - **Dim screen at** — 24h time picker (default 22:00). When the clock
+    crosses this time, brightness drops to the night level.
+  - **Brighten screen at** — 24h time picker (default 07:00). When the clock
+    crosses this time, brightness restores to the system level.
+  - **Night brightness** — slider 0–100% (default 0%). Screen brightness
+    during night hours. 0% is darkest (near-black on OLED), but the screen is
+    never fully turned off. While night mode is active, the slideshow is
+    hidden behind a black overlay and the auto-advance timer is paused.
 - **Start on Boot** — launch on device boot (default off). Requires the "Display over other apps" permission (Android 10+ BAL exemption); on Chinese OEMs, also shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Launcher Mode** — register as a Home launcher (default off; only visible when Start on Boot is enabled). The most reliable autostart method; the system always launches the Home app on boot, bypassing BOOT_COMPLETED and OEM autostart blocks entirely. Shows an "Open Launcher Settings" button to switch launchers or re-select this app; the same action is available in the slideshow hover UI.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play
@@ -258,6 +276,8 @@ Options:
 - **Clock** section:
   - **Show Clock** — display time overlay (default off)
   - **Clock Size** — slider 24–96 sp (default 48)
+  - **Clock Format** — 24h (default) or 12h with AM/PM
+  - **Show Seconds** — display seconds in the clock; updates every second (default off)
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline

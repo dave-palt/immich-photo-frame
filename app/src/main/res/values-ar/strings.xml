@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">إخفاء أشرطة النظام</string>
     <string name="keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">الوضع الليلي</string>
+    <string name="night_mode">الوضع الليلي</string>
+    <string name="night_mode_desc">تعتيم الشاشة خلال الساعات المحددة لتقليل استهلاك الطاقة وتآكل الشاشة ليلاً</string>
+    <string name="night_mode_alt_hint">للحصول على أفضل النتائج، فضّل ميزة التشغيل/الإيقاف المجدولة المدمجة في جهازك (في إعدادات النظام) إن كانت متوفرة. هذا الخيار داخل التطبيق هو بديل احتياطي.</string>
+    <string name="night_mode_start">تعتيم الساعة عند</string>
+    <string name="night_mode_end">إضاءة الشاشة عند</string>
+    <string name="night_mode_brightness">سطوع الليل</string>
+    <string name="night_mode_brightness_hint">مستوى سطوع الشاشة خلال ساعات الليل. 0%% هو الأغمق، لكنه ليس مطفأ بالكامل.</string>
+
     <!-- Clock -->
     <string name="show_clock">إظهار الساعة</string>
     <string name="clock_size">حجم الساعة</string>
     <string name="drag_clock_hint">اسحب الساعة على شاشة العرض لإعادة وضعها</string>
+    <string name="clock_seconds">إظهار الثواني</string>
+    <string name="clock_seconds_desc">عرض الثواني في الساعة (تحديث كل ثانية)</string>
+    <string name="clock_format">تنسيق الساعة</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">محاذاة إلى الشبكة</string>
     <string name="snap_to_grid_desc">محاذاة الساعة إلى الشبكة بناءً على حجمها عند الإفلات</string>
 

@@ -60,13 +60,21 @@ the app probes each required endpoint to verify the key actually has the
 necessary scopes. This mirrors the external `scripts/check-api-key.sh`
 script. Probes run in dependency order:
 
-| Step | Endpoint | Permission Tested | Notes |
-|---|---|---|---|
-| 1 | `GET /api/users/me` | `user.read` | Also validates the key itself |
-| 2 | `GET /api/albums` | `album.read` | Returns album list |
-| 3 | `POST /api/search/metadata` | `asset.read` | Returns first asset ID for downstream probes |
-| 4 | `GET /api/assets/{id}/thumbnail` | `asset.view` | Uses asset ID from step 3 |
-| 5 | `GET /api/assets/{id}/original` | `asset.download` | Optional; gates video playback + media cache |
+| Step | Endpoint | Permission Tested | Auth method | Notes |
+|---|---|---|---|---|
+| 1 | `GET /api/users/me` | `user.read` | `x-api-key` header | Also validates the key itself |
+| 2 | `GET /api/albums` | `album.read` | `x-api-key` header | Returns album list |
+| 3 | `POST /api/search/metadata` | `asset.read` | `x-api-key` header | Returns first asset ID for downstream probes |
+| 4 | `GET /api/assets/{id}/thumbnail?size=preview` | `asset.view` | `?apiKey=` query param | **Same auth path as Coil image loading** — probed via OkHttp, not Retrofit, because the real app never loads media through the header |
+| 5 | `GET /api/assets/{id}/original` | `asset.download` | `?apiKey=` query param | **Same auth path as ExoPlayer video loading** — Optional; gates video playback + media cache |
+
+> **Why two auth methods?** Steps 4–5 use the `?apiKey=` query parameter
+> (not the `x-api-key` header) because that is exactly how Coil (images) and
+> ExoPlayer (videos) authenticate when loading media in the app. Probing with
+> the header would test a code path the app never actually uses — and on some
+> Immich deployments the two auth methods are handled differently for scoped
+> keys, causing a false "missing asset.view" report despite images loading
+> fine. Using the query param makes the probe reflect reality.
 
 If an upstream probe fails, downstream probes are skipped and marked
 "unknown" (not "denied"). Results are stored as `permission_status` (JSON)
@@ -100,6 +108,7 @@ key-creation calls use `Bearer` tokens passed per-call via the
 | GET | `/api-keys` | List existing keys (metadata only, no secrets) |
 | POST | `/api-keys` | Create a new key: `{ name: "ImmichMediaFrame", permissions: [...] }` → returns `{ secret }` |
 | PUT | `/api-keys/{id}` | Update key name/permissions (metadata only) |
+| POST | `/auth/logout` | Invalidate the bearer session after key creation so the device doesn't linger in "Authorized Devices". The API key survives logout. |
 
 ### OAuth PKCE (no auth)
 

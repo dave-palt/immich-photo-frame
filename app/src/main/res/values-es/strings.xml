@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">Ocultar barras del sistema</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Modo Noche</string>
+    <string name="night_mode">Modo Noche</string>
+    <string name="night_mode_desc">Atenuar la pantalla durante las horas establecidas para reducir el consumo de energía y el desgaste de la pantalla por la noche</string>
+    <string name="night_mode_alt_hint">Para mejores resultados, prefiera el encendido/apagado programado integrado de su dispositivo (en ajustes del sistema) si está disponible. Esta opción en la aplicación es una alternativa.</string>
+    <string name="night_mode_start">Atenuar pantalla a las</string>
+    <string name="night_mode_end">Aclarar pantalla a las</string>
+    <string name="night_mode_brightness">Brillo nocturno</string>
+    <string name="night_mode_brightness_hint">Nivel de brillo de la pantalla durante las horas nocturnas. 0%% es lo más oscuro, pero no completamente apagado.</string>
+
     <!-- Clock -->
     <string name="show_clock">Mostrar reloj</string>
     <string name="clock_size">Tamaño del reloj</string>
     <string name="drag_clock_hint">Arrastra el reloj en la pantalla de presentación para reposicionarlo</string>
+    <string name="clock_seconds">Mostrar segundos</string>
+    <string name="clock_seconds_desc">Mostrar segundos en el reloj (se actualiza cada segundo)</string>
+    <string name="clock_format">Formato de reloj</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Ajustar a la cuadrícula</string>
     <string name="snap_to_grid_desc">Alinear el reloj a la cuadrícula según su tamaño al soltarlo</string>
 

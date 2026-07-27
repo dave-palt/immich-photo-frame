@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">システムバーを非表示</string>
     <string name="keep_screen_on">画面をオンのままにする</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">ナイトモード</string>
+    <string name="night_mode">ナイトモード</string>
+    <string name="night_mode_desc">設定した時間帯に画面を暗くし、夜間の消費電力と画面の劣化を軽減します</string>
+    <string name="night_mode_alt_hint">最良の結果を得るには、デバイスの内蔵スケジュール電源オン/オフ（システム設定）を優先してください（利用可能な場合）。このアプリ内オプションは代替手段です。</string>
+    <string name="night_mode_start">暗くする時間</string>
+    <string name="night_mode_end">明るくする時間</string>
+    <string name="night_mode_brightness">夜間の明るさ</string>
+    <string name="night_mode_brightness_hint">夜間時間中の画面の明るさレベル。0%%が最も暗いですが、完全にオフではありません。</string>
+
     <!-- Clock -->
     <string name="show_clock">時計を表示</string>
     <string name="clock_size">時計のサイズ</string>
     <string name="drag_clock_hint">スライドショー画面で時計をドラッグして位置を変更</string>
+    <string name="clock_seconds">秒を表示</string>
+    <string name="clock_seconds_desc">時計に秒を表示（毎秒更新）</string>
+    <string name="clock_format">時計の形式</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">グリッドにスナップ</string>
     <string name="snap_to_grid_desc">離した際にサイズに基づいて時計をグリッドに合わせる</string>
 

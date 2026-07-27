@@ -2,13 +2,17 @@
 #
 # check-api-key.sh — Diagnose an Immich API key's permissions
 #
-# Tests the exact endpoints Immich Media Frame uses, in order:
-#   1. GET  /server/ping
-#   2. GET  /users/me
-#   3. GET  /albums
-#   4. POST /search/metadata (album assets — same as the app)
-#   5. GET  /assets/{id}/thumbnail?size=preview
-#   6. GET  /assets/{id}/original
+# Tests the exact endpoints Immich Media Frame uses, in order, using the SAME
+# auth mechanism the app uses for each:
+#   1. GET  /server/ping                              (no auth)
+#   2. GET  /users/me                                 (x-api-key header)
+#   3. GET  /albums                                   (x-api-key header)
+#   4. POST /search/metadata (album assets)           (x-api-key header)
+#   5. GET  /assets/{id}/thumbnail?size=preview       (?apiKey= query param)
+#   6. GET  /assets/{id}/original                     (?apiKey= query param)
+#
+# Steps 5–6 use the ?apiKey= query parameter (not the header) because that is
+# how Coil (images) and ExoPlayer (videos) authenticate in the real app.
 #
 # Usage:
 #   ./scripts/check-api-key.sh <server-url> <api-key>
@@ -44,7 +48,7 @@ echo ""
 
 # --- 1. Ping ---
 info "Testing GET /server/ping ..."
-PING=$(curl -sf -w "\n%{http_code}" "${BASE}/server/ping" -H "x-api-key: ${API_KEY}" 2>&1) || {
+PING=$(curl -sf -w "\n%{http_code}" "${BASE}/server/ping" 2>&1) || {
     fail "Server unreachable at ${BASE}/server/ping"
     exit 1
 }
@@ -122,12 +126,12 @@ else
 fi
 echo ""
 
-# --- 5. Thumbnail ---
+# --- 5. Thumbnail (?apiKey= query param — same as Coil image loading) ---
 if [ "${ASSET_COUNT:-0}" -gt 0 ]; then
     FIRST_ASSET_ID=$(echo "$SEARCH_BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['assets']['items'][0]['id'])" 2>/dev/null || echo "")
     if [ -n "$FIRST_ASSET_ID" ]; then
-        info "Testing thumbnail: GET /assets/$FIRST_ASSET_ID/thumbnail?size=preview ..."
-        THUMB_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/thumbnail?size=preview" -H "x-api-key: ${API_KEY}" 2>&1) || true
+        info "Testing thumbnail: GET /assets/$FIRST_ASSET_ID/thumbnail?size=preview&apiKey=*** ..."
+        THUMB_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/thumbnail?size=preview&apiKey=${API_KEY}" 2>&1) || true
         if [ "$THUMB_CODE" = "200" ]; then
             pass "Thumbnail loaded (HTTP 200)"
         else
@@ -137,9 +141,9 @@ if [ "${ASSET_COUNT:-0}" -gt 0 ]; then
             fi
         fi
 
-        # --- 6. Download original (video playback) ---
-        info "Testing download: GET /assets/$FIRST_ASSET_ID/original ..."
-        DL_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/original" -H "x-api-key: ***" 2>&1) || true
+        # --- 6. Download original (?apiKey= query param — same as ExoPlayer video loading) ---
+        info "Testing download: GET /assets/$FIRST_ASSET_ID/original?apiKey=*** ..."
+        DL_CODE=$(curl -sf -o /dev/null -w "%{http_code}" "${BASE}/assets/${FIRST_ASSET_ID}/original?apiKey=${API_KEY}" 2>&1) || true
         if [ "$DL_CODE" = "200" ]; then
             pass "Original download OK (HTTP 200)"
         else

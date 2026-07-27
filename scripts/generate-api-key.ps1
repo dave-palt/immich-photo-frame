@@ -147,3 +147,11 @@ catch {
     }
     exit 1
 }
+finally {
+    # Invalidate the login session so this device doesn't linger in Immich's
+    # "Authorized Devices". The API key is independent of the session and survives.
+    if ($token) {
+        try { Invoke-ImmichRequest -Url "$ServerUrl/api/auth/logout" -Method POST -Token $token | Out-Null }
+        catch { Write-Warn "Could not log out (session may linger)." }
+    }
+}

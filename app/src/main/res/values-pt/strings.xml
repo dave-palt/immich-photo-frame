@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">Ocultar barras do sistema</string>
     <string name="keep_screen_on">Manter ecrã ligado</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Modo Noturno</string>
+    <string name="night_mode">Modo Noturno</string>
+    <string name="night_mode_desc">Escurecer o ecrã durante as horas definidas para reduzir o consumo de energia e o desgaste do ecrã à noite</string>
+    <string name="night_mode_alt_hint">Para melhores resultados, prefira o agendamento de ligar/desligar incorporado do seu dispositivo (nas definições do sistema), se disponível. Esta opção na aplicação é uma alternativa.</string>
+    <string name="night_mode_start">Escurecer ecrã às</string>
+    <string name="night_mode_end">Aclarar ecrã às</string>
+    <string name="night_mode_brightness">Brilho noturno</string>
+    <string name="night_mode_brightness_hint">Nível de brilho do ecrã durante as horas noturnas. 0%% é o mais escuro, mas não completamente desligado.</string>
+
     <!-- Clock -->
     <string name="show_clock">Mostrar relógio</string>
     <string name="clock_size">Tamanho do relógio</string>
     <string name="drag_clock_hint">Arraste o relógio no ecrã de apresentação para o reposicionar</string>
+    <string name="clock_seconds">Mostrar segundos</string>
+    <string name="clock_seconds_desc">Mostrar segundos no relógio (atualiza a cada segundo)</string>
+    <string name="clock_format">Formato do relógio</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Ajustar à grelha</string>
     <string name="snap_to_grid_desc">Alinhar o relógio à grelha conforme o seu tamanho ao soltar</string>
 

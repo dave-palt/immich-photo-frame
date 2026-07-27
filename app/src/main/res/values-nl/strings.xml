@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">Systeembalken verbergen</string>
     <string name="keep_screen_on">Scherm aan laten</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Nachtmodus</string>
+    <string name="night_mode">Nachtmodus</string>
+    <string name="night_mode_desc">Dim het scherm tijdens ingestelde uren om stroomverbruik en schermverslijting \'s nachts te verminderen</string>
+    <string name="night_mode_alt_hint">Voor de beste resultaten, geef de voorkeur aan de ingebouwde geplande aan/uit-functie van uw apparaat (in systeeminstellingen) indien beschikbaar. Deze in-app optie is een alternatief.</string>
+    <string name="night_mode_start">Dimmen om</string>
+    <string name="night_mode_end">Helder maken om</string>
+    <string name="night_mode_brightness">Nacht helderheid</string>
+    <string name="night_mode_brightness_hint">Schermhelderheid tijdens nachturen. 0%% is donkerst, maar niet helemaal uit.</string>
+
     <!-- Clock -->
     <string name="show_clock">Klok tonen</string>
     <string name="clock_size">Klok grootte</string>
     <string name="drag_clock_hint">Sleep de klok op de diavoorstelling om te verplaatsen</string>
+    <string name="clock_seconds">Seconden weergeven</string>
+    <string name="clock_seconds_desc">Seconden in de klok weergeven (elke seconde bijgewerkt)</string>
+    <string name="clock_format">Tijdformaat</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Uitlijnen op raster</string>
     <string name="snap_to_grid_desc">Klok bij loslaten uitlijnen op raster op basis van grootte</string>
 

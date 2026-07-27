@@ -29,6 +29,7 @@ The app stores the server URL and API key on-device, lets the user pick which al
 - Start-on-boot for dedicated frame devices
 - Self-update via GitHub releases (bypasses Play Store for sideloaded installs)
 - Offline-capable media cache (Room + WorkManager background sync)
+- Night Mode (scheduled brightness dimming for always-on displays)
 - Minimal setup: enter URL, generate key in-app (or paste existing), pick album, done
 - Sensible defaults, configurable later
 

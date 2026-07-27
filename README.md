@@ -26,7 +26,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Fullscreen slideshow with crossfade transitions
 - Configurable interval, transition speed, fill mode (Contain/Cover)
 - Video playback with mute and skip options (Media3/ExoPlayer)
-- Draggable clock overlay with configurable size and snap-to-grid
+- Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's dominant color)
 - Shuffle mode for randomized image order
@@ -35,6 +35,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Launcher mode (Home replacement) — the most reliable boot method for dedicated photo frames; bypasses BOOT_COMPLETED entirely
 - Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
 - Offline media cache with background sync (Room + WorkManager) — slideshow keeps playing from cached files when the server is unreachable; album deletions are detected and the user is sent back to album selection
+- Night Mode — automatically dims the screen during set hours (brightness-based fallback for devices without built-in scheduled power on/off)
 - Auto-resumes last album on launch
 - Interactive onboarding tour with coachmark overlays — guides users through setup, album selection, slideshow controls (including back-to-albums and update indicator), and settings; replayable per-screen ("Show Tour Again") or globally ("Reset All Tours")
 - Adaptive launcher icon with day/night variants and Android 13+ monochrome (themed icon) support; dedicated debug-build variant (amber background); separate background-free logo drawable for the Setup screen

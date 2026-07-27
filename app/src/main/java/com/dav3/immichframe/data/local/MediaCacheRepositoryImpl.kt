@@ -111,8 +111,24 @@ class MediaCacheRepositoryImpl @Inject constructor(
     override suspend fun getAssetFilePaths(assetIds: List<String>): Map<String, String> = withContext(Dispatchers.IO) {
         if (assetIds.isEmpty()) return@withContext emptyMap()
         db.cachedAssetDao().getByIds(assetIds)
-            .filter { File(it.filePath).exists() }
+            .filter { entity ->
+                val file = File(entity.filePath)
+                // File must exist, be non-empty, and match the stored file size
+                // (a mismatch indicates a partial/corrupt download).
+                file.exists() && file.length() > 0 && file.length() == entity.fileSize
+            }
             .associate { it.id to it.filePath }
+    }
+
+    override suspend fun getAssetThumbnailPaths(assetIds: List<String>): Map<String, String> = withContext(Dispatchers.IO) {
+        if (assetIds.isEmpty()) return@withContext emptyMap()
+        db.cachedAssetDao().getByIds(assetIds)
+            .mapNotNull { entity ->
+                val thumb = entity.thumbnailPath ?: return@mapNotNull null
+                val file = File(thumb)
+                if (file.exists() && file.length() > 0) entity.id to thumb else null
+            }
+            .toMap()
     }
 
     override suspend fun deleteAssetFiles(assetId: String) {

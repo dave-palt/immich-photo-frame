@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PermissionCheckResult
@@ -41,6 +42,8 @@ constructor(
         val TRANSITION = floatPreferencesKey("transition_sec")
         val FILL_MODE = stringPreferencesKey("fill_mode")
         val SHOW_CLOCK = stringPreferencesKey("show_clock")
+        val CLOCK_SECONDS = stringPreferencesKey("clock_seconds")
+        val CLOCK_FORMAT = stringPreferencesKey("clock_format")
         val CLOCK_SIZE = floatPreferencesKey("clock_size")
         val CLOCK_X = floatPreferencesKey("clock_x")
         val CLOCK_Y = floatPreferencesKey("clock_y")
@@ -64,6 +67,10 @@ constructor(
         val ANIM_PAN_DOWN = stringPreferencesKey("anim_pan_down")
         val AUTO_SYNC = stringPreferencesKey("auto_sync")
         val SYNC_INTERVAL_MINUTES = intPreferencesKey("sync_interval_minutes")
+        val NIGHT_MODE = stringPreferencesKey("night_mode")
+        val NIGHT_MODE_START = intPreferencesKey("night_mode_start")
+        val NIGHT_MODE_END = intPreferencesKey("night_mode_end")
+        val NIGHT_MODE_BRIGHTNESS = intPreferencesKey("night_mode_brightness")
         val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
         val SERVER_VERSION = stringPreferencesKey("server_version")
@@ -114,6 +121,8 @@ constructor(
                 transitionSeconds = prefs[Keys.TRANSITION] ?: 1f,
                 fillMode = FillMode.valueOf(prefs[Keys.FILL_MODE] ?: FillMode.CONTAIN.name),
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
+                clockSeconds = prefs[Keys.CLOCK_SECONDS]?.toBoolean() ?: false,
+                clockFormat = ClockFormat.valueOf(prefs[Keys.CLOCK_FORMAT] ?: ClockFormat.H24.name),
                 clockSize = prefs[Keys.CLOCK_SIZE] ?: 48f,
                 clockPosition = ClockPosition(
                     x = prefs[Keys.CLOCK_X] ?: -1f,
@@ -139,6 +148,10 @@ constructor(
                 animPanDown = prefs[Keys.ANIM_PAN_DOWN]?.toBoolean() ?: true,
                 autoSync = prefs[Keys.AUTO_SYNC]?.toBoolean() ?: true,
                 syncIntervalMinutes = prefs[Keys.SYNC_INTERVAL_MINUTES] ?: 30,
+                nightMode = prefs[Keys.NIGHT_MODE]?.toBoolean() ?: false,
+                nightModeStart = prefs[Keys.NIGHT_MODE_START] ?: 1320,
+                nightModeEnd = prefs[Keys.NIGHT_MODE_END] ?: 420,
+                nightModeBrightness = prefs[Keys.NIGHT_MODE_BRIGHTNESS] ?: 0,
             )
         }
 
@@ -203,6 +216,8 @@ constructor(
             it[Keys.TRANSITION] = settings.transitionSeconds
             it[Keys.FILL_MODE] = settings.fillMode.name
             it[Keys.SHOW_CLOCK] = settings.showClock.toString()
+            it[Keys.CLOCK_SECONDS] = settings.clockSeconds.toString()
+            it[Keys.CLOCK_FORMAT] = settings.clockFormat.name
             it[Keys.CLOCK_SIZE] = settings.clockSize
             it[Keys.CLOCK_X] = settings.clockPosition.x
             it[Keys.CLOCK_Y] = settings.clockPosition.y
@@ -226,6 +241,10 @@ constructor(
             it[Keys.ANIM_PAN_DOWN] = settings.animPanDown.toString()
             it[Keys.AUTO_SYNC] = settings.autoSync.toString()
             it[Keys.SYNC_INTERVAL_MINUTES] = settings.syncIntervalMinutes
+            it[Keys.NIGHT_MODE] = settings.nightMode.toString()
+            it[Keys.NIGHT_MODE_START] = settings.nightModeStart
+            it[Keys.NIGHT_MODE_END] = settings.nightModeEnd
+            it[Keys.NIGHT_MODE_BRIGHTNESS] = settings.nightModeBrightness
         }
     }
 

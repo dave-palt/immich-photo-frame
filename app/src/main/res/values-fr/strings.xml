@@ -46,10 +46,25 @@
     <string name="fullscreen_desc">Masquer les barres système</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>
 
+    <!-- Night Mode -->
+    <string name="section_night_mode">Mode Nuit</string>
+    <string name="night_mode">Mode Nuit</string>
+    <string name="night_mode_desc">Atténuer l\'écran pendant les heures définies pour réduire la consommation d\'énergie et l\'usure de l\'écran la nuit</string>
+    <string name="night_mode_alt_hint">Pour de meilleurs résultats, privilégiez l\'allumage/extinction programmée intégrée de votre appareil (dans les paramètres système) si disponible. Cette option intégrée est une alternative.</string>
+    <string name="night_mode_start">Atténuer à</string>
+    <string name="night_mode_end">Raviver à</string>
+    <string name="night_mode_brightness">Luminosité de nuit</string>
+    <string name="night_mode_brightness_hint">Niveau de luminosité de l\'écran pendant les heures nocturnes. 0%% est le plus sombre, mais pas complètement éteint.</string>
+
     <!-- Clock -->
     <string name="show_clock">Afficher l\'horloge</string>
     <string name="clock_size">Taille de l\'horloge</string>
     <string name="drag_clock_hint">Faites glisser l\'horloge sur l\'écran du diaporama pour la repositionner</string>
+    <string name="clock_seconds">Afficher les secondes</string>
+    <string name="clock_seconds_desc">Afficher les secondes dans l\'horloge (mise à jour chaque seconde)</string>
+    <string name="clock_format">Format de l\'heure</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Aligner sur la grille</string>
     <string name="snap_to_grid_desc">Aligner l\'horloge sur la grille selon sa taille lors du relâchement</string>
 

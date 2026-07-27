@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -71,6 +72,7 @@ import androidx.media3.ui.PlayerView
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
@@ -148,14 +150,35 @@ fun SlideshowScreen(
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
+    // Night Mode active state — polled every few seconds, used to:
+    // 1) pause the auto-advance timer below, and
+    // 2) render a black screen instead of photo/video content.
+    // A short poll interval keeps the transition snappy when settings change
+    // or when crossing the window boundary. The 60s tick used previously meant
+    // up to a full minute of latency after returning from Settings.
+    var nightActive by remember { mutableStateOf(false) }
+    LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
+        if (!s.nightMode) {
+            nightActive = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            val cal = java.util.Calendar.getInstance()
+            val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                cal.get(java.util.Calendar.MINUTE)
+            nightActive = s.isNightModeActive(nowMin)
+            kotlinx.coroutines.delay(5_000L)
+        }
+    }
+
     // Auto-advance with progress tracking
     // For images: fixed timer. For videos: VideoPlayer drives advancing
     // (advances when the video ends, not on the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds) {
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive) {
         progress = 0f
-        if (!isPaused && state.assets.isNotEmpty()) {
+        if (!isPaused && !nightActive && state.assets.isNotEmpty()) {
             val currentAsset = state.assets[state.currentIndex]
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
@@ -192,13 +215,47 @@ fun SlideshowScreen(
         view.keepScreenOn = s.keepScreenOn
     }
 
+    // Night Mode brightness application — dim the screen when nightActive.
+    // Uses per-window brightness (WindowManager.LayoutParams.screenBrightness).
+    // BRIGHTNESS_OVERRIDE_NONE (-1f) = defer to the system/user brightness.
+    // nightActive is declared + polled above, alongside the auto-advance timer.
+    DisposableEffect(nightActive, s.nightModeBrightness) {
+        val window = (view.context as? Activity)?.window
+        if (window != null) {
+            val params = window.attributes
+            params.screenBrightness = if (nightActive) {
+                s.nightModeBrightness / 100f
+            } else {
+                android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            }
+            window.attributes = params
+        }
+        onDispose {
+            // Restore system brightness when leaving the slideshow
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                val params = window.attributes
+                params.screenBrightness =
+                    android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                window.attributes = params
+            }
+        }
+    }
+
     // Clock
     var currentTime by remember { mutableStateOf("") }
     if (s.showClock) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(s.clockSeconds, s.clockFormat) {
             while (true) {
-                currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                delay(30_000)
+                val hourToken = if (s.clockFormat == ClockFormat.H12) "hh" else "HH"
+                val secToken = if (s.clockSeconds) ":ss" else ""
+                val amPm = if (s.clockFormat == ClockFormat.H12) " a" else ""
+                val pattern = "$hourToken:mm$secToken$amPm"
+                currentTime = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
+                // With seconds: update every 1s. Without: every 10s is enough
+                // (the minute changes at most once per 60s, and the 10s tick
+                // ensures we roll over promptly without drifting).
+                delay(if (s.clockSeconds) 1_000L else 10_000L)
             }
         }
     }
@@ -228,7 +285,7 @@ fun SlideshowScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(if (s.adaptiveBackground) dominantColor else Color.Black)
+                    .background(if (s.adaptiveBackground && !nightActive) dominantColor else Color.Black)
                     .onSizeChanged { containerSize = it }
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { controlsVisible = !controlsVisible })
@@ -236,6 +293,10 @@ fun SlideshowScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 when {
+                    // Night Mode active — black screen, no photo/video rendering.
+                    // The timer (above) is also paused via the nightActive flag.
+                    nightActive -> { /* pure black surface, nothing to render */ }
+
                     state.isLoading -> CircularProgressIndicator()
 
                     state.error != null -> Text(state.error!!, color = Color.White)
@@ -290,7 +351,7 @@ fun SlideshowScreen(
                             fontSize = s.clockSize,
                             position = s.clockPosition,
                             containerSize = containerSize,
-                            clockDrift = s.photoAnimations,
+                            clockDrift = true,
                             snapToGrid = s.clockSnapToGrid,
                             onPositionChanged = { normX, normY ->
                                 viewModel.setClockPosition(ClockPosition(normX, normY))
@@ -327,8 +388,10 @@ fun SlideshowScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0x80000000))
+                            .displayCutoutPadding()
                             .statusBarsPadding()
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
@@ -448,7 +511,10 @@ fun SlideshowScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.navigationBarsPadding(),
+                        modifier = Modifier
+                            .navigationBarsPadding()
+                            .displayCutoutPadding()
+                            .padding(vertical = 24.dp),
                     ) {
                         IconButton(
                             onClick = { isPaused = !isPaused },

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.sync.SyncScheduler
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PermissionCheckResult
@@ -148,6 +149,10 @@ constructor(
 
     fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
 
+    fun toggleClockSeconds() = update { it.copy(clockSeconds = !it.clockSeconds) }
+
+    fun updateClockFormat(format: ClockFormat) = update { it.copy(clockFormat = format) }
+
     fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
 
     fun toggleFullscreen() = update { it.copy(fullscreen = !it.fullscreen) }
@@ -178,6 +183,30 @@ constructor(
     fun toggleAutoSync() = update { it.copy(autoSync = !it.autoSync) }
 
     fun updateSyncInterval(minutes: Int) = update { it.copy(syncIntervalMinutes = minutes) }
+
+    fun toggleNightMode() = update { it.copy(nightMode = !it.nightMode) }
+
+    /**
+     * Move the night-mode start time, preserving the window duration. The end
+     * time shifts by the same delta so a 22:00→07:00 window moved to 23:00
+     * becomes 23:00→08:00. Prevents degenerate windows where start >= end.
+     */
+    fun updateNightModeStart(minutes: Int) = update {
+        val newStart = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newEnd = (newStart + duration) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
+
+    /** Move the night-mode end time, preserving the window duration. */
+    fun updateNightModeEnd(minutes: Int) = update {
+        val newEnd = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newStart = (newEnd - duration + 1440) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
+
+    fun updateNightModeBrightness(percent: Int) = update { it.copy(nightModeBrightness = percent.coerceIn(0, 100)) }
 
     fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
 
