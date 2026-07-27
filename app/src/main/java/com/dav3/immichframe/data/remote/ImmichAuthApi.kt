@@ -34,6 +34,16 @@ interface ImmichAuthApi {
         @Body request: LoginRequestDto,
     ): LoginResponseDto
 
+    /**
+     * Invalidate the current bearer session after key creation so the device
+     * does not linger in Immich's "Authorized Devices" list. The API key we
+     * created is independent of the session and remains valid.
+     */
+    @POST("auth/logout")
+    suspend fun logout(
+        @Header("Authorization") bearer: String,
+    ): retrofit2.Response<Unit>
+
     // --- API key management (Bearer token) ---
 
     @GET("api-keys")
