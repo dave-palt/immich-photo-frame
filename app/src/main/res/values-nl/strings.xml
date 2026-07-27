@@ -62,6 +62,9 @@
     <string name="drag_clock_hint">Sleep de klok op de diavoorstelling om te verplaatsen</string>
     <string name="clock_seconds">Seconden weergeven</string>
     <string name="clock_seconds_desc">Seconden in de klok weergeven (elke seconde bijgewerkt)</string>
+    <string name="clock_format">Tijdformaat</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Uitlijnen op raster</string>
     <string name="snap_to_grid_desc">Klok bij loslaten uitlijnen op raster op basis van grootte</string>
 

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PermissionCheckResult
@@ -42,6 +43,7 @@ constructor(
         val FILL_MODE = stringPreferencesKey("fill_mode")
         val SHOW_CLOCK = stringPreferencesKey("show_clock")
         val CLOCK_SECONDS = stringPreferencesKey("clock_seconds")
+        val CLOCK_FORMAT = stringPreferencesKey("clock_format")
         val CLOCK_SIZE = floatPreferencesKey("clock_size")
         val CLOCK_X = floatPreferencesKey("clock_x")
         val CLOCK_Y = floatPreferencesKey("clock_y")
@@ -120,6 +122,7 @@ constructor(
                 fillMode = FillMode.valueOf(prefs[Keys.FILL_MODE] ?: FillMode.CONTAIN.name),
                 showClock = prefs[Keys.SHOW_CLOCK]?.toBoolean() ?: false,
                 clockSeconds = prefs[Keys.CLOCK_SECONDS]?.toBoolean() ?: false,
+                clockFormat = ClockFormat.valueOf(prefs[Keys.CLOCK_FORMAT] ?: ClockFormat.H24.name),
                 clockSize = prefs[Keys.CLOCK_SIZE] ?: 48f,
                 clockPosition = ClockPosition(
                     x = prefs[Keys.CLOCK_X] ?: -1f,
@@ -214,6 +217,7 @@ constructor(
             it[Keys.FILL_MODE] = settings.fillMode.name
             it[Keys.SHOW_CLOCK] = settings.showClock.toString()
             it[Keys.CLOCK_SECONDS] = settings.clockSeconds.toString()
+            it[Keys.CLOCK_FORMAT] = settings.clockFormat.name
             it[Keys.CLOCK_SIZE] = settings.clockSize
             it[Keys.CLOCK_X] = settings.clockPosition.x
             it[Keys.CLOCK_Y] = settings.clockPosition.y

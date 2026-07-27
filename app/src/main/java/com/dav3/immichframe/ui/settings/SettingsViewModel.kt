@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.sync.SyncScheduler
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PermissionCheckResult
@@ -149,6 +150,8 @@ constructor(
     fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
 
     fun toggleClockSeconds() = update { it.copy(clockSeconds = !it.clockSeconds) }
+
+    fun updateClockFormat(format: ClockFormat) = update { it.copy(clockFormat = format) }
 
     fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
 

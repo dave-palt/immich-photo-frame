@@ -71,6 +71,7 @@ import androidx.media3.ui.PlayerView
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
@@ -243,9 +244,12 @@ fun SlideshowScreen(
     // Clock
     var currentTime by remember { mutableStateOf("") }
     if (s.showClock) {
-        LaunchedEffect(s.clockSeconds) {
+        LaunchedEffect(s.clockSeconds, s.clockFormat) {
             while (true) {
-                val pattern = if (s.clockSeconds) "HH:mm:ss" else "HH:mm"
+                val hourToken = if (s.clockFormat == ClockFormat.H12) "hh" else "HH"
+                val secToken = if (s.clockSeconds) ":ss" else ""
+                val amPm = if (s.clockFormat == ClockFormat.H12) " a" else ""
+                val pattern = "$hourToken:mm$secToken$amPm"
                 currentTime = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
                 // With seconds: update every 1s. Without: every 10s is enough
                 // (the minute changes at most once per 60s, and the 10s tick

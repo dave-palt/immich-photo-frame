@@ -229,6 +229,8 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │  │      13:37             │  │ ← preview at current size
 │  └────────────────────────┘  │
 │  Clock Size: 48sp       [───]│ ← slider 24-96
+│  Clock Format               │
+│  [ 24h ]  [ 12h ]           │ ← filter chips
 │  "Drag clock to reposition"  │ ← helper text
 │  Show Seconds           [○]  │ ← toggle
 │  Snap to Grid           [●]  │ ← toggle

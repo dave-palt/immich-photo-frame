@@ -266,6 +266,7 @@ Setup → Albums → Slideshow
 | Image fill mode | DataStore | `fill_mode` | String enum (CONTAIN/COVER) |
 | Show clock | DataStore | `show_clock` | String bool |
 | Clock seconds | DataStore | `clock_seconds` | String bool (default false) |
+| Clock format | DataStore | `clock_format` | String enum (H24/H12, default H24) |
 | Clock size | DataStore | `clock_size` | Float (24–96 sp) |
 | Clock X position | DataStore | `clock_x` | Float (0.0–1.0 normalized, -1 = default) |
 | Clock Y position | DataStore | `clock_y` | Float (0.0–1.0 normalized, -1 = default) |

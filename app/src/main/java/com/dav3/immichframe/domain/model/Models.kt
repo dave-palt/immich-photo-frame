@@ -26,6 +26,7 @@ data class SlideshowSettings(
     val fillMode: FillMode = FillMode.CONTAIN,
     val showClock: Boolean = false,
     val clockSeconds: Boolean = false,
+    val clockFormat: ClockFormat = ClockFormat.H24,
     val clockSize: Float = 48f, // sp
     val clockPosition: ClockPosition = ClockPosition(),
     val keepScreenOn: Boolean = true,
@@ -95,6 +96,8 @@ enum class PhotoAnimation {
 }
 
 enum class FillMode { CONTAIN, COVER }
+
+enum class ClockFormat { H12, H24 }
 
 // Media Cache Models
 

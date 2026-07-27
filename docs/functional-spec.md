@@ -276,6 +276,7 @@ Options:
 - **Clock** section:
   - **Show Clock** — display time overlay (default off)
   - **Clock Size** — slider 24–96 sp (default 48)
+  - **Clock Format** — 24h (default) or 12h with AM/PM
   - **Show Seconds** — display seconds in the clock; updates every second (default off)
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:

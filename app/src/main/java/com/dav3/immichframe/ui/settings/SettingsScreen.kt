@@ -73,6 +73,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.R
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.PermissionStatus
 import com.dav3.immichframe.domain.model.PhotoAnimation
@@ -370,7 +371,10 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
-                        val clockPreviewFmt = if (s.clockSeconds) "HH:mm:ss" else "HH:mm"
+                        val hourTok = if (s.clockFormat == ClockFormat.H12) "hh" else "HH"
+                        val secTok = if (s.clockSeconds) ":ss" else ""
+                        val amPm = if (s.clockFormat == ClockFormat.H12) " a" else ""
+                        val clockPreviewFmt = "$hourTok:mm$secTok$amPm"
                         Text(
                             SimpleDateFormat(clockPreviewFmt, LocalLocale.current.platformLocale).format(Date()),
                             color = Color.White,
@@ -385,6 +389,20 @@ fun SettingsScreen(
                         onValueChange = { viewModel.updateClockSize(it) },
                         valueRange = 24f..96f,
                     )
+                    Text(
+                        stringResource(R.string.clock_format),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            s.clockFormat == ClockFormat.H24,
+                            stringResource(R.string.clock_format_24h),
+                        ) { viewModel.updateClockFormat(ClockFormat.H24) }
+                        FilterChip(
+                            s.clockFormat == ClockFormat.H12,
+                            stringResource(R.string.clock_format_12h),
+                        ) { viewModel.updateClockFormat(ClockFormat.H12) }
+                    }
                     Text(
                         stringResource(R.string.drag_clock_hint),
                         style = MaterialTheme.typography.bodySmall,

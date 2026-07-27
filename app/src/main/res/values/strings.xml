@@ -63,6 +63,9 @@
     <string name="drag_clock_hint">Drag the clock on the slideshow screen to reposition</string>
     <string name="clock_seconds">Show Seconds</string>
     <string name="clock_seconds_desc">Display seconds in the clock (updates every second)</string>
+    <string name="clock_format">Clock Format</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Snap to Grid</string>
     <string name="snap_to_grid_desc">Align clock to grid based on its size when released</string>
 
