@@ -262,7 +262,15 @@ constructor(
     }
 
     override suspend fun clearAll() {
-        context.appDataStore.edit { it.clear() }
+        context.appDataStore.edit { prefs ->
+            // Preserve tour completion — there's a separate "Reset All Tours"
+            // button for that. Clearing settings should not un-take tours.
+            val tourSteps = prefs[Keys.ONBOARDING_COMPLETED_STEPS]
+            prefs.clear()
+            if (tourSteps != null) {
+                prefs[Keys.ONBOARDING_COMPLETED_STEPS] = tourSteps
+            }
+        }
         encPrefs.edit().clear().apply()
     }
 
