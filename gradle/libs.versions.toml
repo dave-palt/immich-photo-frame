@@ -21,6 +21,7 @@ media3 = "1.10.1"
 workManager = "2.9.1"
 room = "2.7.1"
 biometric = "1.1.0"
+browser = "1.8.0"
 spotless = "8.8.0"
 
 [libraries]
@@ -85,6 +86,9 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 
 # Biometric authentication (fingerprint / face / device credential)
 androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+
+# Custom Tabs (OAuth browser flow)
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

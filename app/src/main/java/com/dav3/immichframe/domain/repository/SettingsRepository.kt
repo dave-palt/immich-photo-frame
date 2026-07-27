@@ -19,9 +19,19 @@ interface SettingsRepository {
      */
     val mediaSelectionNewItemsShown: Flow<Boolean>
 
+    /** Immich server version string (e.g. "1.135.0"), persisted at connect time. */
+    val serverVersion: Flow<String>
+
+    /** Whether the stored API key was created with scoped permissions. */
+    val apiKeyScoped: Flow<Boolean>
+
     suspend fun setServerUrl(url: String)
 
     suspend fun setApiKey(key: String)
+
+    suspend fun setServerVersion(version: String)
+
+    suspend fun setApiKeyScoped(scoped: Boolean)
 
     suspend fun setSelectedAlbumIds(ids: List<String>)
 

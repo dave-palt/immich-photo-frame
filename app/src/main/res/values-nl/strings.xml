@@ -154,10 +154,12 @@
     <string name="tour_setup_welcome_body">Maak verbinding met je Immich-server om je foto\'s te tonen. Laten we de installatie doorlopen.</string>
     <string name="tour_setup_server_title">Serveradres</string>
     <string name="tour_setup_server_body">Voer hier de URL van je Immich-server in. Gebruik de notatie photos.example.com of 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API-sleutel</string>
-    <string name="tour_setup_apikey_body">Maak een API-sleutel aan in Immich onder Instellingen → API-sleutels. Hiervoor zijn leesrechten nodig voor albums, assets en gebruikers.</string>
-    <string name="tour_setup_connect_title">Testen en verbinden</string>
-    <string name="tour_setup_connect_body">Tik op Verbinding testen om je inloggegevens te controleren. Na het verbinden kies je welke albums je wilt tonen.</string>
+    <string name="tour_setup_validate_title">Server valideren</string>
+    <string name="tour_setup_validate_body">Na het invoeren van het serveradres, tik om de verbinding te controleren. De app detecteert de Immich-versie en beschikbare inlogmethoden.</string>
+    <string name="tour_setup_apikey_title">Sleutel genereren</string>
+    <string name="tour_setup_apikey_body">Log in met e-mail en wachtwoord om automatisch een API-sleutel te maken, of plak er handmatig een. Het wachtwoord wordt één keer gebruikt en nooit opgeslagen.</string>
+    <string name="tour_setup_connect_title">Verbinden</string>
+    <string name="tour_setup_connect_body">Tik om de verbinding te testen en de diavoorstelling te starten.</string>
     <string name="tour_albums_select_title">Kies je albums</string>
     <string name="tour_albums_select_body">Tik op een of meer albums om ze toe te voegen aan je diavoorstelling. Geselecteerde albums tonen een vinkje.</string>
     <string name="tour_albums_start_title">Start de show</string>
@@ -188,4 +190,19 @@
     <string name="tour_settings_cache_body">Auto Sync downloadt foto\'s op de achtergrond zodat de diavoorstelling offline werkt en direct laadt.</string>
     <string name="tour_settings_connection_title">Verbinding</string>
     <string name="tour_settings_connection_body">Werk hier je server-URL of API-sleutel bij als je Immich-instellingen veranderen.</string>
+    <string name="validate_server">Server valideren</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Sleutel genereren</string>
+    <string name="enter_manually">Handmatig invoeren</string>
+    <string name="generate_key_title">API-sleutel genereren</string>
+    <string name="generate_key_desc">Log in met je Immich-e-mailadres en wachtwoord. De app maakt automatisch een scoped API-sleutel aan — je wachtwoord wordt één keer gebruikt en nooit opgeslagen.</string>
+    <string name="email">E-mail</string>
+    <string name="password">Wachtwoord</string>
+    <string name="login_and_generate">Inloggen &amp; sleutel genereren</string>
+    <string name="sign_in_with_oauth">Inloggen met OAuth</string>
+    <string name="api_key_help">Wat is een API-sleutel?</string>
+    <string name="api_key_help_title">Over API-sleutels</string>
+    <string name="api_key_help_what">Een API-sleutel is een token waarmee deze app toegang krijgt tot je foto\'s op je Immich-server — zonder je wachtwoord op te slaan.</string>
+    <string name="api_key_help_why">De app maakt een sleutel met alleen de benodigde rechten (albums lezen, foto\'s bekijken). Je kunt deze altijd intrekken in Immich-instellingen → API-sleutels.</string>
+    <string name="api_key_help_password">Je wachtwoord wordt één keer gebruikt om de sleutel te maken en daarna direct verwijderd. Het wordt nooit op dit apparaat opgeslagen.</string>
 </resources>

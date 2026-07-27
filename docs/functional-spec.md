@@ -5,14 +5,28 @@
 ### F1: First-Run Setup
 
 1. App launches with no stored credentials.
-2. Setup screen prompts for:
-   - Immich Server URL (e.g. `https://photos.example.com` or `http://192.168.1.100:2283`)
-   - API Key
-3. User taps "Test Connection".
-4. App calls `GET /server/ping` then `GET /users/me` to validate.
-   - On failure: show error message (wrong URL, unreachable, invalid key). Stay on setup screen.
-   - On success: store credentials, proceed to album selection.
-5. Credentials persisted to encrypted on-device storage.
+2. **Step 1 — Domain Validation:**
+   - Setup screen prompts for Immich Server URL (protocol dropdown + domain field).
+   - User taps "Validate Server".
+   - App calls `GET /server/version` + `GET /server/features` (no auth required)
+     to detect the Immich version and available auth methods.
+   - On failure: show error message (wrong URL, unreachable). Stay on domain step.
+   - On success: display detected version (e.g. "Immich v1.135.0"), advance to auth step.
+3. **Step 2 — Authentication (three options):**
+   - **Generate Key** (default): User enters email + password. App calls
+     `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
+     key with 5 permissions. Password is used once and never persisted.
+     A `?` icon next to the input opens a dialog explaining what an API key is,
+     why the app generates one, and that the password is discarded immediately.
+   - **Enter Manually**: User pastes an existing API key, then taps
+     "Test Connection" (the legacy flow).
+   - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
+     OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
+     returns to the app → JWT obtained → key created.
+4. App validates the resulting key by calling `GET /users/me`.
+5. Credentials persisted: API key to encrypted on-device storage, server version
+   + key-scope flag to DataStore.
+6. On success, proceed to album selection.
 
 ### F2: Album Selection
 
@@ -318,11 +332,11 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (19 steps across 4 screens):**
+**Step inventory (20 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
-| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Setup (5) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
 | Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |

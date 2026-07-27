@@ -56,6 +56,8 @@ constructor(
         val SYNC_INTERVAL_MINUTES = intPreferencesKey("sync_interval_minutes")
         val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
+        val SERVER_VERSION = stringPreferencesKey("server_version")
+        val API_KEY_SCOPED = stringPreferencesKey("api_key_scoped")
         val ONBOARDING_COMPLETED_STEPS = stringSetPreferencesKey("onboarding_completed_steps")
     }
 
@@ -139,12 +141,28 @@ constructor(
             it[Keys.MEDIA_SELECTION_NEW_SHOWN]?.toBoolean() ?: true
         }
 
+    override val serverVersion: Flow<String> =
+        context.appDataStore.data.map { it[Keys.SERVER_VERSION] ?: "" }
+
+    override val apiKeyScoped: Flow<Boolean> =
+        context.appDataStore.data.map {
+            it[Keys.API_KEY_SCOPED]?.toBoolean() ?: false
+        }
+
     override suspend fun setServerUrl(url: String) {
         context.appDataStore.edit { it[Keys.SERVER_URL] = url }
     }
 
     override suspend fun setApiKey(key: String) {
         encPrefs.edit().putString("api_key", key).apply()
+    }
+
+    override suspend fun setServerVersion(version: String) {
+        context.appDataStore.edit { it[Keys.SERVER_VERSION] = version }
+    }
+
+    override suspend fun setApiKeyScoped(scoped: Boolean) {
+        context.appDataStore.edit { it[Keys.API_KEY_SCOPED] = scoped.toString() }
     }
 
     override suspend fun setSelectedAlbumIds(ids: List<String>) {

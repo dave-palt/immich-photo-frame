@@ -19,6 +19,7 @@
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Biometric Auth | AndroidX Biometric | 1.1.0 |
+| OAuth Browser | AndroidX Browser (Custom Tabs) | 1.8.0 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -41,6 +42,8 @@ immich-android/
 │   │   │   ├── remote/          # Retrofit API interfaces, DTOs
 │   │   │   │   ├── ImmichApi.kt       # Immich endpoints
 │   │   │   │   ├── GitHubApi.kt       # GitHub releases API (self-update)
+│   │   │   │   ├── ImmichAuthApi.kt   # Auth/login/key/OAuth endpoints (no x-api-key)
+│   │   │   │   ├── PkceHelper.kt       # PKCE code verifier/challenge
 │   │   │   │   ├── Dtos.kt            # Immich DTOs
 │   │   │   │   ├── GitHubDtos.kt      # GitHub DTOs
 │   │   │   │   └── ImmichRepositoryImpl.kt
@@ -65,7 +68,7 @@ immich-android/
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
-│   │   │   ├── setup/           # Setup screen (URL + API key)
+│   │   │   ├── setup/           # Setup screen (domain validation → key generation/manual/OAuth)
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
 │   │   │   ├── media/           # Media selection grid (biometric-gated)
@@ -268,6 +271,8 @@ Setup → Albums → Slideshow
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
 | Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
+| Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |
+| API Key Scoped | DataStore | `api_key_scoped` | String bool (key created with scoped permissions) |
 | Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
 
 All settings flow through a single shared DataStore instance

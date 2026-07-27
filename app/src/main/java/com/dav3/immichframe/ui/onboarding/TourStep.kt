@@ -58,6 +58,12 @@ object TourSteps {
             targetKey = "setup_server",
         ),
         TourStep(
+            id = "setup_validate",
+            screen = TourScreen.SETUP,
+            titleRes = R.string.tour_setup_validate_title,
+            bodyRes = R.string.tour_setup_validate_body,
+        ),
+        TourStep(
             id = "setup_apikey",
             screen = TourScreen.SETUP,
             titleRes = R.string.tour_setup_apikey_title,

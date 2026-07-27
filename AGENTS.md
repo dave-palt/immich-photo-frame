@@ -142,6 +142,36 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-27** — In-app API key generation feature. Eliminated the need for
+  external `keymgr.ts` scripts. Setup screen restructured into a two-step flow:
+  (1) Domain Validation — user enters server URL, app calls `GET /server/version`
+  + `GET /server/features` (no auth) to detect version and auth methods; (2)
+  Authentication — three options side-by-side: Generate Key (email/password →
+  `POST /auth/login` → `POST /api-keys`), Enter Manually (paste existing key),
+  OAuth (PKCE via Custom Tabs, only shown if server has OAuth enabled). Password
+  is held in ViewModel memory only for the key-generation call, then discarded —
+  never persisted. Only the resulting API key hits EncryptedSharedPreferences.
+  New separate Retrofit instance `ImmichAuthApi` (no x-api-key interceptor) for
+  login, key creation, and server probing; Bearer token passed per-call. New
+  `PkceHelper.kt` for OAuth code_verifier/challenge/state. New DataStore keys:
+  `server_version` (String), `api_key_scoped` (String bool). New dependency:
+  `androidx.browser:browser:1.8.0` (Custom Tabs). New manifest deep-link
+  intent-filter for `com.dav3.immichframe://oauth-callback`. New setup tour
+  step `setup_validate` (total: 18→19... actually 20 with the count fix). New
+  strings (EN + 12 locales): validate_server, server_version_label,
+  generate_key, enter_manually, generate_key_title, generate_key_desc, email,
+  password, login_and_generate, sign_in_with_oauth, api_key_help,
+  api_key_help_title, api_key_help_what, api_key_help_why,
+  api_key_help_password + tour_setup_validate_title/body (updated
+  tour_setup_apikey + tour_setup_connect body text). Confirmed via git
+  archaeology (v1.50→v3.0.3): Immich NEVER had a `/auth/tfa` endpoint — TFA
+  is OAuth/OIDC-only (enforced by the IdP, not the server API). Updated:
+  functional-spec (F1 rewrite, F7 step count), technical-spec (tech stack,
+  package layout, persistence table, setup description), ui-spec (setup
+  mockup redraw), api-reference (new auth endpoints section, in-app gen
+  note), overview (goals), README (features, setup, permissions table fix
+  4→5 including missing asset.download).
+
 - **2026-07-26** — Media Selection feature (PR2 of media-selection feature).
   New screen `ui/media/MediaSelectionScreen.kt` + `MediaSelectionViewModel`
   showing a grid of all album assets. Tap thumbnails to show/hide from the

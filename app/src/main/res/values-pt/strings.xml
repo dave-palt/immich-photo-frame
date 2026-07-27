@@ -154,10 +154,12 @@
     <string name="tour_setup_welcome_body">Conecte-se ao seu servidor Immich para exibir suas fotos. Vamos passar pela configuração.</string>
     <string name="tour_setup_server_title">Endereço do servidor</string>
     <string name="tour_setup_server_body">Insira a URL do seu servidor Immich aqui. Use o formato photos.example.com ou 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">Chave de API</string>
-    <string name="tour_setup_apikey_body">Crie uma chave de API no Immich em Configurações → Chaves de API. Ela precisa de permissões de leitura de álbum, ativo e usuário.</string>
-    <string name="tour_setup_connect_title">Testar e Conectar</string>
-    <string name="tour_setup_connect_body">Toque em Testar Conexão para verificar suas credenciais. Quando conectado, você escolherá quais álbuns exibir.</string>
+    <string name="tour_setup_validate_title">Validar servidor</string>
+    <string name="tour_setup_validate_body">Após inserir o endereço do servidor, toque para verificar a ligação. A app detetará a versão do Immich e os métodos de início de sessão disponíveis.</string>
+    <string name="tour_setup_apikey_title">Gerar a sua chave</string>
+    <string name="tour_setup_apikey_body">Inicie sessão com e-mail e palavra-passe para criar automaticamente uma chave API, ou cole uma manualmente. A palavra-passe é usada uma vez e nunca guardada.</string>
+    <string name="tour_setup_connect_title">Ligar</string>
+    <string name="tour_setup_connect_body">Toque para testar a ligação e iniciar a apresentação.</string>
     <string name="tour_albums_select_title">Escolha Seus Álbuns</string>
     <string name="tour_albums_select_body">Toque em um ou mais álbuns para incluí-los na sua apresentação. Álbuns selecionados mostram uma marca de verificação.</string>
     <string name="tour_albums_start_title">Iniciar a Apresentação</string>
@@ -188,4 +190,19 @@
     <string name="tour_settings_cache_body">A sincronização automática baixa fotos em segundo plano para que a apresentação funcione offline e carregue instantaneamente.</string>
     <string name="tour_settings_connection_title">Conexão</string>
     <string name="tour_settings_connection_body">Atualize a URL do servidor ou a chave de API aqui se sua configuração do Immich mudar.</string>
+    <string name="validate_server">Validar servidor</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Gerar chave</string>
+    <string name="enter_manually">Inserir manualmente</string>
+    <string name="generate_key_title">Gerar chave API</string>
+    <string name="generate_key_desc">Inicie sessão com o seu e-mail e palavra-passe Immich. A app criará automaticamente uma chave API com permissões limitadas — a sua palavra-passe é usada uma vez e nunca guardada.</string>
+    <string name="email">E-mail</string>
+    <string name="password">Palavra-passe</string>
+    <string name="login_and_generate">Iniciar sessão e gerar chave</string>
+    <string name="sign_in_with_oauth">Iniciar sessão com OAuth</string>
+    <string name="api_key_help">O que é uma chave API?</string>
+    <string name="api_key_help_title">Sobre chaves API</string>
+    <string name="api_key_help_what">Uma chave API é um token que permite a esta app acessar as suas fotos no seu servidor Immich — sem armazenar a sua palavra-passe.</string>
+    <string name="api_key_help_why">A app cria uma chave apenas com as permissões necessárias (ler álbuns, ver fotos). Pode revogá-la a qualquer momento em Configurações Immich → Chaves API.</string>
+    <string name="api_key_help_password">A sua palavra-passe é usada uma vez para criar a chave e depois imediatamente descartada. Nunca é guardada neste dispositivo.</string>
 </resources>

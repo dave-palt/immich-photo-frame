@@ -128,6 +128,21 @@
     <string name="next">Next</string>
     <string name="select_albums">Select Albums</string>
     <string name="done">Done</string>
+    <string name="validate_server">Validate Server</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Generate Key</string>
+    <string name="enter_manually">Enter Manually</string>
+    <string name="generate_key_title">Generate API Key</string>
+    <string name="generate_key_desc">Log in with your Immich email and password. The app will create a scoped API key automatically — your password is used once and never stored.</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_and_generate">Log In &amp; Generate Key</string>
+    <string name="sign_in_with_oauth">Sign in with OAuth</string>
+    <string name="api_key_help">What is an API key?</string>
+    <string name="api_key_help_title">About API Keys</string>
+    <string name="api_key_help_what">An API key is a token that lets this app access your photos on your Immich server — without storing your password.</string>
+    <string name="api_key_help_why">The app creates a scoped key with only the permissions it needs (reading albums, viewing photos). You can revoke it anytime in Immich Settings → API Keys.</string>
+    <string name="api_key_help_password">Your password is used once to create the key, then immediately discarded. It is never saved on this device.</string>
     <string name="no_albums">No albums found</string>
     <string name="no_albums_available">No albums available</string>
     <string name="no_albums_available_desc">Your Immich account doesn\'t have any albums yet. Create one in Immich, then tap retry.</string>
@@ -178,10 +193,12 @@
     <string name="tour_setup_welcome_body">Connect to your Immich server to display your photos. Let\'s walk through the setup.</string>
     <string name="tour_setup_server_title">Server Address</string>
     <string name="tour_setup_server_body">Enter your Immich server URL here. Use the format photos.example.com or 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API Key</string>
-    <string name="tour_setup_apikey_body">Create an API key in Immich under Settings → API Keys. It needs album, asset, and user read permissions.</string>
-    <string name="tour_setup_connect_title">Test &amp; Connect</string>
-    <string name="tour_setup_connect_body">Tap Test Connection to verify your credentials. Once connected, you\'ll pick which albums to display.</string>
+    <string name="tour_setup_validate_title">Validate Server</string>
+    <string name="tour_setup_validate_body">After entering your server address, tap to check the connection. The app will detect the Immich version and available login methods.</string>
+    <string name="tour_setup_apikey_title">Generate Your Key</string>
+    <string name="tour_setup_apikey_body">Log in with your email and password to auto-create a scoped API key, or paste an existing one manually. Your password is used once and never stored.</string>
+    <string name="tour_setup_connect_title">Connect</string>
+    <string name="tour_setup_connect_body">Tap to test the connection and start your slideshow.</string>
 
     <!-- Albums tour steps -->
     <string name="tour_albums_select_title">Choose Your Albums</string>

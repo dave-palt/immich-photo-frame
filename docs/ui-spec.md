@@ -9,41 +9,72 @@ look better against dark background). Light theme available as a setting.
 
 Shown on first launch or when credentials are missing/invalid.
 
+**Step 1: Domain Validation**
+
 ```
 ┌──────────────────────────────┐
 │                              │
-│         [App Logo]           │ ← app logo vector (120dp, no background fill)
+│         [App Logo]           │ ← app logo vector (120dp)
 │                              │
-│   Immich Server URL          │
-│   ┌────────────────────────┐ │
-│   │ https://...            │ │
-│   └────────────────────────┘ │
+│   ImmichFrame                │
+│   Connect to your server     │
 │                              │
-│   API Key                    │
-│   ┌────────────────────────┐ │
-│   │ ••••••••••••••••••     │ │
-│   └────────────────────────┘ │
+│   [https:// ▼] [domain.....] │ ← protocol dropdown + URL field
+│   photos.example.com         │
 │                              │
 │   ┌──────────────────────┐   │
-│   │   Test Connection    │   │
+│   │   Validate Server    │   │
 │   └──────────────────────┘   │
 │                              │
 │   Status: [idle/connecting/  │
-│            success/error]    │
+│            error]            │
 │                              │
+│   [Show Tour Again]          │
 └──────────────────────────────┘
 ```
 
-- URL field auto-normalizes: strips trailing slashes, auto-adds `http://`
-  if no scheme present.
-- API key field is masked (password input).
-- "Test Connection" button validates URL format, then calls the API.
-- Status area shows:
-  - Idle: "Enter your Immich server details"
-  - Connecting: spinner + "Connecting to {url}..."
-  - Success: checkmark + "Connected as {user email}"
-  - Error: red text with specific error (timeout, 401, DNS failure, etc.)
-- On success, "Continue" button appears (or auto-navigates after 1s delay).
+**Step 2: Authentication (after domain validated)**
+
+```
+┌──────────────────────────────┐
+│         [App Logo]           │
+│                              │
+│   Immich v1.135.0            │ ← detected server version
+│   photos.example.com         │
+│                              │
+│   [Generate Key] [Manual]    │ ← auth mode toggle chips
+│                              │
+│   ── Generate Key mode ──    │
+│   Generate API Key      [?]  │ ← help icon → dialog
+│   Log in with email/password │
+│   ┌────────────────────────┐ │
+│   │ Email                  │ │
+│   └────────────────────────┘ │
+│   ┌────────────────────────┐ │
+│   │ Password          [👁] │ │
+│   └────────────────────────┘ │
+│   ┌──────────────────────┐   │
+│   │ Log In & Generate    │   │
+│   └──────────────────────┘   │
+│   ┌──────────────────────┐   │
+│   │ Sign in with OAuth   │   │ ← only if OAuth enabled
+│   └──────────────────────┘   │
+│                              │
+│   [← Back]                   │
+└──────────────────────────────┘
+```
+
+- URL field: protocol dropdown (`https://` / `http://`) + domain field. Auto-normalizes.
+- "Validate Server" calls `GET /server/version` + `GET /server/features` (no auth).
+  On success, shows detected version and advances to the auth step.
+- Auth mode toggle (FilterChips): **Generate Key** or **Enter Manually**.
+- **Generate Key** mode: email + password fields. "Log In & Generate Key"
+  calls `POST /auth/login` → `POST /api-keys` to create a scoped key.
+  Password is never stored. `?` icon opens a dialog explaining API keys.
+- **Manual** mode: API key field (masked), "Test Connection" button (legacy flow).
+- **OAuth** button appears only when the server has OAuth enabled.
+- Status area shows idle / connecting / success / error states.
+- On success, auto-navigates to album selection after brief delay.
 
 ### 2. Album Selection Screen
 

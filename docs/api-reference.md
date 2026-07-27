@@ -31,6 +31,12 @@ Retrofit client), the API key is appended as a query parameter:
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
 
+**In-app key generation** (recommended): the app can auto-generate a scoped key
+during setup — the user enters their email/password, the app logs in via
+`POST /auth/login`, creates a key via `POST /api-keys` with the 5 required
+permissions, then discards the password. OAuth/PKCE is also supported for
+servers with OAuth enabled. See F1 in the functional spec for details.
+
 ### Required Permissions
 
 The API key needs 5 scoped permissions:
@@ -43,7 +49,50 @@ The API key needs 5 scoped permissions:
 | `asset.download` | Download original files (video playback via ExoPlayer) |
 | `user.read` | Validate API key (GET /users/me) |
 
-These permissions are the minimum required for ImmichFrame to function. You can create a key with these exact permissions using the provided `keymgr` tool (or the shell/PowerShell scripts). Requires Immich v1.135+ for scoped keys.
+These permissions are the minimum required for ImmichFrame to function.
+The in-app key generator creates a key with exactly these permissions
+(requires Immich v1.135+ for scoped keys). The external `keymgr` scripts
+are still available as a fallback.
+
+## In-App Auth Endpoints
+
+These endpoints are used during setup by a separate Retrofit instance
+(`ImmichAuthApi`) that does NOT use the `x-api-key` header. Login and
+key-creation calls use `Bearer` tokens passed per-call via the
+`Authorization` header.
+
+### Server Probing (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/server/version` | Detect Immich version (scoped-key support check) |
+| GET | `/server/features` | Detect available auth methods (passwordLogin, oauth) |
+
+### Password Login (no auth)
+
+| Method | Endpoint | Request | Response |
+|---|---|---|---|
+| POST | `/auth/login` | `{ email, password }` | `{ accessToken, userId, userEmail, ... }` |
+
+### API Key Management (Bearer token)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api-keys` | List existing keys (metadata only, no secrets) |
+| POST | `/api-keys` | Create a new key: `{ name: "ImmichMediaFrame", permissions: [...] }` → returns `{ secret }` |
+| PUT | `/api-keys/{id}` | Update key name/permissions (metadata only) |
+
+### OAuth PKCE (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/oauth/authorize` | `{ redirectUri, codeChallenge, state }` → `{ url }` (open in browser) |
+| POST | `/oauth/callback` | `{ url, codeVerifier, state }` → `{ accessToken, ... }` (same as login) |
+
+The OAuth flow uses PKCE: the app generates a `code_verifier` + `code_challenge`
++ `state` locally (`PkceHelper.kt`), opens the authorization URL in a Custom
+Tab, and receives the callback via the `com.dav3.immichframe://oauth-callback`
+deep link.
 
 ## API Key Management Tools
 

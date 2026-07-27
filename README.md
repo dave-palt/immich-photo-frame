@@ -39,27 +39,35 @@ lets you pick which album(s) to display, and remembers your choice.
 - Interactive onboarding tour with coachmark overlays — guides users through setup, album selection, slideshow controls (including back-to-albums and update indicator), and settings; replayable per-screen ("Show Tour Again") or globally ("Reset All Tours")
 - Adaptive launcher icon with day/night variants and Android 13+ monochrome (themed icon) support; dedicated debug-build variant (amber background); separate background-free logo drawable for the Setup screen
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
-- Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
+- **In-app API key generation** — log in with email/password or OAuth; the app auto-creates a scoped key (no external scripts needed)
+- Scoped API key (5 permissions: album.read, asset.read, asset.view, asset.download, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
 - Biometric-protected API key reveal & copy (fingerprint / face / PIN)
 - Media selection grid — biometric-gated, tap to show/hide individual photos
 
 ## Setup
 
-1. Create an API key in Immich (see below)
-2. Enter server URL + API key in the app
+1. Enter your Immich server URL — the app validates it and detects the version
+2. Generate an API key in-app (email/password or OAuth), or paste an existing one
 3. Select album(s)
 4. Slideshow starts
 
-### Creating the API key
+### API key
 
-The app needs a **scoped API key** with exactly 4 permissions:
+The app can **auto-generate a scoped API key** during setup — just enter your
+email and password, and the app handles the rest. Your password is used once
+to create the key, then immediately discarded (never stored). OAuth is also
+supported for servers that have it enabled.
+
+Alternatively, you can create a key manually in Immich under
+**User Settings → API Keys**. The key needs 5 permissions:
 
 | Permission | Used for |
 |---|---|
 | `album.read` | List albums, get album info |
 | `asset.read` | Search/list assets in albums |
-| `asset.view` | Download/view photos and videos |
+| `asset.view` | View thumbnails and previews |
+| `asset.download` | Download originals (video playback) |
 | `user.read` | Validate the key during setup |
 
 > Requires Immich **v1.135+** for scoped keys. On older versions, any API key
