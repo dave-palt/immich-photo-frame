@@ -45,7 +45,10 @@
      is disabled and why.
 6. Credentials persisted: API key to encrypted on-device storage, server version
    + key-scope flag + permission status to DataStore.
-7. On success, proceed to album selection.
+7. On success, proceed to **Settings** so the user can configure the frame
+   (interval, clock, night mode, display fit, etc.) before selecting albums.
+   All settings have sensible defaults, so the user can simply press back to
+   skip. From Settings, back goes to **Album Selection** (first-run path).
 
 ### F2: Album Selection
 
