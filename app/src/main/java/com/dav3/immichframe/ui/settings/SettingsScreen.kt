@@ -153,6 +153,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val authTitleKey = stringResource(R.string.biometric_auth_title)
     val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
+    val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
     val apiKeyCopiedText = stringResource(R.string.api_key_copied)
 
     val tourState = rememberTourState()
@@ -594,7 +595,17 @@ fun SettingsScreen(
                 // ============================= ALBUMS =============================
                 SectionHeader(stringResource(R.string.section_albums))
 
-                Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        biometricLauncher.launch(
+                            title = authTitleKey,
+                            subtitle = authSubtitleAlbums,
+                            onNotSetup = { showBiometricNotSetupDialog = true },
+                            onSuccess = { onChangeAlbums() },
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Text(stringResource(R.string.change_albums))
                 }

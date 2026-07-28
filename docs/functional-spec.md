@@ -309,7 +309,8 @@ Options:
   - When `asset.download` is denied, the **Skip Videos** toggle is locked
     ON (can't be turned off) with subtitle "Locked — API key lacks
     'asset.download' permission". The media cache also skips downloading.
-- **Albums** — change album selection (returns to album picker)
+- **Albums** — change album selection (returns to album picker). Requires
+  biometric / device-credential authentication to open.
 - **Reset All Settings** — clears all settings, credentials, album selection,
   and cached data, returns to setup screen. Tour completion is **preserved**
   (use "Reset All Tours" to clear tour progress).
