@@ -170,6 +170,19 @@ Format:
   (first-run, no albums yet). Updated: functional-spec (F1 step 7, F7 step
   inventory + count + slideshow behavior description).
 
+- **2026-07-28** — Biometric-gated album selection from slideshow. The
+  PhotoLibrary (albums) icon in the slideshow top bar now requires
+  biometric/device-credential auth before navigating to album selection,
+  matching the media-selection grid icon next to it. Both modify what's
+  shown on the frame and sit side-by-side in the top bar, so both should
+  require auth. Reuses the existing `biometric` launcher +
+  `showBioNotSetup` dialog already declared in the top-bar Row for media
+  selection. New string `biometric_auth_subtitle_albums` in all 13 locales.
+  Scope: slideshow top bar only — Settings → Albums and onboarding album
+  selection are NOT gated (those are already behind the Settings screen /
+  first-run flow). Updated: functional-spec (F3 album icon biometric-gated,
+  F7 tour step description).
+
 - **2026-07-28** — Animated GIF playback support. Two compounding gaps
   prevented GIFs from playing: (1) no `coil-gif` dependency and no
   `GifDecoder` registered with Coil's `ImageLoader`, so GIFs decoded as a
