@@ -182,7 +182,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  IMAGE                       │
 │  Fill: [Contain] [Cover]     │ ← filter chips
-│  Adaptive Background    [○]  │ ← toggle (letterbox color fill)
+│  Adaptive Background    [○]  │ ← toggle (per-edge letterbox gradient)
 │                              │
 │  Shuffle                [●]  │ ← toggle
 │  Skip Videos            [●]  │ ← toggle

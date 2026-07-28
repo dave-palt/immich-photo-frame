@@ -41,7 +41,7 @@
     <string name="contain">Einpassen</string>
     <string name="cover">Ausfüllen</string>
     <string name="adaptive_background">Adaptiver Hintergrund</string>
-    <string name="adaptive_background_desc">Füllt die schwarzen Balken mit der Durchschnittsfarbe jedes Fotos</string>
+    <string name="adaptive_background_desc">Füllt die schwarzen Balken mit einem Farbverlauf aus den oberen/unteren Farben jedes Fotos</string>
     <string name="fullscreen">Vollbild</string>
     <string name="fullscreen_desc">Systemleisten ausblenden</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>

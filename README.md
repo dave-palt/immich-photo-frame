@@ -29,7 +29,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Animated GIF playback in the slideshow (Coil GifDecoder; GIFs load from `/original` to preserve animation)
 - Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
-- Adaptive background (fills letterbox bars with each photo's dominant color)
+- Adaptive background (fills letterbox bars with each photo's edge colors as a gradient)
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
 - Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)

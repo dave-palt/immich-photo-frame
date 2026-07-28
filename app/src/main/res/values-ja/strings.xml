@@ -41,7 +41,7 @@
     <string name="contain">収める</string>
     <string name="cover">覆う</string>
     <string name="adaptive_background">適応型背景</string>
-    <string name="adaptive_background_desc">各写真の平均色でレターボックス帯を塗りつぶす</string>
+    <string name="adaptive_background_desc">各写真の上下の色を使ったグラデーションでレターボックス帯を塗りつぶす</string>
     <string name="fullscreen">全画面</string>
     <string name="fullscreen_desc">システムバーを非表示</string>
     <string name="keep_screen_on">画面をオンのままにする</string>

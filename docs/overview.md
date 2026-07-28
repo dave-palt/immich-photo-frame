@@ -25,7 +25,7 @@ The app stores the server URL and API key on-device, lets the user pick which al
 - Video playback (optional, with mute/skip controls)
 - Draggable clock overlay with configurable size and position
 - Photo animations (Ken Burns zoom/pan) — also serves as burn-in protection for always-on displays
-- Adaptive background (fills letterbox bars with each photo's dominant color)
+- Adaptive background (fills letterbox bars with each photo's edge colors as a gradient)
 - Start-on-boot for dedicated frame devices
 - Self-update via GitHub releases (bypasses Play Store for sideloaded installs)
 - Offline-capable media cache (Room + WorkManager background sync)

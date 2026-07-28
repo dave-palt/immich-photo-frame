@@ -41,7 +41,7 @@
     <string name="contain">Contenir</string>
     <string name="cover">Couvrir</string>
     <string name="adaptive_background">Fond adaptatif</string>
-    <string name="adaptive_background_desc">Remplit les bandes noires avec la couleur moyenne de chaque photo</string>
+    <string name="adaptive_background_desc">Remplit les bandes noires avec un dégradé des couleurs haut/bas de chaque photo</string>
     <string name="fullscreen">Plein écran</string>
     <string name="fullscreen_desc">Masquer les barres système</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>

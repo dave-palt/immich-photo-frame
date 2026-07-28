@@ -120,8 +120,8 @@ UI (Compose) → ViewModel → Repository → Retrofit → Immich API
   `GifDecoder.Factory()` so animated GIFs decode frame-by-frame.
 - **ExoPlayer (Media3)** handles video playback inline within the slideshow
   for video assets (when Skip Videos is off).
-- **Palette API** extracts dominant color from each image for adaptive
-  background (letterbox fill).
+- **Palette API** extracts dominant colors from each image's top/bottom and
+  left/right halves for adaptive background (per-edge letterbox gradient fill).
 - **Retrofit OkHttp interceptor** injects the `x-api-key` header on every
   Immich API call automatically.
 - **Night Mode** dims the screen during configured hours via per-window

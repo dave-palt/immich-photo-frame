@@ -19,6 +19,23 @@ data class Asset(
 
 enum class AssetType { IMAGE, VIDEO }
 
+/**
+ * Colors sampled from the four edges of the thumbnail, used to paint the
+ * letterbox bars so each border matches the adjacent slice of the photo.
+ *
+ * [aspectRatio] is width/height of the decoded thumbnail — the same aspect
+ * ratio as the full image (the thumbnail is just a scaled-down original).
+ * Used by the caller to decide whether bars are top/bottom (vertical
+ * gradient) or left/right (horizontal gradient).
+ */
+data class BorderColors(
+    val top: androidx.compose.ui.graphics.Color,
+    val bottom: androidx.compose.ui.graphics.Color,
+    val left: androidx.compose.ui.graphics.Color,
+    val right: androidx.compose.ui.graphics.Color,
+    val aspectRatio: Float,
+)
+
 data class ClockPosition(
     val x: Float = -1f, // -1 = unset (default bottom-start)
     val y: Float = -1f, // normalized 0..1 of screen

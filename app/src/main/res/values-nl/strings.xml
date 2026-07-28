@@ -41,7 +41,7 @@
     <string name="contain">Passen</string>
     <string name="cover">Vullen</string>
     <string name="adaptive_background">Adaptieve achtergrond</string>
-    <string name="adaptive_background_desc">Vult de zwarte balken met de gemiddelde kleur van elke foto</string>
+    <string name="adaptive_background_desc">Vult de zwarte balken met een verloop van de bovenste/onderste kleuren van elke foto</string>
     <string name="fullscreen">Volledig scherm</string>
     <string name="fullscreen_desc">Systeembalken verbergen</string>
     <string name="keep_screen_on">Scherm aan laten</string>

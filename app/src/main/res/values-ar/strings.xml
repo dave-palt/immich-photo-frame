@@ -41,7 +41,7 @@
     <string name="contain">احتواء</string>
     <string name="cover">تغطية</string>
     <string name="adaptive_background">خلفية متكيفة</string>
-    <string name="adaptive_background_desc">ملء الأشرطة السوداء بمتوسط لون كل صورة</string>
+    <string name="adaptive_background_desc">ملء الأشرطة السوداء بتدرج من ألوان أعلى/أسفل كل صورة</string>
     <string name="fullscreen">ملء الشاشة</string>
     <string name="fullscreen_desc">إخفاء أشرطة النظام</string>
     <string name="keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
