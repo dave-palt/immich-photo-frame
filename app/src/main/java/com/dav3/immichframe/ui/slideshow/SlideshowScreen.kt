@@ -65,6 +65,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -148,6 +150,25 @@ fun SlideshowScreen(
     var isPaused by remember { mutableStateOf(false) }
     var isVideoPaused by remember { mutableStateOf(false) }
 
+    // Screen-lock awareness — when the device screen turns off (ON_STOP), the
+    // activity stops but Compose composition stays alive, so the auto-advance
+    // timer and ExoPlayer keep running (audio plays in your pocket). We track
+    // the lifecycle and treat "screen active" as a precondition for playback.
+    val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    var isScreenActive by remember { mutableStateOf(true) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            isScreenActive = when (event) {
+                Lifecycle.Event.ON_START, Lifecycle.Event.ON_RESUME -> true
+                Lifecycle.Event.ON_STOP -> false
+                else -> isScreenActive // ON_PAUSE is ambiguous (system dialog,
+                // transparent overlay); keep current state.
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
@@ -188,9 +209,9 @@ fun SlideshowScreen(
         // Videos are immediately "ready" — ExoPlayer handles its own timeline.
         imageReady = state.assets.getOrNull(state.currentIndex)?.type == AssetType.VIDEO
     }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady) {
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady, isScreenActive) {
         progress = 0f
-        if (!isPaused && !nightActive && imageReady && state.assets.isNotEmpty()) {
+        if (!isPaused && !nightActive && isScreenActive && imageReady && state.assets.isNotEmpty()) {
             val currentAsset = state.assets[state.currentIndex]
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
@@ -364,6 +385,7 @@ fun SlideshowScreen(
                                     muted = s.muted,
                                     isSlideshowPaused = isPaused,
                                     isVideoPaused = isVideoPaused,
+                                    isScreenActive = isScreenActive,
                                     fillMode = s.fillMode,
                                 )
                             } else if (currentAsset != null) {
@@ -670,6 +692,7 @@ private fun VideoPlayer(
     muted: Boolean,
     isSlideshowPaused: Boolean,
     isVideoPaused: Boolean,
+    isScreenActive: Boolean,
     fillMode: FillMode,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -688,8 +711,13 @@ private fun VideoPlayer(
     }
 
     // React to pause/play state
-    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused) {
+    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused, isScreenActive) {
         when {
+            !isScreenActive -> {
+                // Screen locked / app stopped — pause everything, no auto-advance
+                exoPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                exoPlayer.playWhenReady = false
+            }
             isSlideshowPaused -> {
                 // Slideshow paused: video loops, no auto-advance
                 exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
@@ -709,8 +737,8 @@ private fun VideoPlayer(
         onDispose { }
     }
 
-    // Player listener: logging + advance on end (only when not paused)
-    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused) {
+    // Player listener: logging + advance on end (only when not paused and screen active)
+    DisposableEffect(asset.id, isSlideshowPaused, isVideoPaused, isScreenActive) {
         val listener = object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 val stateName = when (playbackState) {
@@ -721,7 +749,7 @@ private fun VideoPlayer(
                     else -> "UNKNOWN($playbackState)"
                 }
                 android.util.Log.d(TAG_VIDEO, "State changed: $stateName (asset=${asset.id})")
-                if (playbackState == Player.STATE_ENDED && !isSlideshowPaused && !isVideoPaused) {
+                if (playbackState == Player.STATE_ENDED && !isSlideshowPaused && !isVideoPaused && isScreenActive) {
                     viewModel.next()
                 }
             }

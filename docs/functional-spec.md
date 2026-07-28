@@ -97,8 +97,12 @@
 8. Next image is pre-fetched and cached so transitions are instant.
 9. When the last image is reached, the slideshow loops back to the first.
 10. Screen stays on (wake lock) while slideshow is active (toggleable).
-11. A progress bar at the bottom shows time remaining for the current image.
-12. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
+11. When the **device screen turns off** (locked / power button), the slideshow
+    pauses entirely: the auto-advance timer stops, and any playing video is
+    paused (no audio plays while the screen is off). Playback resumes
+    automatically when the screen turns back on.
+12. A progress bar at the bottom shows time remaining for the current image.
+13. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
     style animation (zoom/pan). The animation is chosen randomly from the
     set of individually-enabled animation types. Available types: Zoom In,
     Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks
