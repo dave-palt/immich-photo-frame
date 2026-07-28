@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">更新インジケーター</string>
     <string name="tour_slideshow_update_body">更新が利用可能な場合、最新バージョンをインストールできるようにこのアイコンがここに表示されます。表示されていない場合は、すでに最新です。</string>
 <string name="tour_slideshow_settings_title">その場で調整</string>
-    <string name="tour_slideshow_settings_body">スライドショーを抜けずに設定を開き — 間隔の変更、時計の有効化などができます。</string>
-    <string name="tour_slideshow_close_title">スライドショーを終了</string>
-    <string name="tour_slideshow_close_body">ここをタップしてスライドショーを終了し、アルバム選択に戻ります。</string>
-    <string name="tour_settings_overview_title">設定の概要</string>
+    <string name="tour_slideshow_settings_body">スライドショーを抜けずに設定を開き — 間隔の変更、時計の有効化などができます。</string>    <string name="tour_settings_overview_title">設定の概要</string>
     <string name="tour_settings_overview_body">すべての変更は自動保存されます — 保存ボタンは不要です。下にスクロールして各セクションを確認してください。</string>
     <string name="tour_settings_system_title">システムと自動起動</string>
     <string name="tour_settings_system_body">起動時開始とランチャーモードでアプリを自動起動できます — デジタルフォトフレームに最適です。</string>

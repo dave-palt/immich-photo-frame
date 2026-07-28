@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Indicatore di Aggiornamento</string>
     <string name="tour_slideshow_update_body">Quando è disponibile un aggiornamento, questa icona appare qui per permetterti di installare l\'ultima versione. Se non è visibile, sei già aggiornato.</string>
 <string name="tour_slideshow_settings_title">Regola al volo</string>
-    <string name="tour_slideshow_settings_body">Apri le impostazioni senza uscire dalla presentazione — cambia intervallo, attiva l\'orologio e altro.</string>
-    <string name="tour_slideshow_close_title">Esci dalla presentazione</string>
-    <string name="tour_slideshow_close_body">Tocca qui per uscire dalla presentazione e tornare alla selezione degli album.</string>
-    <string name="tour_settings_overview_title">Panoramica impostazioni</string>
+    <string name="tour_slideshow_settings_body">Apri le impostazioni senza uscire dalla presentazione — cambia intervallo, attiva l\'orologio e altro.</string>    <string name="tour_settings_overview_title">Panoramica impostazioni</string>
     <string name="tour_settings_overview_body">Tutte le modifiche vengono salvate automaticamente — nessun pulsante di salvataggio. Scorri verso il basso per esplorare ogni sezione.</string>
     <string name="tour_settings_system_title">Sistema e avvio automatico</string>
     <string name="tour_settings_system_body">Avvio all\'accensione e Modalità Launcher permettono all\'app di avviarsi automaticamente — ideale per cornici digitali dedicate.</string>

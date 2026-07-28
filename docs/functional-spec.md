@@ -375,7 +375,7 @@ a user lands on a screen — only steps not yet completed are shown.
   all remaining steps on that screen as completed.
 - **Slideshow-specific behavior**: during the tour, the on-tap controls are
   force-shown and the 5-second auto-hide is suppressed, so the tour can
-  spotlight the prev/next, pause/mute, settings, and close buttons.
+  spotlight the prev/next, pause/mute, and settings buttons.
 - **Settings-specific behavior**: the tour scrolls the target section into
   view before showing its spotlight (System → Media Cache → Connection).
 - **Two replay buttons** in Settings → System section:
@@ -386,13 +386,13 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (21 steps across 4 screens):**
+**Step inventory (20 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
 | Setup (6) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_generate_key`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
-| Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
+| Slideshow (7) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
 
 - **`slideshow_media_selection`**: highlights the grid icon next to the photo

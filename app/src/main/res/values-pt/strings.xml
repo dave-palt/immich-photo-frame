@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Indicador de Atualização</string>
     <string name="tour_slideshow_update_body">Quando há uma atualização disponível, este ícone aparece aqui para você instalar a versão mais recente. Se não estiver visível, você já está atualizado.</string>
 <string name="tour_slideshow_settings_title">Ajuste em Tempo Real</string>
-    <string name="tour_slideshow_settings_body">Abra as configurações sem sair da apresentação — mude o intervalo, ative o relógio e mais.</string>
-    <string name="tour_slideshow_close_title">Sair da Apresentação</string>
-    <string name="tour_slideshow_close_body">Toque aqui para sair da apresentação e voltar à seleção de álbuns.</string>
-    <string name="tour_settings_overview_title">Visão Geral das Configurações</string>
+    <string name="tour_slideshow_settings_body">Abra as configurações sem sair da apresentação — mude o intervalo, ative o relógio e mais.</string>    <string name="tour_settings_overview_title">Visão Geral das Configurações</string>
     <string name="tour_settings_overview_body">Todas as mudanças são salvas automaticamente — sem botão de salvar. Role para baixo para explorar cada seção.</string>
     <string name="tour_settings_system_title">Sistema e Início Automático</string>
     <string name="tour_settings_system_body">Iniciar na Inicialização e Modo Lançador permitem que o app inicie automaticamente — ideal para molduras digitais dedicadas.</string>

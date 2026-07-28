@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Indicateur de Mise à Jour</string>
     <string name="tour_slideshow_update_body">Lorsqu\'une mise à jour est disponible, cette icône apparaît ici pour vous permettre d\'installer la dernière version. Si elle n\'est pas visible, vous êtes déjà à jour.</string>
 <string name="tour_slideshow_settings_title">Ajuster à la volée</string>
-    <string name="tour_slideshow_settings_body">Ouvrez les paramètres sans quitter le diaporama — modifiez l\'intervalle, activez l\'horloge et plus.</string>
-    <string name="tour_slideshow_close_title">Quitter le diaporama</string>
-    <string name="tour_slideshow_close_body">Touchez ici pour quitter le diaporama et revenir à la sélection des albums.</string>
-    <string name="tour_settings_overview_title">Aperçu des paramètres</string>
+    <string name="tour_slideshow_settings_body">Ouvrez les paramètres sans quitter le diaporama — modifiez l\'intervalle, activez l\'horloge et plus.</string>    <string name="tour_settings_overview_title">Aperçu des paramètres</string>
     <string name="tour_settings_overview_body">Toutes les modifications sont enregistrées automatiquement — pas de bouton de sauvegarde. Faites défiler pour explorer chaque section.</string>
     <string name="tour_settings_system_title">Système et démarrage auto</string>
     <string name="tour_settings_system_body">Démarrage au démarrage et Mode Lanceur permettent à l\'app de se lancer automatiquement — idéal pour les cadres photo dédiés.</string>

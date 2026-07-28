@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Индикатор обновления</string>
     <string name="tour_slideshow_update_body">Когда обновление доступно, этот значок появляется здесь, чтобы вы могли установить последнюю версию. Если его нет, у вас уже последняя версия.</string>
 <string name="tour_slideshow_settings_title">Настройте на лету</string>
-    <string name="tour_slideshow_settings_body">Откройте настройки, не выходя из слайд-шоу — измените интервал, включите часы и т.д.</string>
-    <string name="tour_slideshow_close_title">Выйти из слайд-шоу</string>
-    <string name="tour_slideshow_close_body">Нажмите здесь, чтобы выйти из слайд-шоу и вернуться к выбору альбомов.</string>
-    <string name="tour_settings_overview_title">Обзор настроек</string>
+    <string name="tour_slideshow_settings_body">Откройте настройки, не выходя из слайд-шоу — измените интервал, включите часы и т.д.</string>    <string name="tour_settings_overview_title">Обзор настроек</string>
     <string name="tour_settings_overview_body">Все изменения сохраняются автоматически — без кнопки сохранения. Прокрутите вниз, чтобы изучить разделы.</string>
     <string name="tour_settings_system_title">Система и автозапуск</string>
     <string name="tour_settings_system_body">«Запуск при загрузке» и «Режим лаунчера» позволяют приложению запускаться автоматически — идеально для цифровой фоторамки.</string>

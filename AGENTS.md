@@ -142,6 +142,27 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-29** — Fixed Settings → Back navigation bug + removed redundant
+  slideshow close button. (1) Root cause of back-nav bug: `apiKey` in
+  `SettingsRepositoryImpl` was a cold one-shot `flow { emit(...) }` that
+  emitted once and completed — it never reacted to `EncryptedSharedPreferences`
+  writes. `NavViewModel.startRoute` (which `combine`s `serverUrl`, `apiKey`,
+  `selectedAlbumIds`) therefore permanently evaluated to `SETUP` after the
+  initial collection (where `apiKey=""`), even after the user entered a key.
+  Settings `onBack` reads `startRoute` → got `SETUP` → sent user to domain
+  page. Fix: `apiKey` is now a `MutableStateFlow` backed by
+  `EncryptedSharedPreferences`, updated in `setApiKey()` and `clearAll()`.
+  No navigation restructure needed — the existing state-driven design (where
+  `startRoute` computes the destination and `onBack` uses `popUpTo(0)`) is
+  correct once the flow is live. (2) Removed the X (close) button from the
+  slideshow top bar — it was redundant with the albums (PhotoLibrary) icon,
+  both navigating back to album selection. Removed `onClose` param from
+  `SlideshowScreen`, the `Icons.Default.Close` import, the
+  `slideshow_close` tour step (TourStep.kt), and `tour_slideshow_close_title`
+  + `_body` strings from all 13 locale files. Tour step count: 21→20 (slideshow
+  8→7). Updated: functional-spec (F7 step inventory + count + slideshow
+  behavior description).
+
 - **2026-07-28** — Animated GIF playback support. Two compounding gaps
   prevented GIFs from playing: (1) no `coil-gif` dependency and no
   `GifDecoder` registered with Coil's `ImageLoader`, so GIFs decoded as a

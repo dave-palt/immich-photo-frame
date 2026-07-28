@@ -90,7 +90,6 @@ fun ImmichNavHost() {
         }
         composable(Routes.SLIDESHOW) {
             SlideshowScreen(
-                onClose = { navController.popBackStack() },
                 onSettings = { navController.navigate(Routes.SETTINGS) },
                 onChangeAlbums = {
                     navController.navigate(Routes.ALBUMS) {

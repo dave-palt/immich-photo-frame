@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Indicador de Actualización</string>
     <string name="tour_slideshow_update_body">Cuando hay una actualización disponible, este icono aparece aquí para que puedas instalar la última versión. Si no se muestra, ya estás actualizado.</string>
 <string name="tour_slideshow_settings_title">Ajustar al vuelo</string>
-    <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>
-    <string name="tour_slideshow_close_title">Salir de presentación</string>
-    <string name="tour_slideshow_close_body">Toca aquí para salir de la presentación y volver a la selección de álbumes.</string>
-    <string name="tour_settings_overview_title">Vista general de configuración</string>
+    <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>    <string name="tour_settings_overview_title">Vista general de configuración</string>
     <string name="tour_settings_overview_body">Todos los cambios se guardan automáticamente — sin botón de guardar. Desplázate hacia abajo para explorar cada sección.</string>
     <string name="tour_settings_system_title">Sistema y inicio automático</string>
     <string name="tour_settings_system_body">Inicio en arranque y Modo Lanzador permiten que la app se inicie automáticamente — ideal para marcos de fotos dedicados.</string>

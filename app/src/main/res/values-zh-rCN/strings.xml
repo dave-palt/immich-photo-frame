@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">更新指示器</string>
     <string name="tour_slideshow_update_body">当有更新可用时，此图标会出现在这里，方便您安装最新版本。如果没有显示，说明已是最新版本。</string>
 <string name="tour_slideshow_settings_title">即时调整</string>
-    <string name="tour_slideshow_settings_body">无需离开幻灯片即可打开设置——更改间隔、启用时钟等。</string>
-    <string name="tour_slideshow_close_title">退出幻灯片</string>
-    <string name="tour_slideshow_close_body">点击此处退出幻灯片并返回相册选择。</string>
-    <string name="tour_settings_overview_title">设置概览</string>
+    <string name="tour_slideshow_settings_body">无需离开幻灯片即可打开设置——更改间隔、启用时钟等。</string>    <string name="tour_settings_overview_title">设置概览</string>
     <string name="tour_settings_overview_body">所有更改自动保存——无需保存按钮。向下滚动探索各个部分。</string>
     <string name="tour_settings_system_title">系统和自启动</string>
     <string name="tour_settings_system_body">开机启动和启动器模式可让应用自动启动——非常适合专用相框。</string>

@@ -18,6 +18,8 @@ import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -99,10 +101,9 @@ constructor(
     override val serverUrl: Flow<String> =
         context.appDataStore.data.map { it[Keys.SERVER_URL] ?: "" }
 
-    override val apiKey: Flow<String> =
-        kotlinx.coroutines.flow.flow {
-            emit(encPrefs.getString("api_key", "") ?: "")
-        }
+    private val _apiKey = MutableStateFlow(encPrefs.getString("api_key", "") ?: "")
+
+    override val apiKey: Flow<String> = _apiKey.asStateFlow()
 
     override val selectedAlbumIds: Flow<List<String>> =
         context.appDataStore.data.map {
@@ -186,6 +187,7 @@ constructor(
 
     override suspend fun setApiKey(key: String) {
         encPrefs.edit().putString("api_key", key).apply()
+        _apiKey.value = key
     }
 
     override suspend fun setServerVersion(version: String) {
@@ -291,6 +293,7 @@ constructor(
             }
         }
         encPrefs.edit().clear().apply()
+        _apiKey.value = ""
     }
 
     private val statusJson = Json { ignoreUnknownKeys = true }
