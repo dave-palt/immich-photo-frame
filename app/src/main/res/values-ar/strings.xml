@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">مؤشر التحديث</string>
     <string name="tour_slideshow_update_body">عندما يتوفر تحديث، يظهر هذا الرمز هنا لتتمكن من تثبيت أحدث إصدار. إذا لم يظهر، فأنت تستخدم بالفعل أحدث إصدار.</string>
 <string name="tour_slideshow_settings_title">اضبط فوراً</string>
-    <string name="tour_slideshow_settings_body">افتح الإعدادات دون مغادرة العرض — غيّر الفاصل، فعّل الساعة والمزيد.</string>
-    <string name="tour_slideshow_close_title">إنهاء العرض</string>
-    <string name="tour_slideshow_close_body">اضغط هنا لإنهاء العرض والعودة إلى اختيار الألبوم.</string>
-    <string name="tour_settings_overview_title">نظرة عامة على الإعدادات</string>
+    <string name="tour_slideshow_settings_body">افتح الإعدادات دون مغادرة العرض — غيّر الفاصل، فعّل الساعة والمزيد.</string>    <string name="tour_settings_overview_title">نظرة عامة على الإعدادات</string>
     <string name="tour_settings_overview_body">يتم حفظ جميع التغييرات تلقائياً — لا حاجة لزر الحفظ. مرر للأسفل لاستكشاف كل قسم.</string>
     <string name="tour_settings_system_title">النظام والتشغيل التلقائي</string>
     <string name="tour_settings_system_body">البدء عند الإقلاع ووضع المشغل يسمحان للتطبيق بالتشغيل التلقائي — مثالي لأطر الصور المخصصة.</string>

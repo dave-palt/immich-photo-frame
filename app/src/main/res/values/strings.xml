@@ -248,9 +248,6 @@
     <string name="tour_slideshow_update_body">When an update is available, this icon appears here so you can install the latest version. If it\'s not showing, you\'re already up to date.</string>
     <string name="tour_slideshow_settings_title">Adjust on the Fly</string>
     <string name="tour_slideshow_settings_body">Open settings without leaving the slideshow — change interval, enable the clock, and more.</string>
-    <string name="tour_slideshow_close_title">Exit Slideshow</string>
-    <string name="tour_slideshow_close_body">Tap here to exit the slideshow and return to album selection.</string>
-
     <!-- Settings tour steps -->
     <string name="tour_settings_overview_title">Settings Overview</string>
     <string name="tour_settings_overview_body">All changes save automatically — no save button needed. Scroll down to explore each section.</string>

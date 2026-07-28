@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -91,7 +90,6 @@ import java.util.Locale
 
 @Composable
 fun SlideshowScreen(
-    onClose: () -> Unit,
     onSettings: () -> Unit,
     onChangeAlbums: () -> Unit,
     onMediaSelection: () -> Unit = {},
@@ -480,12 +478,6 @@ fun SlideshowScreen(
                             modifier = Modifier.tourTarget("slideshow_settings_gear", tourState),
                         ) {
                             Icon(Icons.Default.Settings, "Settings", tint = Color.White)
-                        }
-                        IconButton(
-                            onClick = onClose,
-                            modifier = Modifier.tourTarget("slideshow_close", tourState),
-                        ) {
-                            Icon(Icons.Default.Close, "Close", tint = Color.White)
                         }
                     }
                 }

@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Update-Anzeige</string>
     <string name="tour_slideshow_update_body">Wenn ein Update verfügbar ist, erscheint dieses Symbol hier, damit du die neueste Version installieren kannst. Wenn es nicht angezeigt wird, bist du bereits auf dem neuesten Stand.</string>
 <string name="tour_slideshow_settings_title">Sofort anpassen</string>
-    <string name="tour_slideshow_settings_body">Öffne die Einstellungen, ohne die Diashow zu verlassen — ändere Intervall, aktiviere die Uhr und mehr.</string>
-    <string name="tour_slideshow_close_title">Diashow beenden</string>
-    <string name="tour_slideshow_close_body">Tippe hier, um die Diashow zu beenden und zur Albumauswahl zurückzukehren.</string>
-    <string name="tour_settings_overview_title">Einstellungsüberblick</string>
+    <string name="tour_slideshow_settings_body">Öffne die Einstellungen, ohne die Diashow zu verlassen — ändere Intervall, aktiviere die Uhr und mehr.</string>    <string name="tour_settings_overview_title">Einstellungsüberblick</string>
     <string name="tour_settings_overview_body">Alle Änderungen werden automatisch gespeichert — keine Speichertaste. Scrolle nach unten, um jeden Abschnitt zu erkunden.</string>
     <string name="tour_settings_system_title">System &amp; Autostart</string>
     <string name="tour_settings_system_body">Beim Start starten und Launcher-Modus lassen die App automatisch starten — ideal für dedizierte Fotoframes.</string>

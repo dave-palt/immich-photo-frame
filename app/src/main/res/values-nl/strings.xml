@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Update-indicator</string>
     <string name="tour_slideshow_update_body">Als er een update beschikbaar is, verschijnt dit icoon hier zodat u de nieuwste versie kunt installeren. Als het niet zichtbaar is, bent u al up-to-date.</string>
 <string name="tour_slideshow_settings_title">Direct aanpassen</string>
-    <string name="tour_slideshow_settings_body">Open de instellingen zonder de diavoorstelling te verlaten — wijzig interval, schakel de klok in en meer.</string>
-    <string name="tour_slideshow_close_title">Diavoorstelling sluiten</string>
-    <string name="tour_slideshow_close_body">Tik hier om de diavoorstelling te sluiten en terug te keren naar de albumselectie.</string>
-    <string name="tour_settings_overview_title">Overzicht instellingen</string>
+    <string name="tour_slideshow_settings_body">Open de instellingen zonder de diavoorstelling te verlaten — wijzig interval, schakel de klok in en meer.</string>    <string name="tour_settings_overview_title">Overzicht instellingen</string>
     <string name="tour_settings_overview_body">Alle wijzigingen worden automatisch opgeslagen — geen opslanknop nodig. Scroll naar beneden om elke sectie te verkennen.</string>
     <string name="tour_settings_system_title">Systeem en autostart</string>
     <string name="tour_settings_system_body">Opstarten bij opstart en Launcher-modus laten de app automatisch starten — ideaal voor speciale fotolijsten.</string>

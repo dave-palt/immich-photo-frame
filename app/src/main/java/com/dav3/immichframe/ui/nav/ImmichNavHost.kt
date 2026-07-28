@@ -74,7 +74,11 @@ fun ImmichNavHost() {
         composable(Routes.SETUP) {
             SetupScreen(
                 onSuccess = {
-                    navController.navigate(Routes.ALBUMS) {
+                    // After authentication, show Settings so the user can
+                    // configure the frame before picking albums. Settings back
+                    // is driven by startRoute — at this point key is set but no
+                    // albums, so back goes to Albums automatically.
+                    navController.navigate(Routes.SETTINGS) {
                         popUpTo(Routes.SETUP) { inclusive = true }
                     }
                 },
@@ -90,7 +94,6 @@ fun ImmichNavHost() {
         }
         composable(Routes.SLIDESHOW) {
             SlideshowScreen(
-                onClose = { navController.popBackStack() },
                 onSettings = { navController.navigate(Routes.SETTINGS) },
                 onChangeAlbums = {
                     navController.navigate(Routes.ALBUMS) {

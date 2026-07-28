@@ -202,10 +202,7 @@
     <string name="tour_slideshow_update_title">Wskaźnik Aktualizacji</string>
     <string name="tour_slideshow_update_body">Gdy aktualizacja jest dostępna, ta ikona pojawia się tutaj, abyś mógł zainstalować najnowszą wersję. Jeśli jej nie ma, masz już najnowszą wersję.</string>
 <string name="tour_slideshow_settings_title">Dostosuj w locie</string>
-    <string name="tour_slideshow_settings_body">Otwórz ustawienia bez wychodzenia z pokazu slajdów — zmień interwał, włącz zegar i więcej.</string>
-    <string name="tour_slideshow_close_title">Wyjdź z pokazu</string>
-    <string name="tour_slideshow_close_body">Naciśnij tutaj, aby wyjść z pokazu slajdów i wrócić do wyboru albumów.</string>
-    <string name="tour_settings_overview_title">Przegląd ustawień</string>
+    <string name="tour_slideshow_settings_body">Otwórz ustawienia bez wychodzenia z pokazu slajdów — zmień interwał, włącz zegar i więcej.</string>    <string name="tour_settings_overview_title">Przegląd ustawień</string>
     <string name="tour_settings_overview_body">Wszystkie zmiany zapisują się automatycznie — bez przycisku zapisu. Przewiń w dół, aby przejrzeć sekcje.</string>
     <string name="tour_settings_system_title">System i autostart</string>
     <string name="tour_settings_system_body">Uruchamianie przy starcie i Tryb Launchera pozwalają aplikacji uruchamiać się automatycznie — idealne dla dedykowanych ramek cyfrowych.</string>

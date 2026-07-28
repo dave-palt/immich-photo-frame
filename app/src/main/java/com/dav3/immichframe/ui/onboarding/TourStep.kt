@@ -160,13 +160,6 @@ object TourSteps {
             bodyRes = R.string.tour_slideshow_settings_body,
             targetKey = "slideshow_settings_gear",
         ),
-        TourStep(
-            id = "slideshow_close",
-            screen = TourScreen.SLIDESHOW,
-            titleRes = R.string.tour_slideshow_close_title,
-            bodyRes = R.string.tour_slideshow_close_body,
-            targetKey = "slideshow_close",
-        ),
     )
 
     val SETTINGS = listOf(
