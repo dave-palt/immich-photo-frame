@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">Uwierzytelnij</string>
     <string name="biometric_auth_subtitle_key">Uwierzytelnij się, aby wyświetlić klucz API</string>
     <string name="biometric_auth_subtitle_media">Uwierzytelnij się, aby zarządzać wyborem mediów</string>
+    <string name="biometric_auth_subtitle_albums">Uwierzytelnij się, aby zmienić albumy</string>
     <string name="biometric_not_setup_title">Wymagana blokada ekranu</string>
     <string name="biometric_not_setup_message">To działanie wymaga blokady ekranu (odcisk palca, twarz lub PIN). Skonfiguruj ją w ustawieniach bezpieczeństwa urządzenia, aby korzystać z tej funkcji.</string>
 

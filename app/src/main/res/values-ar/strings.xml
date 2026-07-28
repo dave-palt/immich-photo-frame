@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">المصادقة</string>
     <string name="biometric_auth_subtitle_key">المصادقة لعرض مفتاح API الخاص بك</string>
     <string name="biometric_auth_subtitle_media">المصادقة لإدارة اختيار الوسائط</string>
+    <string name="biometric_auth_subtitle_albums">المصادقة لتغيير الألبومات</string>
     <string name="biometric_not_setup_title">مطلوب قفل الشاشة</string>
     <string name="biometric_not_setup_message">يتطلب هذا الإجراء قفل شاشة (بصمة أو وجه أو رمز PIN). قم بإعداد واحد في إعدادات أمان جهازك لاستخدام هذه الميزة.</string>
 

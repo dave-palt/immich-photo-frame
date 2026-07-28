@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">Аутентификация</string>
     <string name="biometric_auth_subtitle_key">Пройдите аутентификацию, чтобы просмотреть API-ключ</string>
     <string name="biometric_auth_subtitle_media">Пройдите аутентификацию для управления выбором медиа</string>
+    <string name="biometric_auth_subtitle_albums">Пройдите аутентификацию для смены альбомов</string>
     <string name="biometric_not_setup_title">Требуется блокировка экрана</string>
     <string name="biometric_not_setup_message">Это действие требует блокировки экрана (отпечаток, лицо или PIN-код). Настройте её в параметрах безопасности устройства, чтобы использовать эту функцию.</string>
 

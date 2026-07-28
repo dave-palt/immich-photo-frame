@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">Verifiëren</string>
     <string name="biometric_auth_subtitle_key">Verifieer om uw API-sleutel te bekijken</string>
     <string name="biometric_auth_subtitle_media">Verifieer om mediaselectie te beheren</string>
+    <string name="biometric_auth_subtitle_albums">Verifieer om albums te wijzigen</string>
     <string name="biometric_not_setup_title">Schermvergrendeling vereist</string>
     <string name="biometric_not_setup_message">Deze actie vereist een schermvergrendeling (vingerafdruk, gezicht of PIN). Stel er een in de beveiligingsinstellingen van uw apparaat om deze functie te gebruiken.</string>
 

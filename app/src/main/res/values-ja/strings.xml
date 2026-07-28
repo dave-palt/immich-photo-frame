@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">認証</string>
     <string name="biometric_auth_subtitle_key">APIキーを表示するには認証してください</string>
     <string name="biometric_auth_subtitle_media">メディア選択を管理するには認証してください</string>
+    <string name="biometric_auth_subtitle_albums">アルバムを変更するには認証してください</string>
     <string name="biometric_not_setup_title">画面ロックが必要です</string>
     <string name="biometric_not_setup_message">この操作には画面ロック（指紋、顔、またはPIN）が必要です。この機能を使用するには、デバイスのセキュリティ設定で設定してください。</string>
 

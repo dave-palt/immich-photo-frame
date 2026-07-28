@@ -117,6 +117,7 @@
     <string name="biometric_auth_title">Authenticate</string>
     <string name="biometric_auth_subtitle_key">Authenticate to view your API key</string>
     <string name="biometric_auth_subtitle_media">Authenticate to manage media selection</string>
+    <string name="biometric_auth_subtitle_albums">Authenticate to change albums</string>
     <string name="biometric_not_setup_title">Screen Lock Required</string>
     <string name="biometric_not_setup_message">This action requires a screen lock (fingerprint, face, or PIN). Set one up in your device security settings to use this feature.</string>
 

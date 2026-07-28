@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">Authentifizieren</string>
     <string name="biometric_auth_subtitle_key">Authentifizieren Sie sich, um Ihren API-Schlüssel anzuzeigen</string>
     <string name="biometric_auth_subtitle_media">Authentifizieren Sie sich, um die Medienauswahl zu verwalten</string>
+    <string name="biometric_auth_subtitle_albums">Authentifizieren Sie sich, um die Alben zu ändern</string>
     <string name="biometric_not_setup_title">Bildschirmsperre erforderlich</string>
     <string name="biometric_not_setup_message">Diese Aktion erfordert eine Bildschirmsperre (Fingerabdruck, Gesicht oder PIN). Richten Sie eine in den SicherheitsEinstellungen Ihres Geräts ein, um diese Funktion zu nutzen.</string>
 
