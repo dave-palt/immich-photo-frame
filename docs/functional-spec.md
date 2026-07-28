@@ -242,8 +242,9 @@ Accessible from:
 Options:
 - **Slideshow Interval** — seconds per image (5–120, default 30)
 - **Image Fit** — Contain (letterbox) or Cover (crop to fill)
-- **Adaptive Background** — fill letterbox bars with dominant color from each
-  photo (uses Palette API, default off)
+- **Adaptive Background** — fill letterbox bars with a gradient derived from
+  each photo's edge colors (top/bottom for horizontal bars, left/right for
+  vertical bars; uses Palette API, default off)
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)

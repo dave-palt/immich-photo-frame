@@ -41,7 +41,7 @@
     <string name="contain">Вписать</string>
     <string name="cover">Заполнить</string>
     <string name="adaptive_background">Адаптивный фон</string>
-    <string name="adaptive_background_desc">Заполняет чёрные полосы средним цветом каждого фото</string>
+    <string name="adaptive_background_desc">Заполняет чёрные полосы градиентом из верхних/нижних цветов каждого фото</string>
     <string name="fullscreen">Полноэкранный режим</string>
     <string name="fullscreen_desc">Скрыть системные панели</string>
     <string name="keep_screen_on">Не выключать экран</string>

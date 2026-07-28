@@ -41,7 +41,7 @@
     <string name="contain">Conter</string>
     <string name="cover">Cobrir</string>
     <string name="adaptive_background">Fundo adaptativo</string>
-    <string name="adaptive_background_desc">Preenche as barras pretas com a cor média de cada foto</string>
+    <string name="adaptive_background_desc">Preenche as barras pretas com um gradiente das cores superior/inferior de cada foto</string>
     <string name="fullscreen">Ecrã inteiro</string>
     <string name="fullscreen_desc">Ocultar barras do sistema</string>
     <string name="keep_screen_on">Manter ecrã ligado</string>

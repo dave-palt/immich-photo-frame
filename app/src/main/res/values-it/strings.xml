@@ -41,7 +41,7 @@
     <string name="contain">Contieni</string>
     <string name="cover">Riempimento</string>
     <string name="adaptive_background">Sfondo adattivo</string>
-    <string name="adaptive_background_desc">Riempie le barre nere con il colore medio di ogni foto</string>
+    <string name="adaptive_background_desc">Riempie le barre nere con un sfumatura dai colori superiore/inferiore di ogni foto</string>
     <string name="fullscreen">Schermo intero</string>
     <string name="fullscreen_desc">Nascondi barre di sistema</string>
     <string name="keep_screen_on">Schermo sempre acceso</string>

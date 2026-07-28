@@ -41,7 +41,7 @@
     <string name="contain">Dopasuj</string>
     <string name="cover">Wypełnij</string>
     <string name="adaptive_background">Adaptacyjne tło</string>
-    <string name="adaptive_background_desc">Wypełnia czarne paski średnim kolorem każdego zdjęcia</string>
+    <string name="adaptive_background_desc">Wypełnia czarne paski gradientem z górnych/dolnych kolorów każdego zdjęcia</string>
     <string name="fullscreen">Pełny ekran</string>
     <string name="fullscreen_desc">Ukryj paski systemowe</string>
     <string name="keep_screen_on">Utrzymuj ekran włączony</string>

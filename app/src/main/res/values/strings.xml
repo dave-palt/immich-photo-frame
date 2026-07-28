@@ -42,7 +42,7 @@
     <string name="contain">Contain</string>
     <string name="cover">Cover</string>
     <string name="adaptive_background">Adaptive Background</string>
-    <string name="adaptive_background_desc">Fill letterbox bars with average color from each photo</string>
+    <string name="adaptive_background_desc">Fill letterbox bars with a gradient from each photo\'s top/bottom colors</string>
     <string name="fullscreen">Fullscreen</string>
     <string name="fullscreen_desc">Hide system bars</string>
     <string name="keep_screen_on">Keep Screen On</string>

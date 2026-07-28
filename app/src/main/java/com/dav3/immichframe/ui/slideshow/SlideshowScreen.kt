@@ -53,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -72,6 +73,7 @@ import androidx.media3.ui.PlayerView
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.BorderColors
 import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
@@ -83,7 +85,7 @@ import com.dav3.immichframe.ui.onboarding.TourSteps
 import com.dav3.immichframe.ui.onboarding.rememberTourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.update.UpdateViewModel
-import com.dav3.immichframe.util.extractDominantColor
+import com.dav3.immichframe.util.extractBorderColors
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -271,8 +273,10 @@ fun SlideshowScreen(
         }
     }
 
-    // Adaptive background — extract dominant color from current image
-    var dominantColor by remember { mutableStateOf(Color.Black) }
+    // Adaptive background — extract edge colors from current image's thumbnail.
+    // We sample the top/bottom and left/right halves so the letterbox bars can
+    // be painted as a gradient that matches the adjacent slice of the photo.
+    var borderColors by remember { mutableStateOf<BorderColors?>(null) }
     val context = LocalContext.current
     LaunchedEffect(state.currentIndex, s.adaptiveBackground, state.assets.size) {
         if (s.adaptiveBackground && state.assets.isNotEmpty()) {
@@ -280,10 +284,34 @@ fun SlideshowScreen(
             // Always extract from the small JPEG thumbnail — it's fast for
             // all asset types (GIFs, videos, regular images) since Coil only
             // needs a 128px bitmap for Palette.
-            dominantColor = extractDominantColor(context, viewModel.thumbnailUrl(asset.id))
+            borderColors = extractBorderColors(context, viewModel.thumbnailUrl(asset.id))
         } else {
-            dominantColor = Color.Black
+            borderColors = null
         }
+    }
+
+    // Pick gradient direction based on which axis has letterbox bars.
+    // When the image is wider than the container → top/bottom bars → vertical gradient.
+    // When the image is taller than the container → left/right bars → horizontal gradient.
+    // When perfectly fitted (no bars) the gradient is hidden behind the image anyway.
+    val adaptiveBrush = if (
+        s.adaptiveBackground &&
+        !nightActive &&
+        borderColors != null &&
+        containerSize.width > 0 &&
+        containerSize.height > 0
+    ) {
+        val bc = borderColors!!
+        val containerAspect = containerSize.width.toFloat() / containerSize.height
+        if (bc.aspectRatio > containerAspect) {
+            // Image wider than container → bars on top/bottom
+            Brush.verticalGradient(listOf(bc.top, bc.bottom))
+        } else {
+            // Image taller than (or equal to) container → bars on left/right
+            Brush.horizontalGradient(listOf(bc.left, bc.right))
+        }
+    } else {
+        null
     }
 
     TourHost(
@@ -297,7 +325,7 @@ fun SlideshowScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(if (s.adaptiveBackground && !nightActive) dominantColor else Color.Black)
+                    .background(adaptiveBrush ?: Brush.verticalGradient(listOf(Color.Black, Color.Black)))
                     .onSizeChanged { containerSize = it }
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { controlsVisible = !controlsVisible })

@@ -41,7 +41,7 @@
     <string name="contain">포함</string>
     <string name="cover">채우기</string>
     <string name="adaptive_background">적응형 배경</string>
-    <string name="adaptive_background_desc">각 사진의 평균 색상으로 레터박스 막대 채우기</string>
+    <string name="adaptive_background_desc">각 사진의 상하 색상 그라데이션으로 레터박스 막대 채우기</string>
     <string name="fullscreen">전체 화면</string>
     <string name="fullscreen_desc">시스템 바 숨기기</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
