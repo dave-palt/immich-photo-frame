@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">验证</string>
     <string name="biometric_auth_subtitle_key">验证以查看您的API密钥</string>
     <string name="biometric_auth_subtitle_media">验证以管理媒体选择</string>
+    <string name="biometric_auth_subtitle_albums">验证以更改相册</string>
     <string name="biometric_not_setup_title">需要屏幕锁定</string>
     <string name="biometric_not_setup_message">此操作需要屏幕锁定（指纹、面容或PIN码）。请在设备安全设置中设置一个才能使用此功能。</string>
 

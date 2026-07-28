@@ -94,6 +94,7 @@
     <string name="biometric_auth_title">Autentica</string>
     <string name="biometric_auth_subtitle_key">Autenticati per visualizzare la tua chiave API</string>
     <string name="biometric_auth_subtitle_media">Autenticati per gestire la selezione dei media</string>
+    <string name="biometric_auth_subtitle_albums">Autenticati per cambiare gli album</string>
     <string name="biometric_not_setup_title">Blocco schermo richiesto</string>
     <string name="biometric_not_setup_message">Questa azione richiede un blocco schermo (impronta, volto o PIN). Configurane uno nelle impostazioni di sicurezza del dispositivo per utilizzare questa funzione.</string>
 

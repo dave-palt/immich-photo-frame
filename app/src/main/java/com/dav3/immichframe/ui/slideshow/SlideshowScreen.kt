@@ -114,6 +114,7 @@ fun SlideshowScreen(
 
     val authTitle = stringResource(R.string.biometric_auth_title)
     val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
+    val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
 
     LaunchedEffect(Unit) { viewModel.load() }
 
@@ -496,7 +497,14 @@ fun SlideshowScreen(
                             }
                         }
                         IconButton(
-                            onClick = onChangeAlbums,
+                            onClick = {
+                                biometric.launch(
+                                    title = authTitle,
+                                    subtitle = authSubtitleAlbums,
+                                    onNotSetup = { showBioNotSetup = true },
+                                    onSuccess = { onChangeAlbums() },
+                                )
+                            },
                             modifier = Modifier.tourTarget("slideshow_albums", tourState),
                         ) {
                             Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)

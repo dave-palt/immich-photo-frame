@@ -130,9 +130,8 @@ Tap the screen to reveal controls:
   show/hide them from the slideshow (see F8)
 - Update status icon (checking / downloading / ready)
 - Launcher switch (apps icon, when Launcher Mode is active)
-- Albums (photo library icon)
+- Albums (photo library icon) — biometric-gated; returns to album selection
 - Settings (gear icon)
-- Close slideshow (return to album selection)
 
 Controls auto-hide after 5 seconds of no interaction.
 
@@ -310,7 +309,8 @@ Options:
   - When `asset.download` is denied, the **Skip Videos** toggle is locked
     ON (can't be turned off) with subtitle "Locked — API key lacks
     'asset.download' permission". The media cache also skips downloading.
-- **Albums** — change album selection (returns to album picker)
+- **Albums** — change album selection (returns to album picker). Requires
+  biometric / device-credential authentication to open.
 - **Reset All Settings** — clears all settings, credentials, album selection,
   and cached data, returns to setup screen. Tour completion is **preserved**
   (use "Reset All Tours" to clear tour progress).
@@ -404,6 +404,7 @@ a user lands on a screen — only steps not yet completed are shown.
   selection grid where the user can choose which photos and videos appear.
 
 - **`slideshow_albums`**: highlights the back-to-album-selection button.
+  This button is biometric-gated.
 - **`slideshow_update`**: highlights the update status icon. Since this icon
   normally only appears when an update is available, the tour force-shows a
   dimmed placeholder icon so the coachmark always has a visible target on the
