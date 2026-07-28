@@ -43,6 +43,28 @@ class MediaCacheWorker @AssistedInject constructor(
     }
 
     private suspend fun performFullSync(albumIds: List<String>) {
+        // If the API key lacks asset.download, skip the entire download phase —
+        // the cache can't fetch originals without it. Metadata sync still runs
+        // so the asset list stays current; images just won't be available offline.
+        val permStatus = settingsRepository.permissionStatus.first()
+        val downloadDenied = permStatus?.statuses?.get(
+            com.dav3.immichframe.domain.model.RequiredPermission.ASSET_DOWNLOAD,
+        ) == com.dav3.immichframe.domain.model.PermissionStatus.Denied
+
+        if (downloadDenied) {
+            mediaCacheRepository.updateSyncProgress(
+                SyncProgress(
+                    albumIds = albumIds,
+                    currentAlbum = "",
+                    phase = SyncProgress.Phase.COMPLETE,
+                    totalAssets = 0,
+                    processedAssets = 0,
+                    currentAsset = "Skipped — API key lacks asset.download permission",
+                ),
+            )
+            return
+        }
+
         mediaCacheRepository.updateSyncProgress(
             SyncProgress(
                 albumIds = albumIds,
@@ -115,8 +137,22 @@ class MediaCacheWorker @AssistedInject constructor(
             AlbumSyncState(albumId = albumId)
         }
         val cachedAssets = mediaCacheRepository.getCachedAssets(albumId).getOrElse { emptyList() }
-        val cachedIds = cachedAssets.map { it.id }.toSet()
         val remoteIds = remoteAssets.map { it.id }.toSet()
+
+        // Purge corrupt cache entries: files that are missing, empty, or whose
+        // on-disk size doesn't match the stored fileSize. These are removed from
+        // the DB so they're treated as "not cached" and redownloaded below.
+        val corruptIds = cachedAssets.filter { cached ->
+            val file = File(cached.filePath)
+            !file.exists() || file.length() == 0L || file.length() != cached.fileSize
+        }.map { it.id }
+        if (corruptIds.isNotEmpty()) {
+            android.util.Log.w("MediaCacheWorker", "Purging ${corruptIds.size} corrupt cache entries: ${corruptIds.take(3)}")
+            mediaCacheRepository.removeAssets(corruptIds)
+        }
+        // Recompute after purge so the download loop redownloads them.
+        val validCachedAssets = cachedAssets.filter { it.id !in corruptIds }
+        val validCachedIds = validCachedAssets.map { it.id }.toSet()
 
         // Remove assets that are in cache but no longer in the album.
         // Guard: only reconcile when we actually got a non-empty remote list —
@@ -124,7 +160,7 @@ class MediaCacheWorker @AssistedInject constructor(
         // service restarting), and wiping the cache on that would leave the
         // user with nothing to display offline.
         if (remoteAssets.isNotEmpty()) {
-            val toRemove = cachedAssets.filter { it.id !in remoteIds }
+            val toRemove = validCachedAssets.filter { it.id !in remoteIds }
             if (toRemove.isNotEmpty()) {
                 mediaCacheRepository.removeAssets(toRemove.map { it.id })
             }
@@ -144,12 +180,12 @@ class MediaCacheWorker @AssistedInject constructor(
                 ),
             )
 
-            if (asset.id !in cachedIds) {
+            if (asset.id !in validCachedIds) {
                 downloadAsset(albumId, asset).onSuccess { cached ->
                     mediaCacheRepository.upsertAssets(listOf(cached))
                 }
             } else {
-                val cached = cachedAssets.find { it.id == asset.id }
+                val cached = validCachedAssets.find { it.id == asset.id }
                 if (cached?.lastModified != asset.lastModified) {
                     downloadAsset(albumId, asset).onSuccess { updated ->
                         mediaCacheRepository.upsertAssets(listOf(updated))
@@ -179,29 +215,66 @@ class MediaCacheWorker @AssistedInject constructor(
             val thumbUrl = "${base}assets/${asset.id}/thumbnail?size=thumbnail&apiKey=$apiKey"
 
             val cacheDir = mediaCacheRepository.cacheDir
-            val filePath = File(cacheDir, asset.id).absolutePath
-            val thumbPath = File(cacheDir, "${asset.id}_thumb").absolutePath
+            val filePath = File(cacheDir, asset.id)
+            val thumbPath = File(cacheDir, "${asset.id}_thumb")
+            val tmpPath = File(cacheDir, "${asset.id}.tmp")
 
             val client = OkHttpClient()
 
-            // Download main file
+            // Download main file to a .tmp file first, then atomically rename
+            // to the final path only after validating completeness. This prevents
+            // truncated/partial files from being served as cached media.
             val response = client.newCall(Request.Builder().url(fileUrl).build()).execute()
             if (!response.isSuccessful) {
                 return@withContext kotlin.Result.failure(
                     Exception("Download failed: ${response.code}"),
                 )
             }
+            val expectedLength = response.header("Content-Length")?.toLongOrNull() ?: -1L
             val body = response.body?.byteStream()
                 ?: return@withContext kotlin.Result.failure(Exception("Empty response body"))
-            File(filePath).outputStream().use { output -> body.copyTo(output) }
+            tmpPath.outputStream().use { output -> body.copyTo(output) }
 
-            // Download thumbnail (best-effort)
+            // Validate downloaded size against Content-Length (if server provided it).
+            // A mismatch means the download was truncated — delete and fail so the
+            // caller can retry and the UI falls back to the network URL.
+            val actualLength = tmpPath.length()
+            if (expectedLength > 0 && actualLength != expectedLength) {
+                tmpPath.delete()
+                return@withContext kotlin.Result.failure(
+                    Exception("Download truncated: got $actualLength/$expectedLength bytes"),
+                )
+            }
+            if (actualLength == 0L) {
+                tmpPath.delete()
+                return@withContext kotlin.Result.failure(Exception("Downloaded file is empty"))
+            }
+            // Atomic move — the final path only exists once the file is complete.
+            if (!tmpPath.renameTo(filePath)) {
+                tmpPath.delete()
+                return@withContext kotlin.Result.failure(Exception("Failed to move temp file to final path"))
+            }
+
+            // Download thumbnail (best-effort) — same atomic pattern.
             var thumbPathResult: String? = null
+            val thumbTmp = File(cacheDir, "${asset.id}_thumb.tmp")
             val thumbResponse = client.newCall(Request.Builder().url(thumbUrl).build()).execute()
             if (thumbResponse.isSuccessful) {
+                val thumbExpected = thumbResponse.header("Content-Length")?.toLongOrNull() ?: -1L
                 thumbResponse.body?.byteStream()?.use { input ->
-                    File(thumbPath).outputStream().use { output -> input.copyTo(output) }
-                    thumbPathResult = thumbPath
+                    thumbTmp.outputStream().use { output -> input.copyTo(output) }
+                    val thumbActual = thumbTmp.length()
+                    if (thumbExpected > 0 && thumbActual != thumbExpected) {
+                        thumbTmp.delete()
+                    } else if (thumbActual > 0) {
+                        if (thumbTmp.renameTo(thumbPath)) {
+                            thumbPathResult = thumbPath.absolutePath
+                        } else {
+                            thumbTmp.delete()
+                        }
+                    } else {
+                        thumbTmp.delete()
+                    }
                 }
             }
 
@@ -210,12 +283,13 @@ class MediaCacheWorker @AssistedInject constructor(
                     id = asset.id,
                     albumId = albumId,
                     type = asset.type,
-                    filePath = filePath,
+                    filePath = filePath.absolutePath,
                     thumbnailPath = thumbPathResult,
-                    fileSize = File(filePath).length(),
+                    fileSize = filePath.length(),
                     checksum = null,
                     lastModified = System.currentTimeMillis(),
                     cachedAt = System.currentTimeMillis(),
+                    originalMimeType = asset.originalMimeType,
                 ),
             )
         } catch (e: Exception) {

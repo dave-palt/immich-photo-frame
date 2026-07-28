@@ -4,16 +4,20 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dav3.immichframe.data.sync.SyncScheduler
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.model.PhotoAnimation
 import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
+import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
 import com.dav3.immichframe.ui.onboarding.TourSteps
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -28,6 +32,8 @@ data class SettingsUiState(
     val settings: SlideshowSettings = SlideshowSettings(),
     val serverUrl: String = "",
     val apiKey: String = "",
+    val permissionStatus: PermissionCheckResult? = null,
+    val permissionCheckInProgress: Boolean = false,
 )
 
 @HiltViewModel
@@ -36,15 +42,20 @@ class SettingsViewModel
 constructor(
     private val settingsRepo: SettingsRepository,
     private val immichRepo: ImmichRepository,
+    private val mediaCacheRepo: MediaCacheRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
+    private val permissionCheckingFlow = MutableStateFlow(false)
+
     val uiState: StateFlow<SettingsUiState> =
         combine(
             settingsRepo.slideshowSettings,
             settingsRepo.serverUrl,
             settingsRepo.apiKey,
-        ) { slideshow, url, key ->
-            SettingsUiState(slideshow, url, key)
+            settingsRepo.permissionStatus,
+            permissionCheckingFlow,
+        ) { slideshow, url, key, perms, checking ->
+            SettingsUiState(slideshow, url, key, perms, checking)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
     val onboardingSteps: StateFlow<Set<String>> =
@@ -63,6 +74,40 @@ constructor(
 
     fun resetOnboarding() {
         viewModelScope.launch { settingsRepo.resetOnboarding() }
+    }
+
+    /**
+     * Re-probe all API endpoints and update the stored permission status.
+     * Called when the Settings screen opens and via the "Re-check" button.
+     */
+    fun recheckPermissions() {
+        viewModelScope.launch {
+            permissionCheckingFlow.value = true
+            immichRepo.checkPermissions().onSuccess { result ->
+                settingsRepo.setPermissionStatus(result)
+                enforceDegradedSettings(result)
+            }.onFailure {
+                // Network error — keep the previous status, don't wipe it
+            }
+            permissionCheckingFlow.value = false
+        }
+    }
+
+    /**
+     * Force-off any setting gated by a missing optional permission.
+     * Mirrors the logic in SetupViewModel.
+     */
+    private suspend fun enforceDegradedSettings(result: PermissionCheckResult) {
+        val currentSettings = settingsRepo.slideshowSettings.first()
+        var newSettings = currentSettings
+        for (perm in result.missingOptional) {
+            when (perm.gatedSettingKey) {
+                "skip_videos" -> newSettings = newSettings.copy(skipVideos = true)
+            }
+        }
+        if (newSettings != currentSettings) {
+            settingsRepo.setSlideshowSettings(newSettings)
+        }
     }
 
     fun resetOnboardingForSettings() {
@@ -106,6 +151,10 @@ constructor(
 
     fun updateClockSize(size: Float) = update { it.copy(clockSize = size) }
 
+    fun toggleClockSeconds() = update { it.copy(clockSeconds = !it.clockSeconds) }
+
+    fun updateClockFormat(format: ClockFormat) = update { it.copy(clockFormat = format) }
+
     fun toggleKeepScreenOn() = update { it.copy(keepScreenOn = !it.keepScreenOn) }
 
     fun toggleFullscreen() = update { it.copy(fullscreen = !it.fullscreen) }
@@ -137,6 +186,30 @@ constructor(
 
     fun updateSyncInterval(minutes: Int) = update { it.copy(syncIntervalMinutes = minutes) }
 
+    fun toggleNightMode() = update { it.copy(nightMode = !it.nightMode) }
+
+    /**
+     * Move the night-mode start time, preserving the window duration. The end
+     * time shifts by the same delta so a 22:00→07:00 window moved to 23:00
+     * becomes 23:00→08:00. Prevents degenerate windows where start >= end.
+     */
+    fun updateNightModeStart(minutes: Int) = update {
+        val newStart = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newEnd = (newStart + duration) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
+
+    /** Move the night-mode end time, preserving the window duration. */
+    fun updateNightModeEnd(minutes: Int) = update {
+        val newEnd = minutes.coerceIn(0, 1439)
+        val duration = (it.nightModeEnd - it.nightModeStart + 1440) % 1440
+        val newStart = (newEnd - duration + 1440) % 1440
+        it.copy(nightModeStart = newStart, nightModeEnd = newEnd)
+    }
+
+    fun updateNightModeBrightness(percent: Int) = update { it.copy(nightModeBrightness = percent.coerceIn(0, 100)) }
+
     fun toggleClockSnapToGrid() = update { it.copy(clockSnapToGrid = !it.clockSnapToGrid) }
 
     fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }
@@ -165,6 +238,11 @@ constructor(
     }
 
     fun resetAll() = viewModelScope.launch {
+        // Wipe the media cache BEFORE settings so a rapid re-login can't
+        // serve cached files from a previous account. Without this, the
+        // cache-first slideshow loader shows the old account's photos even
+        // after DataStore + EncryptedSharedPreferences are cleared.
+        mediaCacheRepo.clearAll()
         settingsRepo.clearAll()
     }
 

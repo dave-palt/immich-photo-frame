@@ -11,9 +11,30 @@ data class Asset(
     val id: String,
     val type: AssetType,
     val lastModified: Long = 0,
-)
+    val originalMimeType: String? = null,
+) {
+    /** Whether this asset is an animated GIF (needs the /original endpoint for Coil's GifDecoder). */
+    val isGif: Boolean get() = originalMimeType?.equals("image/gif", ignoreCase = true) == true
+}
 
 enum class AssetType { IMAGE, VIDEO }
+
+/**
+ * Colors sampled from the four edges of the thumbnail, used to paint the
+ * letterbox bars so each border matches the adjacent slice of the photo.
+ *
+ * [aspectRatio] is width/height of the decoded thumbnail — the same aspect
+ * ratio as the full image (the thumbnail is just a scaled-down original).
+ * Used by the caller to decide whether bars are top/bottom (vertical
+ * gradient) or left/right (horizontal gradient).
+ */
+data class BorderColors(
+    val top: androidx.compose.ui.graphics.Color,
+    val bottom: androidx.compose.ui.graphics.Color,
+    val left: androidx.compose.ui.graphics.Color,
+    val right: androidx.compose.ui.graphics.Color,
+    val aspectRatio: Float,
+)
 
 data class ClockPosition(
     val x: Float = -1f, // -1 = unset (default bottom-start)
@@ -25,6 +46,8 @@ data class SlideshowSettings(
     val transitionSeconds: Float = 1f,
     val fillMode: FillMode = FillMode.CONTAIN,
     val showClock: Boolean = false,
+    val clockSeconds: Boolean = false,
+    val clockFormat: ClockFormat = ClockFormat.H24,
     val clockSize: Float = 48f, // sp
     val clockPosition: ClockPosition = ClockPosition(),
     val keepScreenOn: Boolean = true,
@@ -49,7 +72,27 @@ data class SlideshowSettings(
     // Media Cache
     val autoSync: Boolean = true,
     val syncIntervalMinutes: Int = 30,
+    // Night Mode (brightness-based display schedule)
+    val nightMode: Boolean = false,
+    val nightModeStart: Int = 1320, // minutes since midnight (22:00)
+    val nightModeEnd: Int = 420, // minutes since midnight (07:00)
+    val nightModeBrightness: Int = 0, // 0-100 percent
 ) {
+    /**
+     * Whether the current wall-clock time falls inside the configured night-mode
+     * window. Handles wrap-around (start > end means overnight, e.g. 22:00→07:00).
+     */
+    fun isNightModeActive(hourMinute: Int): Boolean {
+        val now = hourMinute
+        return if (nightModeStart <= nightModeEnd) {
+            // Same-day window, e.g. 09:00→17:00
+            now in nightModeStart until nightModeEnd
+        } else {
+            // Overnight window, e.g. 22:00→07:00
+            now >= nightModeStart || now < nightModeEnd
+        }
+    }
+
     /** Non-random enabled animations. Empty = no animation. */
     val enabledAnimations: List<PhotoAnimation>
         get() = PhotoAnimation.entries.filter { anim ->
@@ -75,6 +118,8 @@ enum class PhotoAnimation {
 
 enum class FillMode { CONTAIN, COVER }
 
+enum class ClockFormat { H12, H24 }
+
 // Media Cache Models
 
 data class CachedAsset(
@@ -87,6 +132,7 @@ data class CachedAsset(
     val checksum: String?,
     val lastModified: Long,
     val cachedAt: Long,
+    val originalMimeType: String? = null,
 )
 
 data class AlbumSyncState(

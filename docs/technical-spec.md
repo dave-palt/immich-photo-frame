@@ -10,7 +10,7 @@
 | Target SDK | API 35 (Android 15) | Latest stable |
 | HTTP Client | Retrofit 2 + OkHttp | 2.11+ / 4.12+ |
 | JSON Parsing | Kotlinx Serialization | 1.7+ |
-| Image Loading | Coil 3 (Compose) | 3.0+ |
+| Image Loading | Coil 3 (Compose) + GifDecoder | 3.0+ |
 | Video Playback | Media3 ExoPlayer | 1.5.1 |
 | Color Extraction | AndroidX Palette | 1.0+ |
 | Animation | Compose Animation Core | (BOM) |
@@ -19,6 +19,7 @@
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Biometric Auth | AndroidX Biometric | 1.1.0 |
+| OAuth Browser | AndroidX Browser (Custom Tabs) | 1.8.0 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.2.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -41,6 +42,8 @@ immich-android/
 │   │   │   ├── remote/          # Retrofit API interfaces, DTOs
 │   │   │   │   ├── ImmichApi.kt       # Immich endpoints
 │   │   │   │   ├── GitHubApi.kt       # GitHub releases API (self-update)
+│   │   │   │   ├── ImmichAuthApi.kt   # Auth/login/key/OAuth endpoints (no x-api-key)
+│   │   │   │   ├── PkceHelper.kt       # PKCE code verifier/challenge
 │   │   │   │   ├── Dtos.kt            # Immich DTOs
 │   │   │   │   ├── GitHubDtos.kt      # GitHub DTOs
 │   │   │   │   └── ImmichRepositoryImpl.kt
@@ -60,12 +63,14 @@ immich-android/
 │   │   │   └── (repository/ is in di/)
 │   │   ├── domain/
 │   │   │   ├── model/           # Domain models (Album, Asset, Settings)
+│   │   │   │   ├── Models.kt            # Album, Asset, SlideshowSettings, SyncProgress
+│   │   │   │   └── RequiredPermission.kt # Permission registry + PermissionCheckResult
 │   │   │   ├── repository/      # Repository interfaces
 │   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
-│   │   │   ├── setup/           # Setup screen (URL + API key)
+│   │   │   ├── setup/           # Setup screen (domain validation → key generation/manual/OAuth)
 │   │   │   ├── albums/          # Album picker
 │   │   │   ├── slideshow/       # Slideshow player (images, video, clock)
 │   │   │   ├── media/           # Media selection grid (biometric-gated)
@@ -110,13 +115,25 @@ UI (Compose) → ViewModel → Repository → Retrofit → Immich API
 - **ViewModel** holds UI state as `StateFlow`, survives config changes.
 - **Repository** abstracts data sources (remote API + local storage).
 - **Coil** handles image fetching/caching transparently — the slideshow
-  feeds Coil image URLs and Coil manages the disk/memory cache.
+  feeds Coil image URLs and Coil manages the disk/memory cache. A custom
+  `SingletonImageLoader.Factory` in `ImmichFrameApp` registers
+  `GifDecoder.Factory()` so animated GIFs decode frame-by-frame.
 - **ExoPlayer (Media3)** handles video playback inline within the slideshow
   for video assets (when Skip Videos is off).
-- **Palette API** extracts dominant color from each image for adaptive
-  background (letterbox fill).
+- **Palette API** extracts dominant colors from each image's top/bottom and
+  left/right halves for adaptive background (per-edge letterbox gradient fill).
 - **Retrofit OkHttp interceptor** injects the `x-api-key` header on every
   Immich API call automatically.
+- **Night Mode** dims the screen during configured hours via per-window
+  brightness (`WindowManager.LayoutParams.screenBrightness`). A
+  `LaunchedEffect` in `SlideshowScreen` re-evaluates the current time every 5
+  seconds and sets `screenBrightness` to the configured percentage when inside
+  the night window, or `BRIGHTNESS_OVERRIDE_NONE` (defer to system) outside it.
+  While active, the slideshow is fully hidden behind a black overlay, the
+  adaptive background is forced to pure black, and the auto-advance timer is
+  paused (no photo/video fetching or rendering). The screen is never turned off
+  at the hardware level — this is a brightness-based fallback for devices
+  without built-in scheduled power on/off.
 
 ## Package Naming
 
@@ -138,7 +155,12 @@ makes the slideshow fully offline-capable once assets are synced. The same
 pattern applies to `MediaSelectionViewModel.thumbnailUrl()` for the
 media-selection grid.
 - **Image size**: Request preview thumbnails (`size=preview` in Immich API)
-  for slideshow display, not full originals — saves bandwidth and disk
+  for slideshow display, not full originals — saves bandwidth and disk.
+  **Exception: animated GIFs** are routed to `/original` (raw bytes) instead
+  of the `/thumbnail` JPEG transcode, otherwise the animation collapses to
+  a single frame. Detection is by `originalMimeType == "image/gif"`, which
+  is carried through `AssetDto` → `Asset` → `CachedAsset` (persisted as
+  `original_mime_type` in the cache DB).
 
 ### Auth for image/video URLs
 
@@ -146,6 +168,13 @@ Image and video URLs are constructed with the API key appended as a query
 parameter (`?apiKey=<key>`) for Coil and ExoPlayer to fetch without custom
 HTTP clients. API calls (Retrofit) use the `x-api-key` header via an
 OkHttp interceptor instead.
+
+**Permission probes use the same auth path as the feature they test**:
+steps 1–3 (`user.read`, `album.read`, `asset.read`) go through the Retrofit
+header path, but steps 4–5 (`asset.view`, `asset.download`) are probed via
+raw OkHttp with the `?apiKey=` query param — exactly how Coil/ExoPlayer
+load media. This ensures the probe reflects what the app actually does,
+not a code path it never uses.
 
 > **Note**: Immich v3 deprecated the `apiKey` query parameter in favor of
 > `key`. The app currently uses `apiKey` for image/video URLs and may need
@@ -162,8 +191,8 @@ loading.
 
 - **`cached_assets`** — one row per downloaded asset: `id`, `album_id`,
   `type` (IMAGE/VIDEO), `file_path`, `thumbnail_path`, `file_size`,
-  `checksum`, `last_modified`, `cached_at`. Indexed on `album_id`,
-  `cached_at`, `last_modified`.
+  `checksum`, `last_modified`, `cached_at`, `original_mime_type`. Indexed
+  on `album_id`, `cached_at`, `last_modified`.
 - **`album_sync_states`** — per-album sync metadata: `album_id` (PK),
   `last_synced_at`, `last_cursor`, `asset_count`.
 
@@ -243,6 +272,8 @@ Setup → Albums → Slideshow
 | Transition duration | DataStore | `transition_sec` | Float (0–3) |
 | Image fill mode | DataStore | `fill_mode` | String enum (CONTAIN/COVER) |
 | Show clock | DataStore | `show_clock` | String bool |
+| Clock seconds | DataStore | `clock_seconds` | String bool (default false) |
+| Clock format | DataStore | `clock_format` | String enum (H24/H12, default H24) |
 | Clock size | DataStore | `clock_size` | Float (24–96 sp) |
 | Clock X position | DataStore | `clock_x` | Float (0.0–1.0 normalized, -1 = default) |
 | Clock Y position | DataStore | `clock_y` | Float (0.0–1.0 normalized, -1 = default) |
@@ -266,9 +297,21 @@ Setup → Albums → Slideshow
 | Anim: Pan Down | DataStore | `anim_pan_down` | String bool |
 | Auto Sync | DataStore | `auto_sync` | String bool (default true) |
 | Sync Interval | DataStore | `sync_interval_minutes` | Int (1 or 5–480 step 5, default 30) |
+| Night Mode | DataStore | `night_mode` | String bool (default false) |
+| Night Mode Start | DataStore | `night_mode_start` | Int (minutes since midnight, default 1320 = 22:00) |
+| Night Mode End | DataStore | `night_mode_end` | Int (minutes since midnight, default 420 = 07:00) |
+| Night Mode Brightness | DataStore | `night_mode_brightness` | Int (0–100 percent, default 0) |
 | Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
+| Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |
+| API Key Scoped | DataStore | `api_key_scoped` | String bool (key created with scoped permissions) |
+| Permission Status | DataStore | `permission_status` | String JSON (serialized `PermissionCheckResult` — per-endpoint probe results) |
 | Onboarding Steps | DataStore | `onboarding_completed_steps` | StringSet (step IDs) |
+
+> **Note**: The `original_mime_type` column is NOT a DataStore key — it is a
+> Room column on the `cached_assets` table (version 2 of `media_cache_db`).
+> It holds the Immich `originalMimeType` string (e.g. `image/gif`) used to
+> route GIFs to the `/original` endpoint at display time.
 
 All settings flow through a single shared DataStore instance
 (`DataStoreProvider.kt`) — there must be only one DataStore active per file

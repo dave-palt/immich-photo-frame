@@ -58,11 +58,24 @@ object TourSteps {
             targetKey = "setup_server",
         ),
         TourStep(
+            id = "setup_validate",
+            screen = TourScreen.SETUP,
+            titleRes = R.string.tour_setup_validate_title,
+            bodyRes = R.string.tour_setup_validate_body,
+        ),
+        TourStep(
             id = "setup_apikey",
             screen = TourScreen.SETUP,
             titleRes = R.string.tour_setup_apikey_title,
             bodyRes = R.string.tour_setup_apikey_body,
             targetKey = "setup_apikey",
+        ),
+        TourStep(
+            id = "setup_generate_key",
+            screen = TourScreen.SETUP,
+            titleRes = R.string.tour_setup_generate_title,
+            bodyRes = R.string.tour_setup_generate_body,
+            targetKey = "setup_generate_key",
         ),
         TourStep(
             id = "setup_connect",
@@ -146,13 +159,6 @@ object TourSteps {
             titleRes = R.string.tour_slideshow_settings_title,
             bodyRes = R.string.tour_slideshow_settings_body,
             targetKey = "slideshow_settings_gear",
-        ),
-        TourStep(
-            id = "slideshow_close",
-            screen = TourScreen.SLIDESHOW,
-            titleRes = R.string.tour_slideshow_close_title,
-            bodyRes = R.string.tour_slideshow_close_body,
-            targetKey = "slideshow_close",
         ),
     )
 

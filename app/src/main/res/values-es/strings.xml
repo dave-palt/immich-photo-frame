@@ -9,6 +9,12 @@
     <string name="section_system">Sistema</string>
     <string name="section_albums">Álbumes</string>
     <string name="section_connection">Conexión</string>
+    <string name="api_key_permissions">Permisos de la clave API</string>
+    <string name="recheck_permissions">Reverificar</string>
+    <string name="checking">Verificando…</string>
+    <string name="missing_required_perms">Faltan permisos requeridos — algunas funciones no estarán disponibles. Genera una nueva clave o actualízala en Immich.</string>
+    <string name="optional_perms_missing">Algunas funciones opcionales están deshabilitadas por permisos faltantes.</string>
+    <string name="skip_videos_locked_desc">Bloqueado — la clave API caree de permiso \'asset.download\'</string>
 
     <!-- Playback -->
     <string name="interval">Intervalo</string>
@@ -35,15 +41,30 @@
     <string name="contain">Contener</string>
     <string name="cover">Cubrir</string>
     <string name="adaptive_background">Fondo adaptativo</string>
-    <string name="adaptive_background_desc">Rellena las barras negras con el color promedio de cada foto</string>
+    <string name="adaptive_background_desc">Rellena las barras negras con un degradado de los colores superior/inferior de cada foto</string>
     <string name="fullscreen">Pantalla completa</string>
     <string name="fullscreen_desc">Ocultar barras del sistema</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
+
+    <!-- Night Mode -->
+    <string name="section_night_mode">Modo Noche</string>
+    <string name="night_mode">Modo Noche</string>
+    <string name="night_mode_desc">Atenuar la pantalla durante las horas establecidas para reducir el consumo de energía y el desgaste de la pantalla por la noche</string>
+    <string name="night_mode_alt_hint">Para mejores resultados, prefiera el encendido/apagado programado integrado de su dispositivo (en ajustes del sistema) si está disponible. Esta opción en la aplicación es una alternativa.</string>
+    <string name="night_mode_start">Atenuar pantalla a las</string>
+    <string name="night_mode_end">Aclarar pantalla a las</string>
+    <string name="night_mode_brightness">Brillo nocturno</string>
+    <string name="night_mode_brightness_hint">Nivel de brillo de la pantalla durante las horas nocturnas. 0%% es lo más oscuro, pero no completamente apagado.</string>
 
     <!-- Clock -->
     <string name="show_clock">Mostrar reloj</string>
     <string name="clock_size">Tamaño del reloj</string>
     <string name="drag_clock_hint">Arrastra el reloj en la pantalla de presentación para reposicionarlo</string>
+    <string name="clock_seconds">Mostrar segundos</string>
+    <string name="clock_seconds_desc">Mostrar segundos en el reloj (se actualiza cada segundo)</string>
+    <string name="clock_format">Formato de reloj</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Ajustar a la cuadrícula</string>
     <string name="snap_to_grid_desc">Alinear el reloj a la cuadrícula según su tamaño al soltarlo</string>
 
@@ -73,6 +94,7 @@
     <string name="biometric_auth_title">Autenticar</string>
     <string name="biometric_auth_subtitle_key">Autentíquese para ver su clave API</string>
     <string name="biometric_auth_subtitle_media">Autentíquese para gestionar la selección de medios</string>
+    <string name="biometric_auth_subtitle_albums">Autentíquese para cambiar los álbumes</string>
     <string name="biometric_not_setup_title">Bloqueo de pantalla requerido</string>
     <string name="biometric_not_setup_message">Esta acción requiere un bloqueo de pantalla (huella, rostro o PIN). Configúrelo en los ajustes de seguridad de su dispositivo para usar esta función.</string>
 
@@ -154,10 +176,14 @@
     <string name="tour_setup_welcome_body">Conéctate a tu servidor Immich para mostrar tus fotos. Repasemos la configuración.</string>
     <string name="tour_setup_server_title">Dirección del servidor</string>
     <string name="tour_setup_server_body">Introduce la URL de tu servidor Immich aquí. Usa el formato photos.example.com o 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">Clave de API</string>
-    <string name="tour_setup_apikey_body">Crea una clave de API en Immich en Configuración → Claves de API. Necesita permisos de lectura de álbumes, activos y usuario.</string>
-    <string name="tour_setup_connect_title">Probar y conectar</string>
-    <string name="tour_setup_connect_body">Toca Probar conexión para verificar tus credenciales. Una vez conectado, elegirás qué álbumes mostrar.</string>
+    <string name="tour_setup_validate_title">Validar servidor</string>
+    <string name="tour_setup_validate_body">Tras introducir la dirección del servidor, pulsa para comprobar la conexión. La app detectará la versión de Immich y los métodos de inicio de sesión disponibles.</string>
+        <string name="tour_setup_generate_title">Generar clave automáticamente</string>
+    <string name="tour_setup_generate_body">¿Prefieres no manejar claves de API manualmente? Toca aquí e inicia sesión con tu correo y contraseña — la app crea una clave por ti y luego descarta tu contraseña.</string>
+<string name="tour_setup_apikey_title">Generar tu clave</string>
+    <string name="tour_setup_apikey_body">Una clave de API es un token que permite a esta app acceder a tus fotos en el servidor de Immich — sin compartir tu contraseña. Puedes pegar una clave existente aquí o usar el botón de abajo para generar una automáticamente.</string>
+    <string name="tour_setup_connect_title">Conectar</string>
+    <string name="tour_setup_connect_body">Pulsa para probar la conexión e iniciar la presentación.</string>
     <string name="tour_albums_select_title">Elige tus álbumes</string>
     <string name="tour_albums_select_body">Toca uno o más álbumes para incluirlos en tu presentación. Los álbumes seleccionados muestran una marca.</string>
     <string name="tour_albums_start_title">Iniciar presentación</string>
@@ -177,10 +203,7 @@
     <string name="tour_slideshow_update_title">Indicador de Actualización</string>
     <string name="tour_slideshow_update_body">Cuando hay una actualización disponible, este icono aparece aquí para que puedas instalar la última versión. Si no se muestra, ya estás actualizado.</string>
 <string name="tour_slideshow_settings_title">Ajustar al vuelo</string>
-    <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>
-    <string name="tour_slideshow_close_title">Salir de presentación</string>
-    <string name="tour_slideshow_close_body">Toca aquí para salir de la presentación y volver a la selección de álbumes.</string>
-    <string name="tour_settings_overview_title">Vista general de configuración</string>
+    <string name="tour_slideshow_settings_body">Abre la configuración sin salir de la presentación — cambia el intervalo, activa el reloj y más.</string>    <string name="tour_settings_overview_title">Vista general de configuración</string>
     <string name="tour_settings_overview_body">Todos los cambios se guardan automáticamente — sin botón de guardar. Desplázate hacia abajo para explorar cada sección.</string>
     <string name="tour_settings_system_title">Sistema y inicio automático</string>
     <string name="tour_settings_system_body">Inicio en arranque y Modo Lanzador permiten que la app se inicie automáticamente — ideal para marcos de fotos dedicados.</string>
@@ -188,4 +211,21 @@
     <string name="tour_settings_cache_body">La sincronización automática descarga fotos en segundo plano para que la presentación funcione sin conexión y cargue al instante.</string>
     <string name="tour_settings_connection_title">Conexión</string>
     <string name="tour_settings_connection_body">Actualiza la URL del servidor o la clave de API aquí si cambia tu configuración de Immich.</string>
+    <string name="validate_server">Validar servidor</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Generar clave</string>
+    <string name="enter_manually">Introducir manualmente</string>
+    <string name="generate_key_prompt">¿No tienes una clave de API? Genera una automáticamente:</string>
+    <string name="generate_key_title">Generar clave API</string>
+    <string name="generate_key_desc">Inicia sesión con tu correo y contraseña de Immich. La app creará automáticamente una clave API con permisos limitados — tu contraseña se usa una vez y nunca se guarda.</string>
+    <string name="generate_key_account_note">Usa la cuenta destinada a este marco de fotos — determina qué álbumes y fotos están disponibles. No tiene que ser tu cuenta personal.</string>
+    <string name="email">Correo</string>
+    <string name="password">Contraseña</string>
+    <string name="login_and_generate">Iniciar sesión y generar clave</string>
+    <string name="sign_in_with_oauth">Iniciar sesión con OAuth</string>
+    <string name="api_key_help">¿Qué es una clave API?</string>
+    <string name="api_key_help_title">Acerca de las claves API</string>
+    <string name="api_key_help_what">Una clave API es un token que permite a esta app acceder a tus fotos en tu servidor Immich — sin almacenar tu contraseña.</string>
+    <string name="api_key_help_why">La app crea una clave con permisos solo para lo necesario (leer álbumes, ver fotos). Puedes revocarla cuando quieras en Ajustes de Immich → Claves API.</string>
+    <string name="api_key_help_password">Tu contraseña se usa una vez para crear la clave y luego se descarta inmediatamente. Nunca se guarda en este dispositivo.</string>
 </resources>

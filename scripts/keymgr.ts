@@ -138,6 +138,22 @@ async function deleteKey(serverUrl: string, token: string, keyId: string): Promi
   });
 }
 
+/**
+ * Invalidate the login session so this device doesn't linger in Immich's
+ * "Authorized Devices". The API key we created is independent of the session
+ * and remains valid. Best-effort — failures are logged, not fatal.
+ */
+async function logout(serverUrl: string, token: string): Promise<void> {
+  try {
+    await fetch(`${serverUrl}/api/auth/logout`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (e) {
+    logWarn(`Could not log out (session may linger): ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
 async function updateKey(
   serverUrl: string,
   token: string,
@@ -184,6 +200,10 @@ async function checkServerVersion(serverUrl: string): Promise<string | null> {
 /**
  * Test an API key against a specific endpoint.
  * Returns the HTTP status code and whether the request succeeded.
+ *
+ * When useQueryAuth is true, the API key is appended as ?apiKey= instead of
+ * using the x-api-key header. This mirrors how the app loads media via
+ * Coil/ExoPlayer, so the probe tests the same auth path the app actually uses.
  */
 async function testEndpoint(
   serverUrl: string,
@@ -191,14 +211,20 @@ async function testEndpoint(
   endpoint: string,
   method: string = "GET",
   body?: any,
+  useQueryAuth: boolean = false,
 ): Promise<{ ok: boolean; status: number; error?: string }> {
   try {
-    const res = await fetch(`${serverUrl}${endpoint}`, {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    let url = `${serverUrl}${endpoint}`;
+    if (useQueryAuth) {
+      const sep = endpoint.includes("?") ? "&" : "?";
+      url = `${url}${sep}apiKey=${encodeURIComponent(apiKey)}`;
+    } else {
+      headers["x-api-key"] = apiKey;
+    }
+    const res = await fetch(url, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-      },
+      headers,
       body: body ? JSON.stringify(body) : undefined,
     });
 
@@ -292,9 +318,10 @@ async function checkApiKey(serverUrl: string, apiKey: string): Promise<void> {
   }
 
   // --- 5. asset.view: GET /assets/{id}/thumbnail?size=preview ---
+  // Uses ?apiKey= query param (same as Coil image loading in the app).
   if (firstAssetId) {
     logStep(`Testing GET /api/assets/${firstAssetId}/thumbnail (asset.view) ...`);
-    const result = await testEndpoint(serverUrl, apiKey, `/api/assets/${firstAssetId}/thumbnail?size=preview`);
+    const result = await testEndpoint(serverUrl, apiKey, `/api/assets/${firstAssetId}/thumbnail?size=preview`, "GET", undefined, true);
     if (result.ok) {
       logSuccess(`${colorize("asset.view", Colors.cyan)} → View thumbnail (${result.status})`);
     } else {
@@ -305,10 +332,11 @@ async function checkApiKey(serverUrl: string, apiKey: string): Promise<void> {
     logWarn("Skipping asset.view test — no assets found to test thumbnail with");
   }
 
-  // --- 6. asset.download: HEAD /assets/{id}/original ---
+  // --- 6. asset.download: GET /assets/{id}/original ---
+  // Uses ?apiKey= query param (same as ExoPlayer video loading in the app).
   if (firstAssetId) {
     logStep(`Testing GET /api/assets/${firstAssetId}/original (asset.download) ...`);
-    const result = await testEndpoint(serverUrl, apiKey, `/api/assets/${firstAssetId}/original`);
+    const result = await testEndpoint(serverUrl, apiKey, `/api/assets/${firstAssetId}/original`, "GET", undefined, true);
     if (result.ok) {
       logSuccess(`${colorize("asset.download", Colors.cyan)} → Download original (${result.status})`);
     } else {
@@ -340,39 +368,45 @@ async function generateKey(serverUrl: string, email: string, password: string): 
 
   const token = await login(serverUrl, email, password);
 
-  logStep("Checking for existing Immich Media Frame API key...");
-  const existingKeys = await getExistingKeys(serverUrl, token);
-  const existing = await findKeyByName(existingKeys, KEY_NAME);
+  // Ensure we always log out after key creation/update so this device doesn't
+  // linger in Immich's "Authorized Devices". The API key survives logout.
+  try {
+    logStep("Checking for existing Immich Media Frame API key...");
+    const existingKeys = await getExistingKeys(serverUrl, token);
+    const existing = await findKeyByName(existingKeys, KEY_NAME);
 
-  if (existing) {
-    logWarn(`Found existing "${KEY_NAME}" key (ID: ${existing.id})`);
+    if (existing) {
+      logWarn(`Found existing "${KEY_NAME}" key (ID: ${existing.id})`);
 
-    if (process.stdin.isTTY) {
-      const confirm = await prompt("Update permissions on this key? [Y/n] ");
-      if (confirm.toLowerCase().startsWith("n")) {
-        logInfo("Keeping existing key as-is. Use 'check' command to verify permissions.");
-        return;
+      if (process.stdin.isTTY) {
+        const confirm = await prompt("Update permissions on this key? [Y/n] ");
+        if (confirm.toLowerCase().startsWith("n")) {
+          logInfo("Keeping existing key as-is. Use 'check' command to verify permissions.");
+          return;
+        }
       }
+
+      // Edit in-place — preserves the key value so the app keeps working
+      await updateKey(serverUrl, token, existing.id, REQUIRED_PERMS);
+
+      console.log();
+      logSuccess(`Done! "${KEY_NAME}" key updated with ${REQUIRED_PERMS.length} permissions.`);
+      logInfo("The key value is unchanged — no need to re-enter it in Immich Media Frame.");
+      logInfo("Run 'keymgr check <server-url> <api-key>' to verify.");
+      return;
     }
 
-    // Edit in-place — preserves the key value so the app keeps working
-    await updateKey(serverUrl, token, existing.id, REQUIRED_PERMS);
+    const apiKey = await createKey(serverUrl, token, REQUIRED_PERMS);
 
     console.log();
-    logSuccess(`Done! "${KEY_NAME}" key updated with ${REQUIRED_PERMS.length} permissions.`);
-    logInfo("The key value is unchanged — no need to re-enter it in Immich Media Frame.");
-    logInfo("Run 'keymgr check <server-url> <api-key>' to verify.");
-    return;
+    logSuccess("Done! Your Immich Media Frame API key:");
+    console.log(colorize(`  ${apiKey}`, Colors.bold + Colors.green));
+    console.log();
+    logInfo("Copy this key into Immich Media Frame Settings → API Key");
+    logInfo("Run 'keymgr check <server-url> <api-key>' to verify it works.");
+  } finally {
+    await logout(serverUrl, token);
   }
-
-  const apiKey = await createKey(serverUrl, token, REQUIRED_PERMS);
-
-  console.log();
-  logSuccess("Done! Your Immich Media Frame API key:");
-  console.log(colorize(`  ${apiKey}`, Colors.bold + Colors.green));
-  console.log();
-  logInfo("Copy this key into Immich Media Frame Settings → API Key");
-  logInfo("Run 'keymgr check <server-url> <api-key>' to verify it works.");
 }
 
 async function prompt(question: string): Promise<string> {

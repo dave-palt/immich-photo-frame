@@ -5,14 +5,50 @@
 ### F1: First-Run Setup
 
 1. App launches with no stored credentials.
-2. Setup screen prompts for:
-   - Immich Server URL (e.g. `https://photos.example.com` or `http://192.168.1.100:2283`)
-   - API Key
-3. User taps "Test Connection".
-4. App calls `GET /server/ping` then `GET /users/me` to validate.
-   - On failure: show error message (wrong URL, unreachable, invalid key). Stay on setup screen.
-   - On success: store credentials, proceed to album selection.
-5. Credentials persisted to encrypted on-device storage.
+2. **Step 1 — Domain Validation:**
+   - Setup screen prompts for Immich Server URL (protocol dropdown + domain field).
+   - User taps "Validate Server".
+   - App calls `GET /server/version` + `GET /server/features` (no auth required)
+     to detect the Immich version and available auth methods.
+   - On failure: show error message (wrong URL, unreachable). Stay on domain step.
+   - On success: display detected version (e.g. "Immich v1.135.0"), advance to auth step.
+3. **Step 2 — Authentication (manual paste is default):**
+   - **Enter Manually** (default): User pastes an existing API key, then taps
+     "Test Connection" (the legacy flow). Below the key field, a helper button
+     offers auto-generation for users who don't have a key yet.
+   - **Generate Key** (helper button): Email + password fields. App calls
+     `POST /auth/login` → obtains a JWT → `POST /api-keys` to create a scoped
+     key with 5 permissions → `POST /auth/logout` to invalidate the session.
+     Password is used once and never persisted; the login session is closed
+     immediately after key creation so the device does not appear in the
+     server's "Authorized Devices" list. The API key is independent of the
+     session and remains valid.
+     A note reminds the user to log in with the account meant for this photo
+     frame (not necessarily their personal account).
+     A `?` icon opens a dialog explaining what an API key is, why the app
+     generates one, and that the password is discarded immediately.
+   - **OAuth** (shown only if server has OAuth enabled): User taps "Sign in with
+     OAuth" → browser opens via Custom Tabs (PKCE flow) → callback deep-link
+     returns to the app → JWT obtained → key created → session logged out.
+4. App validates the key by calling `GET /users/me`.
+5. **Permission verification**: App probes all 5 required endpoints in
+   dependency order (user → albums → search → thumbnail → original) to verify
+   the key has the necessary scopes. Results are stored as `permission_status`
+   in DataStore.
+   - If a **blocking** permission is missing (`user.read`, `album.read`,
+     `asset.read`, `asset.view`), setup is blocked with an error showing
+     which permissions are missing and a shortcut to generate a properly-
+     scoped key.
+   - If only the **optional** permission (`asset.download`) is missing, setup
+     proceeds in degraded mode: video playback is locked off and the media
+     cache skips downloading originals. The user is informed which feature
+     is disabled and why.
+6. Credentials persisted: API key to encrypted on-device storage, server version
+   + key-scope flag + permission status to DataStore.
+7. On success, proceed to **Settings** so the user can configure the frame
+   (interval, clock, night mode, display fit, etc.) before selecting albums.
+   All settings have sensible defaults, so the user can simply press back to
+   skip. From Settings, back goes to **Album Selection** (first-run path).
 
 ### F2: Album Selection
 
@@ -50,13 +86,19 @@
 4. If **Skip Videos** is enabled (default on), video assets are filtered out.
    When disabled, video assets are played inline via ExoPlayer (Media3), with
    optional mute and automatic advance on completion.
-5. Slideshow displays each image fullscreen for the configured interval (default 30s).
-6. Transition between images is a crossfade (default 1s).
-7. Next image is pre-fetched and cached so transitions are instant.
-8. When the last image is reached, the slideshow loops back to the first.
-9. Screen stays on (wake lock) while slideshow is active (toggleable).
-10. A progress bar at the bottom shows time remaining for the current image.
-11. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
+5. **Animated GIFs** are rendered as animated images (not videos). They are
+   detected by `originalMimeType == "image/gif"` from the search response and
+   loaded from the `/original` endpoint (the `/thumbnail` transcode would
+   collapse the animation to a single JPEG frame). Coil's `GifDecoder`
+   decodes the frames; the slideshow interval timer advances as normal
+   (GIFs don't drive their own duration the way videos do).
+6. Slideshow displays each image fullscreen for the configured interval (default 30s).
+7. Transition between images is a crossfade (default 1s).
+8. Next image is pre-fetched and cached so transitions are instant.
+9. When the last image is reached, the slideshow loops back to the first.
+10. Screen stays on (wake lock) while slideshow is active (toggleable).
+11. A progress bar at the bottom shows time remaining for the current image.
+12. **Photo Animations**: When enabled, each photo gets a subtle Ken Burns
     style animation (zoom/pan). The animation is chosen randomly from the
     set of individually-enabled animation types. Available types: Zoom In,
     Zoom Out, Pan Left, Pan Right, Pan Up, Pan Down, Random. Random picks
@@ -88,9 +130,8 @@ Tap the screen to reveal controls:
   show/hide them from the slideshow (see F8)
 - Update status icon (checking / downloading / ready)
 - Launcher switch (apps icon, when Launcher Mode is active)
-- Albums (photo library icon)
+- Albums (photo library icon) — biometric-gated; returns to album selection
 - Settings (gear icon)
-- Close slideshow (return to album selection)
 
 Controls auto-hide after 5 seconds of no interaction.
 
@@ -203,8 +244,9 @@ Accessible from:
 Options:
 - **Slideshow Interval** — seconds per image (5–120, default 30)
 - **Image Fit** — Contain (letterbox) or Cover (crop to fill)
-- **Adaptive Background** — fill letterbox bars with dominant color from each
-  photo (uses Palette API, default off)
+- **Adaptive Background** — fill letterbox bars with a gradient derived from
+  each photo's edge colors (top/bottom for horizontal bars, left/right for
+  vertical bars; uses Palette API, default off)
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)
@@ -215,6 +257,20 @@ Options:
   and requires at least one other enabled.
 - **Fullscreen** — hide system bars (default on)
 - **Keep Screen On** — wake lock toggle (default on)
+- **Night Mode** section (brightness-based display schedule, for devices
+  without built-in scheduled power on/off):
+  - **Night Mode** toggle (default off). When on, the screen brightness is
+    reduced during configured night hours. A helper text notes that the
+    device's native scheduled power on/off (if available in system settings)
+    is preferable — this in-app option is a fallback.
+  - **Dim screen at** — 24h time picker (default 22:00). When the clock
+    crosses this time, brightness drops to the night level.
+  - **Brighten screen at** — 24h time picker (default 07:00). When the clock
+    crosses this time, brightness restores to the system level.
+  - **Night brightness** — slider 0–100% (default 0%). Screen brightness
+    during night hours. 0% is darkest (near-black on OLED), but the screen is
+    never fully turned off. While night mode is active, the slideshow is
+    hidden behind a black overlay and the auto-advance timer is paused.
 - **Start on Boot** — launch on device boot (default off). Requires the "Display over other apps" permission (Android 10+ BAL exemption); on Chinese OEMs, also shows an "Open Autostart Settings" button until a reboot confirms the receiver fired.
 - **Launcher Mode** — register as a Home launcher (default off; only visible when Start on Boot is enabled). The most reliable autostart method; the system always launches the Home app on boot, bypassing BOOT_COMPLETED and OEM autostart blocks entirely. Shows an "Open Launcher Settings" button to switch launchers or re-select this app; the same action is available in the slideshow hover UI.
 - **Auto-Update** — check GitHub for new builds (default on, hidden if Play
@@ -229,6 +285,8 @@ Options:
 - **Clock** section:
   - **Show Clock** — display time overlay (default off)
   - **Clock Size** — slider 24–96 sp (default 48)
+  - **Clock Format** — 24h (default) or 12h with AM/PM
+  - **Show Seconds** — display seconds in the clock; updates every second (default off)
   - **Snap to Grid** — align clock to grid on release (default on)
 - **Connection** section:
   - **Server URL** — editable inline
@@ -240,8 +298,22 @@ Options:
     fingerprint / face / device-PIN authentication. If no screen lock
     is set up, a dialog prompts the user to create one.
   - Test Connection button
-- **Albums** — change album selection (returns to album picker)
-- **Reset All Settings** — clears everything, returns to setup screen
+  - **API Key Permissions** card (shown when a key is set):
+    - Lists all 5 required permissions with ✓ (granted), ✗ (denied),
+      or ? (unknown — couldn't probe) status icons.
+    - **Re-check** button re-probes all endpoints.
+    - Auto-refreshes every time Settings is opened.
+    - If blocking permissions are missing, the card uses an error-colored
+      background and shows guidance to regenerate the key.
+- **Feature gating based on permissions:**
+  - When `asset.download` is denied, the **Skip Videos** toggle is locked
+    ON (can't be turned off) with subtitle "Locked — API key lacks
+    'asset.download' permission". The media cache also skips downloading.
+- **Albums** — change album selection (returns to album picker). Requires
+  biometric / device-credential authentication to open.
+- **Reset All Settings** — clears all settings, credentials, album selection,
+  and cached data, returns to setup screen. Tour completion is **preserved**
+  (use "Reset All Tours" to clear tour progress).
 
 ### F8: Media Selection
 
@@ -307,7 +379,7 @@ a user lands on a screen — only steps not yet completed are shown.
   all remaining steps on that screen as completed.
 - **Slideshow-specific behavior**: during the tour, the on-tap controls are
   force-shown and the 5-second auto-hide is suppressed, so the tour can
-  spotlight the prev/next, pause/mute, settings, and close buttons.
+  spotlight the prev/next, pause/mute, and settings buttons.
 - **Settings-specific behavior**: the tour scrolls the target section into
   view before showing its spotlight (System → Media Cache → Connection).
 - **Two replay buttons** in Settings → System section:
@@ -318,13 +390,13 @@ a user lands on a screen — only steps not yet completed are shown.
 - A **"Show Tour Again"** button is also available on the Setup screen.
 - Resetting all settings also clears the onboarding set (DataStore is wiped).
 
-**Step inventory (19 steps across 4 screens):**
+**Step inventory (20 steps across 4 screens):**
 
 | Screen | Steps |
 |---|---|
-| Setup (4) | `setup_welcome` (centered), `setup_server`, `setup_apikey`, `setup_connect` |
+| Setup (6) | `setup_welcome` (centered), `setup_server`, `setup_validate` (centered), `setup_apikey`, `setup_generate_key`, `setup_connect` |
 | Albums (3) | `albums_select`, `albums_start`, `albums_settings` |
-| Slideshow (8) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings`, `slideshow_close` |
+| Slideshow (7) | `slideshow_tap` (centered), `slideshow_nav`, `slideshow_playback`, `slideshow_media_selection`, `slideshow_albums`, `slideshow_update`, `slideshow_settings` |
 | Settings (4) | `settings_overview` (centered), `settings_system`, `settings_cache`, `settings_connection` |
 
 - **`slideshow_media_selection`**: highlights the grid icon next to the photo
@@ -332,6 +404,7 @@ a user lands on a screen — only steps not yet completed are shown.
   selection grid where the user can choose which photos and videos appear.
 
 - **`slideshow_albums`**: highlights the back-to-album-selection button.
+  This button is biometric-gated.
 - **`slideshow_update`**: highlights the update status icon. Since this icon
   normally only appears when an update is available, the tour force-shows a
   dimmed placeholder icon so the coachmark always has a visible target on the

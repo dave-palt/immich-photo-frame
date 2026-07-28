@@ -26,40 +26,52 @@ lets you pick which album(s) to display, and remembers your choice.
 - Fullscreen slideshow with crossfade transitions
 - Configurable interval, transition speed, fill mode (Contain/Cover)
 - Video playback with mute and skip options (Media3/ExoPlayer)
-- Draggable clock overlay with configurable size and snap-to-grid
+- Animated GIF playback in the slideshow (Coil GifDecoder; GIFs load from `/original` to preserve animation)
+- Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
-- Adaptive background (fills letterbox bars with each photo's dominant color)
+- Adaptive background (fills letterbox bars with each photo's edge colors as a gradient)
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
 - Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)
 - Launcher mode (Home replacement) — the most reliable boot method for dedicated photo frames; bypasses BOOT_COMPLETED entirely
 - Self-update via GitHub releases with manual "Check Now" button (sideloaded installs only)
 - Offline media cache with background sync (Room + WorkManager) — slideshow keeps playing from cached files when the server is unreachable; album deletions are detected and the user is sent back to album selection
+- Night Mode — automatically dims the screen during set hours (brightness-based fallback for devices without built-in scheduled power on/off)
 - Auto-resumes last album on launch
 - Interactive onboarding tour with coachmark overlays — guides users through setup, album selection, slideshow controls (including back-to-albums and update indicator), and settings; replayable per-screen ("Show Tour Again") or globally ("Reset All Tours")
 - Adaptive launcher icon with day/night variants and Android 13+ monochrome (themed icon) support; dedicated debug-build variant (amber background); separate background-free logo drawable for the Setup screen
 - Localized into 13 languages (en, ar, zh, nl, fr, de, it, ja, ko, pl, pt, ru, es)
-- Scoped API key (4 permissions only: album.read, asset.read, asset.view, user.read)
+- **In-app API key generation** — log in with email/password or OAuth; the app auto-creates a scoped key (no external scripts needed)
+- **Permission verification** — after setup, the app probes all 5 required endpoints to verify the key works; missing permissions are shown in Settings with per-feature impact (e.g., video playback locked off if `asset.download` is missing)
+- Scoped API key (5 permissions: album.read, asset.read, asset.view, asset.download, user.read)
 - API key stored encrypted on-device (AES-256, Android Keystore)
 - Biometric-protected API key reveal & copy (fingerprint / face / PIN)
 - Media selection grid — biometric-gated, tap to show/hide individual photos
 
 ## Setup
 
-1. Create an API key in Immich (see below)
-2. Enter server URL + API key in the app
+1. Enter your Immich server URL — the app validates it and detects the version
+2. Paste an existing API key, or generate one in-app (email/password or OAuth)
 3. Select album(s)
 4. Slideshow starts
 
-### Creating the API key
+### API key
 
-The app needs a **scoped API key** with exactly 4 permissions:
+You can **paste an existing API key** from Immich (User Settings → API Keys),
+or use the **Generate Key** button during setup to auto-create one — just
+enter your email and password. Your password is used once to create the key,
+then immediately discarded (never stored). OAuth is also supported for
+servers that have it enabled.
+
+Alternatively, you can create a key manually in Immich under
+**User Settings → API Keys**. The key needs 5 permissions:
 
 | Permission | Used for |
 |---|---|
 | `album.read` | List albums, get album info |
 | `asset.read` | Search/list assets in albums |
-| `asset.view` | Download/view photos and videos |
+| `asset.view` | View thumbnails and previews |
+| `asset.download` | Download originals (video playback) |
 | `user.read` | Validate the key during setup |
 
 > Requires Immich **v1.135+** for scoped keys. On older versions, any API key
@@ -99,7 +111,7 @@ To verify an existing key's permissions against the app's endpoints:
 
 ## Tech Stack
 
-Kotlin 2.1 · Jetpack Compose · Retrofit 2 · Coil 3 · Media3 ExoPlayer · Hilt · DataStore · Palette
+Kotlin 2.1 · Jetpack Compose · Retrofit 2 · Coil 3 (+ GifDecoder) · Media3 ExoPlayer · Hilt · DataStore · Palette
 
 ## Requirements
 

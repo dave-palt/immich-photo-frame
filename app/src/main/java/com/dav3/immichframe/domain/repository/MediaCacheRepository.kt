@@ -30,6 +30,14 @@ interface MediaCacheRepository {
      */
     suspend fun getAssetFilePaths(assetIds: List<String>): Map<String, String>
 
+    /**
+     * Batch-resolve local thumbnail paths for a set of asset IDs. Returns only
+     * entries whose thumbnail file still exists on disk. Used by the media
+     * selection grid where thumbnails (always JPEG) are needed regardless of
+     * asset type — Coil can't decode video files into bitmaps.
+     */
+    suspend fun getAssetThumbnailPaths(assetIds: List<String>): Map<String, String>
+
     suspend fun deleteAssetFiles(assetId: String)
 
     // Cache directory

@@ -25,6 +25,7 @@ data class CachedAssetEntity(
     val checksum: String?,
     @ColumnInfo(name = "last_modified") val lastModified: Long,
     @ColumnInfo(name = "cached_at") val cachedAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "original_mime_type") val originalMimeType: String? = null,
 ) {
     companion object {
         fun fromDomain(domain: CachedAsset): CachedAssetEntity = CachedAssetEntity(
@@ -37,6 +38,7 @@ data class CachedAssetEntity(
             checksum = domain.checksum,
             lastModified = domain.lastModified,
             cachedAt = domain.cachedAt,
+            originalMimeType = domain.originalMimeType,
         )
 
         fun toDomain(entity: CachedAssetEntity): CachedAsset = CachedAsset(
@@ -49,6 +51,7 @@ data class CachedAssetEntity(
             checksum = entity.checksum,
             lastModified = entity.lastModified,
             cachedAt = entity.cachedAt,
+            originalMimeType = entity.originalMimeType,
         )
     }
 }

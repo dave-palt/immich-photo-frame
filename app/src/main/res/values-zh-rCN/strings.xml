@@ -9,6 +9,12 @@
     <string name="section_system">系统</string>
     <string name="section_albums">相册</string>
     <string name="section_connection">连接</string>
+    <string name="api_key_permissions">API 密钥权限</string>
+    <string name="recheck_permissions">重新检查</string>
+    <string name="checking">检查中…</string>
+    <string name="missing_required_perms">缺少必需权限 — 部分功能将不可用。请在 Immich 中生成新密钥或更新现有密钥。</string>
+    <string name="optional_perms_missing">由于缺少权限，部分可选功能已被禁用。</string>
+    <string name="skip_videos_locked_desc">已锁定 — API 密钥缺少 \'asset.download\' 权限</string>
 
     <!-- Playback -->
     <string name="interval">间隔</string>
@@ -35,15 +41,30 @@
     <string name="contain">包含</string>
     <string name="cover">填充</string>
     <string name="adaptive_background">自适应背景</string>
-    <string name="adaptive_background_desc">用每张照片的平均色填充黑边</string>
+    <string name="adaptive_background_desc">用每张照片上下两端的颜色渐变填充黑边</string>
     <string name="fullscreen">全屏</string>
     <string name="fullscreen_desc">隐藏系统栏</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
+
+    <!-- Night Mode -->
+    <string name="section_night_mode">夜间模式</string>
+    <string name="night_mode">夜间模式</string>
+    <string name="night_mode_desc">在设定的时间段内调暗屏幕，以减少夜间耗电和屏幕损耗</string>
+    <string name="night_mode_alt_hint">为获得最佳效果，如果设备支持，请优先使用系统设置中的内置定时开关机功能。此应用内选项是备选方案。</string>
+    <string name="night_mode_start">调暗时间</string>
+    <string name="night_mode_end">调亮时间</string>
+    <string name="night_mode_brightness">夜间亮度</string>
+    <string name="night_mode_brightness_hint">夜间时段的屏幕亮度级别。0%%最暗，但不会完全关闭。</string>
 
     <!-- Clock -->
     <string name="show_clock">显示时钟</string>
     <string name="clock_size">时钟大小</string>
     <string name="drag_clock_hint">在幻灯片放映屏幕上拖动时钟以重新定位</string>
+    <string name="clock_seconds">显示秒</string>
+    <string name="clock_seconds_desc">在时钟中显示秒（每秒更新）</string>
+    <string name="clock_format">时间格式</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">对齐到网格</string>
     <string name="snap_to_grid_desc">释放时根据时钟大小对齐到网格</string>
 
@@ -73,6 +94,7 @@
     <string name="biometric_auth_title">验证</string>
     <string name="biometric_auth_subtitle_key">验证以查看您的API密钥</string>
     <string name="biometric_auth_subtitle_media">验证以管理媒体选择</string>
+    <string name="biometric_auth_subtitle_albums">验证以更改相册</string>
     <string name="biometric_not_setup_title">需要屏幕锁定</string>
     <string name="biometric_not_setup_message">此操作需要屏幕锁定（指纹、面容或PIN码）。请在设备安全设置中设置一个才能使用此功能。</string>
 
@@ -154,10 +176,14 @@
     <string name="tour_setup_welcome_body">连接到您的 Immich 服务器以显示照片。让我们来完成设置。</string>
     <string name="tour_setup_server_title">服务器地址</string>
     <string name="tour_setup_server_body">在此输入您的 Immich 服务器 URL。格式为 photos.example.com 或 192.168.1.100:2283。</string>
-    <string name="tour_setup_apikey_title">API 密钥</string>
-    <string name="tour_setup_apikey_body">在 Immich 的 设置 → API 密钥 中创建 API 密钥。需要相册、资产和用户读取权限。</string>
-    <string name="tour_setup_connect_title">测试并连接</string>
-    <string name="tour_setup_connect_body">点击测试连接以验证您的凭据。连接成功后，您将选择要显示的相册。</string>
+    <string name="tour_setup_validate_title">验证服务器</string>
+    <string name="tour_setup_validate_body">输入服务器地址后，点击验证连接。应用会检测 Immich 版本和可用的登录方式。</string>
+        <string name="tour_setup_generate_title">自动生成密钥</string>
+    <string name="tour_setup_generate_body">不想手动处理 API 密钥？点击此处，用邮箱和密码登录——应用会为您创建密钥，然后丢弃密码。</string>
+<string name="tour_setup_apikey_title">生成密钥</string>
+    <string name="tour_setup_apikey_body">API 密钥是一个令牌，让此应用可以访问您在 Immich 服务器上的照片——无需共享密码。您可以在此粘贴现有密钥，或使用下方按钮自动生成。</string>
+    <string name="tour_setup_connect_title">连接</string>
+    <string name="tour_setup_connect_body">点击测试连接并开始幻灯片放映。</string>
     <string name="tour_albums_select_title">选择您的相册</string>
     <string name="tour_albums_select_body">点选一个或多个相册加入幻灯片。选中的相册会显示勾选标记。</string>
     <string name="tour_albums_start_title">开始播放</string>
@@ -177,10 +203,7 @@
     <string name="tour_slideshow_update_title">更新指示器</string>
     <string name="tour_slideshow_update_body">当有更新可用时，此图标会出现在这里，方便您安装最新版本。如果没有显示，说明已是最新版本。</string>
 <string name="tour_slideshow_settings_title">即时调整</string>
-    <string name="tour_slideshow_settings_body">无需离开幻灯片即可打开设置——更改间隔、启用时钟等。</string>
-    <string name="tour_slideshow_close_title">退出幻灯片</string>
-    <string name="tour_slideshow_close_body">点击此处退出幻灯片并返回相册选择。</string>
-    <string name="tour_settings_overview_title">设置概览</string>
+    <string name="tour_slideshow_settings_body">无需离开幻灯片即可打开设置——更改间隔、启用时钟等。</string>    <string name="tour_settings_overview_title">设置概览</string>
     <string name="tour_settings_overview_body">所有更改自动保存——无需保存按钮。向下滚动探索各个部分。</string>
     <string name="tour_settings_system_title">系统和自启动</string>
     <string name="tour_settings_system_body">开机启动和启动器模式可让应用自动启动——非常适合专用相框。</string>
@@ -188,4 +211,21 @@
     <string name="tour_settings_cache_body">自动同步在后台下载照片，使幻灯片可以离线工作并立即加载。</string>
     <string name="tour_settings_connection_title">连接</string>
     <string name="tour_settings_connection_body">如果您的 Immich 设置发生变化，请在此更新服务器 URL 或 API 密钥。</string>
+    <string name="validate_server">验证服务器</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">生成密钥</string>
+    <string name="enter_manually">手动输入</string>
+    <string name="generate_key_prompt">没有 API 密钥？自动生成一个：</string>
+    <string name="generate_key_title">生成 API 密钥</string>
+    <string name="generate_key_desc">使用您的 Immich 邮箱和密码登录。应用会自动创建一个限定权限的 API 密钥 — 密码仅使用一次，永不保存。</string>
+    <string name="generate_key_account_note">请使用专为此相框准备的账户——它决定了可用的相册和照片。不必是您的个人账户。</string>
+    <string name="email">邮箱</string>
+    <string name="password">密码</string>
+    <string name="login_and_generate">登录并生成密钥</string>
+    <string name="sign_in_with_oauth">通过 OAuth 登录</string>
+    <string name="api_key_help">什么是 API 密钥？</string>
+    <string name="api_key_help_title">关于 API 密钥</string>
+    <string name="api_key_help_what">API 密钥是一个令牌，让本应用可以访问您 Immich 服务器上的照片 — 无需保存您的密码。</string>
+    <string name="api_key_help_why">应用创建的密钥仅具有所需权限（读取相册、查看照片）。您可以随时在 Immich 设置 → API 密钥中撤销它。</string>
+    <string name="api_key_help_password">您的密码仅用于创建密钥一次，然后立即丢弃。它永远不会保存在此设备上。</string>
 </resources>

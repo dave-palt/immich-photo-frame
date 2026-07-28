@@ -9,6 +9,12 @@
     <string name="section_system">System</string>
     <string name="section_albums">Alben</string>
     <string name="section_connection">Verbindung</string>
+    <string name="api_key_permissions">API-Schlüssel-Berechtigungen</string>
+    <string name="recheck_permissions">Erneut prüfen</string>
+    <string name="checking">Prüfen…</string>
+    <string name="missing_required_perms">Erforderliche Berechtigungen fehlen — einige Funktionen werden nicht verfügbar sein. Erstellen Sie einen neuen Schlüssel oder aktualisieren Sie ihn in Immich.</string>
+    <string name="optional_perms_missing">Einige optionale Funktionen sind aufgrund fehlender Berechtigungen deaktiviert.</string>
+    <string name="skip_videos_locked_desc">Gesperrt — API-Schlüssel fehlt \'asset.download\'-Berechtigung</string>
 
     <!-- Playback -->
     <string name="interval">Intervall</string>
@@ -35,15 +41,30 @@
     <string name="contain">Einpassen</string>
     <string name="cover">Ausfüllen</string>
     <string name="adaptive_background">Adaptiver Hintergrund</string>
-    <string name="adaptive_background_desc">Füllt die schwarzen Balken mit der Durchschnittsfarbe jedes Fotos</string>
+    <string name="adaptive_background_desc">Füllt die schwarzen Balken mit einem Farbverlauf aus den oberen/unteren Farben jedes Fotos</string>
     <string name="fullscreen">Vollbild</string>
     <string name="fullscreen_desc">Systemleisten ausblenden</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
+
+    <!-- Night Mode -->
+    <string name="section_night_mode">Nachtmodus</string>
+    <string name="night_mode">Nachtmodus</string>
+    <string name="night_mode_desc">Bildschirm während festgelegter Stunden dimmen, um Stromverbrauch und Bildschirmverschleiß nachts zu reduzieren</string>
+    <string name="night_mode_alt_hint">Für beste Ergebnisse bevorzugen Sie die integrierte zeitgesteuerte Ein-/Ausschaltung Ihres Geräts (in den Systemeinstellungen), falls verfügbar. Diese In-App-Option ist eine Alternative.</string>
+    <string name="night_mode_start">Dimmen um</string>
+    <string name="night_mode_end">Aufhellen um</string>
+    <string name="night_mode_brightness">Nachthelligkeit</string>
+    <string name="night_mode_brightness_hint">Bildschirmhelligkeit während der Nachtstunden. 0%% ist am dunkelsten, aber nicht komplett aus.</string>
 
     <!-- Clock -->
     <string name="show_clock">Uhr anzeigen</string>
     <string name="clock_size">Uhrgröße</string>
     <string name="drag_clock_hint">Ziehen Sie die Uhr auf der Diashow-Anzeige, um sie zu verschieben</string>
+    <string name="clock_seconds">Sekunden anzeigen</string>
+    <string name="clock_seconds_desc">Sekunden in der Uhr anzeigen (aktualisiert jede Sekunde)</string>
+    <string name="clock_format">Uhrzeitformat</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Am Raster ausrichten</string>
     <string name="snap_to_grid_desc">Uhr beim Loslassen anhand ihrer Größe am Raster ausrichten</string>
 
@@ -73,6 +94,7 @@
     <string name="biometric_auth_title">Authentifizieren</string>
     <string name="biometric_auth_subtitle_key">Authentifizieren Sie sich, um Ihren API-Schlüssel anzuzeigen</string>
     <string name="biometric_auth_subtitle_media">Authentifizieren Sie sich, um die Medienauswahl zu verwalten</string>
+    <string name="biometric_auth_subtitle_albums">Authentifizieren Sie sich, um die Alben zu ändern</string>
     <string name="biometric_not_setup_title">Bildschirmsperre erforderlich</string>
     <string name="biometric_not_setup_message">Diese Aktion erfordert eine Bildschirmsperre (Fingerabdruck, Gesicht oder PIN). Richten Sie eine in den SicherheitsEinstellungen Ihres Geräts ein, um diese Funktion zu nutzen.</string>
 
@@ -154,10 +176,14 @@
     <string name="tour_setup_welcome_body">Verbinde dich mit deinem Immich-Server, um deine Fotos anzuzeigen. Lass uns die Einrichtung durchgehen.</string>
     <string name="tour_setup_server_title">Serveradresse</string>
     <string name="tour_setup_server_body">Gib hier die URL deines Immich-Servers ein. Verwende das Format photos.example.com oder 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API-Schlüssel</string>
-    <string name="tour_setup_apikey_body">Erstelle einen API-Schlüssel in Immich unter Einstellungen → API-Schlüssel. Benötigt Leseberechtigungen für Alben, Assets und Benutzer.</string>
-    <string name="tour_setup_connect_title">Testen und verbinden</string>
-    <string name="tour_setup_connect_body">Tippe auf Verbindung testen, um deine Zugangsdaten zu prüfen. Nach der Verbindung wählst du die anzuzeigenden Alben.</string>
+    <string name="tour_setup_validate_title">Server überprüfen</string>
+    <string name="tour_setup_validate_body">Nach der Eingabe der Serveradresse tippen, um die Verbindung zu prüfen. Die App erkennt die Immich-Version und verfügbare Anmeldemethoden.</string>
+        <string name="tour_setup_generate_title">Schlüssel automatisch generieren</string>
+    <string name="tour_setup_generate_body">Möchtest du API-Schlüssel nicht manuell verwalten? Tippe hier und melde dich mit E-Mail und Passwort an — die App erstellt einen Schlüssel für dich und verwirft dann dein Passwort.</string>
+<string name="tour_setup_apikey_title">Schlüssel erstellen</string>
+    <string name="tour_setup_apikey_body">Ein API-Schlüssel ist ein Token, das dieser App den Zugriff auf deine Fotos auf dem Immich-Server ermöglicht — ohne dein Passwort zu teilen. Du kannst hier einen vorhandenen Schlüssel einfügen oder die Schaltfläche unten verwenden, um automatisch einen zu generieren.</string>
+    <string name="tour_setup_connect_title">Verbinden</string>
+    <string name="tour_setup_connect_body">Tippen, um die Verbindung zu testen und die Diashow zu starten.</string>
     <string name="tour_albums_select_title">Wähle deine Alben</string>
     <string name="tour_albums_select_body">Tippe auf ein oder mehrere Alben, um sie zur Diashow hinzuzufügen. Ausgewählte Alben zeigen ein Häkchen.</string>
     <string name="tour_albums_start_title">Show starten</string>
@@ -177,10 +203,7 @@
     <string name="tour_slideshow_update_title">Update-Anzeige</string>
     <string name="tour_slideshow_update_body">Wenn ein Update verfügbar ist, erscheint dieses Symbol hier, damit du die neueste Version installieren kannst. Wenn es nicht angezeigt wird, bist du bereits auf dem neuesten Stand.</string>
 <string name="tour_slideshow_settings_title">Sofort anpassen</string>
-    <string name="tour_slideshow_settings_body">Öffne die Einstellungen, ohne die Diashow zu verlassen — ändere Intervall, aktiviere die Uhr und mehr.</string>
-    <string name="tour_slideshow_close_title">Diashow beenden</string>
-    <string name="tour_slideshow_close_body">Tippe hier, um die Diashow zu beenden und zur Albumauswahl zurückzukehren.</string>
-    <string name="tour_settings_overview_title">Einstellungsüberblick</string>
+    <string name="tour_slideshow_settings_body">Öffne die Einstellungen, ohne die Diashow zu verlassen — ändere Intervall, aktiviere die Uhr und mehr.</string>    <string name="tour_settings_overview_title">Einstellungsüberblick</string>
     <string name="tour_settings_overview_body">Alle Änderungen werden automatisch gespeichert — keine Speichertaste. Scrolle nach unten, um jeden Abschnitt zu erkunden.</string>
     <string name="tour_settings_system_title">System &amp; Autostart</string>
     <string name="tour_settings_system_body">Beim Start starten und Launcher-Modus lassen die App automatisch starten — ideal für dedizierte Fotoframes.</string>
@@ -188,4 +211,21 @@
     <string name="tour_settings_cache_body">Auto Sync lädt Fotos im Hintergrund herunter, sodass die Diashow offline funktioniert und sofort lädt.</string>
     <string name="tour_settings_connection_title">Verbindung</string>
     <string name="tour_settings_connection_body">Aktualisiere hier die Server-URL oder den API-Schlüssel, wenn sich dein Immich-Setup ändert.</string>
+    <string name="validate_server">Server überprüfen</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Schlüssel erstellen</string>
+    <string name="enter_manually">Manuell eingeben</string>
+    <string name="generate_key_prompt">Kein API-Schlüssel? Automatisch generieren:</string>
+    <string name="generate_key_title">API-Schlüssel erstellen</string>
+    <string name="generate_key_desc">Melden Sie sich mit Ihrer Immich-E-Mail und Ihrem Passwort an. Die App erstellt automatisch einen bereichsbeschränkten API-Schlüssel — Ihr Passwort wird einmal verwendet und nie gespeichert.</string>
+    <string name="generate_key_account_note">Verwende das Konto, das für diesen Bilderrahmen gedacht ist — es bestimmt, welche Alben und Fotos verfügbar sind. Das muss nicht dein persönliches Konto sein.</string>
+    <string name="email">E-Mail</string>
+    <string name="password">Passwort</string>
+    <string name="login_and_generate">Anmelden &amp; Schlüssel erstellen</string>
+    <string name="sign_in_with_oauth">Mit OAuth anmelden</string>
+    <string name="api_key_help">Was ist ein API-Schlüssel?</string>
+    <string name="api_key_help_title">Über API-Schlüssel</string>
+    <string name="api_key_help_what">Ein API-Schlüssel ist ein Token, der dieser App den Zugriff auf Ihre Fotos auf Ihrem Immich-Server ermöglicht — ohne Ihr Passwort zu speichern.</string>
+    <string name="api_key_help_why">Die App erstellt einen Schlüssel nur mit den benötigten Berechtigungen (Alben lesen, Fotos ansehen). Sie können ihn jederzeit in Immich-Einstellungen → API-Schlüssel widerrufen.</string>
+    <string name="api_key_help_password">Ihr Passwort wird einmalig zum Erstellen des Schlüssels verwendet und dann sofort verworfen. Es wird nie auf diesem Gerät gespeichert.</string>
 </resources>

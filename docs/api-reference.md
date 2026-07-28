@@ -28,8 +28,22 @@ Retrofit client), the API key is appended as a query parameter:
 > The `x-api-key` header used by Retrofit calls is unaffected and works on
 > both v1 and v3.
 
+## Media URL Routing
+
+| Asset type | Endpoint | Notes |
+|---|---|---|
+| Standard image | `GET /api/assets/{id}/thumbnail?size=preview` | Immich transcodes to JPEG preview; small and fast. Auth: `?apiKey=` query param. |
+| Animated GIF | `GET /api/assets/{id}/original` | The thumbnail endpoint re-encodes GIFs as JPEG, collapsing the animation. GIFs are detected by `originalMimeType == "image/gif"` (from the `/search/metadata` response) and routed to `/original` so Coil's `GifDecoder` receives the raw animated bytes. |
+| Video | `GET /api/assets/{id}/original` | Loaded by ExoPlayer. Auth: `?apiKey=` query param. |
+| Thumbnail (media-selection grid) | `GET /api/assets/{id}/thumbnail?size=thumbnail` | Always JPEG — Coil can't decode a video file into a still, and GIF thumbnails are fine as static images. |
+
 API keys can be created in Immich under User Settings > API Keys, and can be
 scoped to specific permissions.
+
+**In-app key generation**: during setup, the default is to paste an existing
+key manually. A **Generate Key** helper button lets the user auto-create a
+scoped key via email/password (or OAuth) — the app logs in, creates the key,
+and discards the password. See F1 in the functional spec for details.
 
 ### Required Permissions
 
@@ -43,7 +57,79 @@ The API key needs 5 scoped permissions:
 | `asset.download` | Download original files (video playback via ExoPlayer) |
 | `user.read` | Validate API key (GET /users/me) |
 
-These permissions are the minimum required for ImmichFrame to function. You can create a key with these exact permissions using the provided `keymgr` tool (or the shell/PowerShell scripts). Requires Immich v1.135+ for scoped keys.
+These permissions are the minimum required for ImmichFrame to function.
+The in-app key generator creates a key with exactly these permissions
+(requires Immich v1.135+ for scoped keys). The external `keymgr` scripts
+are still available as a fallback.
+
+### Permission Verification
+
+After the API key is stored (whether generated in-app or pasted manually),
+the app probes each required endpoint to verify the key actually has the
+necessary scopes. This mirrors the external `scripts/check-api-key.sh`
+script. Probes run in dependency order:
+
+| Step | Endpoint | Permission Tested | Auth method | Notes |
+|---|---|---|---|---|
+| 1 | `GET /api/users/me` | `user.read` | `x-api-key` header | Also validates the key itself |
+| 2 | `GET /api/albums` | `album.read` | `x-api-key` header | Returns album list |
+| 3 | `POST /api/search/metadata` | `asset.read` | `x-api-key` header | Returns first asset ID for downstream probes |
+| 4 | `GET /api/assets/{id}/thumbnail?size=preview` | `asset.view` | `?apiKey=` query param | **Same auth path as Coil image loading** — probed via OkHttp, not Retrofit, because the real app never loads media through the header |
+| 5 | `GET /api/assets/{id}/original` | `asset.download` | `?apiKey=` query param | **Same auth path as ExoPlayer video loading** — Optional; gates video playback + media cache |
+
+> **Why two auth methods?** Steps 4–5 use the `?apiKey=` query parameter
+> (not the `x-api-key` header) because that is exactly how Coil (images) and
+> ExoPlayer (videos) authenticate when loading media in the app. Probing with
+> the header would test a code path the app never actually uses — and on some
+> Immich deployments the two auth methods are handled differently for scoped
+> keys, causing a false "missing asset.view" report despite images loading
+> fine. Using the query param makes the probe reflect reality.
+
+If an upstream probe fails, downstream probes are skipped and marked
+"unknown" (not "denied"). Results are stored as `permission_status` (JSON)
+in DataStore and refreshed every time the Settings screen opens or the
+user taps "Re-check".
+
+## In-App Auth Endpoints
+
+These endpoints are used during setup by a separate Retrofit instance
+(`ImmichAuthApi`) that does NOT use the `x-api-key` header. Login and
+key-creation calls use `Bearer` tokens passed per-call via the
+`Authorization` header.
+
+### Server Probing (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/server/version` | Detect Immich version (scoped-key support check) |
+| GET | `/server/features` | Detect available auth methods (passwordLogin, oauth) |
+
+### Password Login (no auth)
+
+| Method | Endpoint | Request | Response |
+|---|---|---|---|
+| POST | `/auth/login` | `{ email, password }` | `{ accessToken, userId, userEmail, ... }` |
+
+### API Key Management (Bearer token)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api-keys` | List existing keys (metadata only, no secrets) |
+| POST | `/api-keys` | Create a new key: `{ name: "ImmichMediaFrame", permissions: [...] }` → returns `{ secret }` |
+| PUT | `/api-keys/{id}` | Update key name/permissions (metadata only) |
+| POST | `/auth/logout` | Invalidate the bearer session after key creation so the device doesn't linger in "Authorized Devices". The API key survives logout. |
+
+### OAuth PKCE (no auth)
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/oauth/authorize` | `{ redirectUri, codeChallenge, state }` → `{ url }` (open in browser) |
+| POST | `/oauth/callback` | `{ url, codeVerifier, state }` → `{ accessToken, ... }` (same as login) |
+
+The OAuth flow uses PKCE: the app generates a `code_verifier` + `code_challenge`
++ `state` locally (`PkceHelper.kt`), opens the authorization URL in a Custom
+Tab, and receives the callback via the `com.dav3.immichframe://oauth-callback`
+deep link.
 
 ## API Key Management Tools
 

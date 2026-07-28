@@ -9,6 +9,12 @@
     <string name="section_system">Systeem</string>
     <string name="section_albums">Albums</string>
     <string name="section_connection">Verbinding</string>
+    <string name="api_key_permissions">API-sleutel machtigingen</string>
+    <string name="recheck_permissions">Opnieuw controleren</string>
+    <string name="checking">Controleren…</string>
+    <string name="missing_required_perms">Vereiste machtigingen ontbreken — sommige functies werken niet. Genereer een nieuwe sleutel of werk hem bij in Immich.</string>
+    <string name="optional_perms_missing">Sommige optionele functies zijn uitgeschakeld wegens ontbrekende machtigingen.</string>
+    <string name="skip_videos_locked_desc">Vergrendeld — API-sleutel mist \'asset.download\'-machtiging</string>
 
     <!-- Playback -->
     <string name="interval">Interval</string>
@@ -35,15 +41,30 @@
     <string name="contain">Passen</string>
     <string name="cover">Vullen</string>
     <string name="adaptive_background">Adaptieve achtergrond</string>
-    <string name="adaptive_background_desc">Vult de zwarte balken met de gemiddelde kleur van elke foto</string>
+    <string name="adaptive_background_desc">Vult de zwarte balken met een verloop van de bovenste/onderste kleuren van elke foto</string>
     <string name="fullscreen">Volledig scherm</string>
     <string name="fullscreen_desc">Systeembalken verbergen</string>
     <string name="keep_screen_on">Scherm aan laten</string>
+
+    <!-- Night Mode -->
+    <string name="section_night_mode">Nachtmodus</string>
+    <string name="night_mode">Nachtmodus</string>
+    <string name="night_mode_desc">Dim het scherm tijdens ingestelde uren om stroomverbruik en schermverslijting \'s nachts te verminderen</string>
+    <string name="night_mode_alt_hint">Voor de beste resultaten, geef de voorkeur aan de ingebouwde geplande aan/uit-functie van uw apparaat (in systeeminstellingen) indien beschikbaar. Deze in-app optie is een alternatief.</string>
+    <string name="night_mode_start">Dimmen om</string>
+    <string name="night_mode_end">Helder maken om</string>
+    <string name="night_mode_brightness">Nacht helderheid</string>
+    <string name="night_mode_brightness_hint">Schermhelderheid tijdens nachturen. 0%% is donkerst, maar niet helemaal uit.</string>
 
     <!-- Clock -->
     <string name="show_clock">Klok tonen</string>
     <string name="clock_size">Klok grootte</string>
     <string name="drag_clock_hint">Sleep de klok op de diavoorstelling om te verplaatsen</string>
+    <string name="clock_seconds">Seconden weergeven</string>
+    <string name="clock_seconds_desc">Seconden in de klok weergeven (elke seconde bijgewerkt)</string>
+    <string name="clock_format">Tijdformaat</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Uitlijnen op raster</string>
     <string name="snap_to_grid_desc">Klok bij loslaten uitlijnen op raster op basis van grootte</string>
 
@@ -73,6 +94,7 @@
     <string name="biometric_auth_title">Verifiëren</string>
     <string name="biometric_auth_subtitle_key">Verifieer om uw API-sleutel te bekijken</string>
     <string name="biometric_auth_subtitle_media">Verifieer om mediaselectie te beheren</string>
+    <string name="biometric_auth_subtitle_albums">Verifieer om albums te wijzigen</string>
     <string name="biometric_not_setup_title">Schermvergrendeling vereist</string>
     <string name="biometric_not_setup_message">Deze actie vereist een schermvergrendeling (vingerafdruk, gezicht of PIN). Stel er een in de beveiligingsinstellingen van uw apparaat om deze functie te gebruiken.</string>
 
@@ -154,10 +176,14 @@
     <string name="tour_setup_welcome_body">Maak verbinding met je Immich-server om je foto\'s te tonen. Laten we de installatie doorlopen.</string>
     <string name="tour_setup_server_title">Serveradres</string>
     <string name="tour_setup_server_body">Voer hier de URL van je Immich-server in. Gebruik de notatie photos.example.com of 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API-sleutel</string>
-    <string name="tour_setup_apikey_body">Maak een API-sleutel aan in Immich onder Instellingen → API-sleutels. Hiervoor zijn leesrechten nodig voor albums, assets en gebruikers.</string>
-    <string name="tour_setup_connect_title">Testen en verbinden</string>
-    <string name="tour_setup_connect_body">Tik op Verbinding testen om je inloggegevens te controleren. Na het verbinden kies je welke albums je wilt tonen.</string>
+    <string name="tour_setup_validate_title">Server valideren</string>
+    <string name="tour_setup_validate_body">Na het invoeren van het serveradres, tik om de verbinding te controleren. De app detecteert de Immich-versie en beschikbare inlogmethoden.</string>
+        <string name="tour_setup_generate_title">Sleutel automatisch genereren</string>
+    <string name="tour_setup_generate_body">Liever geen API-sleutels handmatig beheren? Tik hier en log in met e-mail en wachtwoord — de app maakt een sleutel voor je aan en verwijdert daarna je wachtwoord.</string>
+<string name="tour_setup_apikey_title">Sleutel genereren</string>
+    <string name="tour_setup_apikey_body">Een API-sleutel is een token waarmee deze app toegang krijgt tot je foto\'s op de Immich-server — zonder je wachtwoord te delen. Je kunt hier een bestaande sleutel plakken, of de knop hieronder gebruiken om er automatisch een te genereren.</string>
+    <string name="tour_setup_connect_title">Verbinden</string>
+    <string name="tour_setup_connect_body">Tik om de verbinding te testen en de diavoorstelling te starten.</string>
     <string name="tour_albums_select_title">Kies je albums</string>
     <string name="tour_albums_select_body">Tik op een of meer albums om ze toe te voegen aan je diavoorstelling. Geselecteerde albums tonen een vinkje.</string>
     <string name="tour_albums_start_title">Start de show</string>
@@ -177,10 +203,7 @@
     <string name="tour_slideshow_update_title">Update-indicator</string>
     <string name="tour_slideshow_update_body">Als er een update beschikbaar is, verschijnt dit icoon hier zodat u de nieuwste versie kunt installeren. Als het niet zichtbaar is, bent u al up-to-date.</string>
 <string name="tour_slideshow_settings_title">Direct aanpassen</string>
-    <string name="tour_slideshow_settings_body">Open de instellingen zonder de diavoorstelling te verlaten — wijzig interval, schakel de klok in en meer.</string>
-    <string name="tour_slideshow_close_title">Diavoorstelling sluiten</string>
-    <string name="tour_slideshow_close_body">Tik hier om de diavoorstelling te sluiten en terug te keren naar de albumselectie.</string>
-    <string name="tour_settings_overview_title">Overzicht instellingen</string>
+    <string name="tour_slideshow_settings_body">Open de instellingen zonder de diavoorstelling te verlaten — wijzig interval, schakel de klok in en meer.</string>    <string name="tour_settings_overview_title">Overzicht instellingen</string>
     <string name="tour_settings_overview_body">Alle wijzigingen worden automatisch opgeslagen — geen opslanknop nodig. Scroll naar beneden om elke sectie te verkennen.</string>
     <string name="tour_settings_system_title">Systeem en autostart</string>
     <string name="tour_settings_system_body">Opstarten bij opstart en Launcher-modus laten de app automatisch starten — ideaal voor speciale fotolijsten.</string>
@@ -188,4 +211,21 @@
     <string name="tour_settings_cache_body">Auto Sync downloadt foto\'s op de achtergrond zodat de diavoorstelling offline werkt en direct laadt.</string>
     <string name="tour_settings_connection_title">Verbinding</string>
     <string name="tour_settings_connection_body">Werk hier je server-URL of API-sleutel bij als je Immich-instellingen veranderen.</string>
+    <string name="validate_server">Server valideren</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Sleutel genereren</string>
+    <string name="enter_manually">Handmatig invoeren</string>
+    <string name="generate_key_prompt">Geen API-sleutel? Genereer er automatisch een:</string>
+    <string name="generate_key_title">API-sleutel genereren</string>
+    <string name="generate_key_desc">Log in met je Immich-e-mailadres en wachtwoord. De app maakt automatisch een scoped API-sleutel aan — je wachtwoord wordt één keer gebruikt en nooit opgeslagen.</string>
+    <string name="generate_key_account_note">Gebruik het account dat bedoeld is voor dit fotolijstje — het bepaalt welke albums en foto\'s beschikbaar zijn. Dit hoeft niet je persoonlijke account te zijn.</string>
+    <string name="email">E-mail</string>
+    <string name="password">Wachtwoord</string>
+    <string name="login_and_generate">Inloggen &amp; sleutel genereren</string>
+    <string name="sign_in_with_oauth">Inloggen met OAuth</string>
+    <string name="api_key_help">Wat is een API-sleutel?</string>
+    <string name="api_key_help_title">Over API-sleutels</string>
+    <string name="api_key_help_what">Een API-sleutel is een token waarmee deze app toegang krijgt tot je foto\'s op je Immich-server — zonder je wachtwoord op te slaan.</string>
+    <string name="api_key_help_why">De app maakt een sleutel met alleen de benodigde rechten (albums lezen, foto\'s bekijken). Je kunt deze altijd intrekken in Immich-instellingen → API-sleutels.</string>
+    <string name="api_key_help_password">Je wachtwoord wordt één keer gebruikt om de sleutel te maken en daarna direct verwijderd. Het wordt nooit op dit apparaat opgeslagen.</string>
 </resources>

@@ -6,15 +6,24 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
-import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
+import com.dav3.immichframe.domain.model.BorderColors
 
-/** Downloads bitmap via Coil and extracts dominant color via Palette. */
-suspend fun extractDominantColor(
+private val FALLBACK = BorderColors(Color.Black, Color.Black, Color.Black, Color.Black, 1f)
+
+/**
+ * Downloads the 128px thumbnail via Coil and extracts dominant colors from
+ * each edge region (top/bottom/left/right halves) via Palette.
+ *
+ * Returns [FALLBACK] (all-black, 1:1 aspect) on any failure so the caller
+ * can render without null-checks.
+ */
+suspend fun extractBorderColors(
     context: Context,
     url: String,
-): Color = try {
-    val loader = ImageLoader(context)
+): BorderColors = try {
+    val loader = SingletonImageLoader.get(context)
     val request = ImageRequest.Builder(context)
         .data(url)
         .size(128)
@@ -28,13 +37,30 @@ suspend fun extractDominantColor(
         } else {
             image.bitmap
         }
-        val palette = Palette.from(bitmap).generate()
-        Color(palette.getDominantColor(0xFF000000.toInt()))
+        val w = bitmap.width
+        val h = bitmap.height
+        val midX = w / 2
+        val midY = h / 2
+
+        fun dominant(left: Int, top: Int, right: Int, bottom: Int): Color = Color(
+            Palette.from(bitmap)
+                .setRegion(left, top, right, bottom)
+                .generate()
+                .getDominantColor(0xFF000000.toInt()),
+        )
+
+        BorderColors(
+            top = dominant(0, 0, w, midY),
+            bottom = dominant(0, midY, w, h),
+            left = dominant(0, 0, midX, h),
+            right = dominant(midX, 0, w, h),
+            aspectRatio = if (h > 0) w.toFloat() / h else 1f,
+        )
     } else {
         Log.w("AdaptiveBg", "Coil returned no image for $url")
-        Color.Black
+        FALLBACK
     }
 } catch (e: Exception) {
-    Log.e("AdaptiveBg", "Failed to extract color", e)
-    Color.Black
+    Log.e("AdaptiveBg", "Failed to extract border colors", e)
+    FALLBACK
 }

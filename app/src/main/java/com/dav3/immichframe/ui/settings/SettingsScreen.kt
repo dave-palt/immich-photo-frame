@@ -8,16 +8,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -39,9 +44,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,8 +73,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.R
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.FillMode
+import com.dav3.immichframe.domain.model.PermissionStatus
 import com.dav3.immichframe.domain.model.PhotoAnimation
+import com.dav3.immichframe.domain.model.RequiredPermission
 import com.dav3.immichframe.domain.system.hasOverlayPermission
 import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
@@ -142,11 +153,21 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val authTitleKey = stringResource(R.string.biometric_auth_title)
     val authSubtitleKey = stringResource(R.string.biometric_auth_subtitle_key)
+    val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
     val apiKeyCopiedText = stringResource(R.string.api_key_copied)
 
     val tourState = rememberTourState()
     val completedSteps by viewModel.onboardingSteps.collectAsState()
     val scrollState = rememberScrollState()
+
+    // Refresh permission status when the Settings screen is opened and whenever
+    // the API key changes. Keying on state.apiKey (instead of Unit) ensures the
+    // check fires once the real key has been collected from DataStore — on the
+    // very first composition state.apiKey is still the default "" and the check
+    // would otherwise be skipped entirely.
+    LaunchedEffect(state.apiKey) {
+        if (state.apiKey.isNotBlank()) viewModel.recheckPermissions()
+    }
 
     TourHost(
         screen = TourScreen.SETTINGS,
@@ -220,11 +241,20 @@ fun SettingsScreen(
                     checked = s.shuffle,
                     onToggle = { viewModel.toggleShuffle() },
                 )
+                val videoDownloadDenied = state.permissionStatus
+                    ?.let { it.statuses[RequiredPermission.ASSET_DOWNLOAD] == PermissionStatus.Denied }
+                    ?: false
+
                 SwitchItem(
                     title = stringResource(R.string.skip_videos),
-                    subtitle = stringResource(R.string.skip_videos_desc),
+                    subtitle = if (videoDownloadDenied) {
+                        stringResource(R.string.skip_videos_locked_desc)
+                    } else {
+                        stringResource(R.string.skip_videos_desc)
+                    },
                     checked = s.skipVideos,
                     onToggle = { viewModel.toggleSkipVideos() },
+                    enabled = !videoDownloadDenied,
                 )
                 SwitchItem(
                     title = stringResource(R.string.muted),
@@ -293,6 +323,45 @@ fun SettingsScreen(
 
                 HorizontalDivider()
 
+                // ============================= NIGHT MODE =============================
+                SectionHeader(stringResource(R.string.section_night_mode))
+                SwitchItem(
+                    title = stringResource(R.string.night_mode),
+                    subtitle = stringResource(R.string.night_mode_desc),
+                    checked = s.nightMode,
+                    onToggle = { viewModel.toggleNightMode() },
+                )
+                if (s.nightMode) {
+                    Text(
+                        stringResource(R.string.night_mode_alt_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    NightModeTimePicker(
+                        label = stringResource(R.string.night_mode_start),
+                        minutes = s.nightModeStart,
+                        onTimeSelected = { viewModel.updateNightModeStart(it) },
+                    )
+                    NightModeTimePicker(
+                        label = stringResource(R.string.night_mode_end),
+                        minutes = s.nightModeEnd,
+                        onTimeSelected = { viewModel.updateNightModeEnd(it) },
+                    )
+                    Text("${stringResource(R.string.night_mode_brightness)}: ${s.nightModeBrightness}%")
+                    Slider(
+                        value = s.nightModeBrightness.toFloat(),
+                        onValueChange = { viewModel.updateNightModeBrightness(it.toInt()) },
+                        valueRange = 0f..100f,
+                    )
+                    Text(
+                        stringResource(R.string.night_mode_brightness_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                HorizontalDivider()
+
                 // ============================= CLOCK =============================
                 SectionHeader(stringResource(R.string.section_clock))
 
@@ -307,8 +376,12 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
+                        val hourTok = if (s.clockFormat == ClockFormat.H12) "hh" else "HH"
+                        val secTok = if (s.clockSeconds) ":ss" else ""
+                        val amPm = if (s.clockFormat == ClockFormat.H12) " a" else ""
+                        val clockPreviewFmt = "$hourTok:mm$secTok$amPm"
                         Text(
-                            SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date()),
+                            SimpleDateFormat(clockPreviewFmt, LocalLocale.current.platformLocale).format(Date()),
                             color = Color.White,
                             fontSize = s.clockSize.sp,
                             fontWeight = FontWeight.Light,
@@ -322,9 +395,29 @@ fun SettingsScreen(
                         valueRange = 24f..96f,
                     )
                     Text(
+                        stringResource(R.string.clock_format),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            s.clockFormat == ClockFormat.H24,
+                            stringResource(R.string.clock_format_24h),
+                        ) { viewModel.updateClockFormat(ClockFormat.H24) }
+                        FilterChip(
+                            s.clockFormat == ClockFormat.H12,
+                            stringResource(R.string.clock_format_12h),
+                        ) { viewModel.updateClockFormat(ClockFormat.H12) }
+                    }
+                    Text(
                         stringResource(R.string.drag_clock_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    SwitchItem(
+                        title = stringResource(R.string.clock_seconds),
+                        subtitle = stringResource(R.string.clock_seconds_desc),
+                        checked = s.clockSeconds,
+                        onToggle = { viewModel.toggleClockSeconds() },
                     )
                     SwitchItem(
                         title = stringResource(R.string.snap_to_grid),
@@ -502,7 +595,17 @@ fun SettingsScreen(
                 // ============================= ALBUMS =============================
                 SectionHeader(stringResource(R.string.section_albums))
 
-                Button(onClick = onChangeAlbums, modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        biometricLauncher.launch(
+                            title = authTitleKey,
+                            subtitle = authSubtitleAlbums,
+                            onNotSetup = { showBiometricNotSetupDialog = true },
+                            onSuccess = { onChangeAlbums() },
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Text(stringResource(R.string.change_albums))
                 }
@@ -654,6 +757,16 @@ fun SettingsScreen(
                     }
                 }
 
+                // ============================= PERMISSIONS =============================
+                val permStatus = state.permissionStatus
+                if (permStatus != null) {
+                    PermissionStatusCard(
+                        status = permStatus,
+                        checking = state.permissionCheckInProgress,
+                        onRecheck = { viewModel.recheckPermissions() },
+                    )
+                }
+
                 HorizontalDivider()
 
                 // ============================= DANGER ZONE =============================
@@ -753,16 +866,117 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
+private fun PermissionStatusCard(
+    status: com.dav3.immichframe.domain.model.PermissionCheckResult,
+    checking: Boolean,
+    onRecheck: () -> Unit,
+) {
+    val missingBlocking = status.missingBlocking
+    val missingOptional = status.missingOptional
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (missingBlocking.isNotEmpty()) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        ),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(R.string.api_key_permissions),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                TextButton(onClick = onRecheck, enabled = !checking) {
+                    Text(
+                        if (checking) {
+                            stringResource(R.string.checking)
+                        } else {
+                            stringResource(R.string.recheck_permissions)
+                        },
+                    )
+                }
+            }
+
+            if (missingBlocking.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.missing_required_perms),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+
+            // List each permission with its status icon
+            RequiredPermission.entries.forEach { perm ->
+                val st = status.statuses[perm]
+                val (icon, tint) = when (st) {
+                    PermissionStatus.Granted -> Icons.Default.Check to androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                    PermissionStatus.Denied -> Icons.Default.Close to MaterialTheme.colorScheme.error
+                    PermissionStatus.Unknown -> Icons.Default.Help to androidx.compose.ui.graphics.Color.Gray
+                    null -> Icons.Default.Help to androidx.compose.ui.graphics.Color.Gray
+                }
+                Row(
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            perm.scope,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            perm.featureName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        )
+                    }
+                }
+            }
+
+            if (missingOptional.isNotEmpty()) {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                Text(
+                    stringResource(R.string.optional_perms_missing),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun SwitchItem(
     title: String,
     checked: Boolean,
     onToggle: () -> Unit,
     subtitle: String? = null,
+    enabled: Boolean = true,
 ) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = subtitle?.let { { Text(it) } },
-        trailingContent = { Switch(checked = checked, onCheckedChange = { onToggle() }) },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = { onToggle() },
+                enabled = enabled,
+            )
+        },
     )
 }
 
@@ -816,6 +1030,56 @@ private fun FilterChip(
         onClick = onClick,
         label = { Text(label) },
     )
+}
+
+/**
+ * Row showing a time label (e.g. "22:00") that opens a Material3 TimePicker
+ * dialog when tapped. [minutes] is minutes-since-midnight (0–1439).
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun NightModeTimePicker(
+    label: String,
+    minutes: Int,
+    onTimeSelected: (Int) -> Unit,
+) {
+    var showPicker by remember { mutableStateOf(false) }
+    val locale = LocalLocale.current.platformLocale
+    val hour = (minutes / 60) % 24
+    val minute = minutes % 60
+    val display = String.format(locale, "%02d:%02d", hour, minute)
+
+    ListItem(
+        headlineContent = { Text(label) },
+        supportingContent = { Text(display) },
+        trailingContent = {
+            TextButton(onClick = { showPicker = true }) {
+                Text(stringResource(R.string.edit))
+            }
+        },
+    )
+
+    if (showPicker) {
+        val state = rememberTimePickerState(
+            initialHour = hour,
+            initialMinute = minute,
+            is24Hour = true,
+        )
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text(label) },
+            text = { TimePicker(state = state) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onTimeSelected(state.hour * 60 + state.minute)
+                    showPicker = false
+                }) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPicker = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
 }
 
 @Composable

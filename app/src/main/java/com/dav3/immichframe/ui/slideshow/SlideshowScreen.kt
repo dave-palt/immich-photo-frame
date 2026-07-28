@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -71,6 +72,8 @@ import androidx.media3.ui.PlayerView
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.domain.model.BorderColors
+import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
@@ -81,7 +84,7 @@ import com.dav3.immichframe.ui.onboarding.TourSteps
 import com.dav3.immichframe.ui.onboarding.rememberTourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.update.UpdateViewModel
-import com.dav3.immichframe.util.extractDominantColor
+import com.dav3.immichframe.util.extractBorderColors
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -89,7 +92,6 @@ import java.util.Locale
 
 @Composable
 fun SlideshowScreen(
-    onClose: () -> Unit,
     onSettings: () -> Unit,
     onChangeAlbums: () -> Unit,
     onMediaSelection: () -> Unit = {},
@@ -112,6 +114,7 @@ fun SlideshowScreen(
 
     val authTitle = stringResource(R.string.biometric_auth_title)
     val authSubtitleMedia = stringResource(R.string.biometric_auth_subtitle_media)
+    val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
 
     LaunchedEffect(Unit) { viewModel.load() }
 
@@ -148,14 +151,46 @@ fun SlideshowScreen(
     // Track container size for clock position normalization
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
 
+    // Night Mode active state — polled every few seconds, used to:
+    // 1) pause the auto-advance timer below, and
+    // 2) render a black screen instead of photo/video content.
+    // A short poll interval keeps the transition snappy when settings change
+    // or when crossing the window boundary. The 60s tick used previously meant
+    // up to a full minute of latency after returning from Settings.
+    var nightActive by remember { mutableStateOf(false) }
+    LaunchedEffect(s.nightMode, s.nightModeStart, s.nightModeEnd) {
+        if (!s.nightMode) {
+            nightActive = false
+            return@LaunchedEffect
+        }
+        while (true) {
+            val cal = java.util.Calendar.getInstance()
+            val nowMin = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                cal.get(java.util.Calendar.MINUTE)
+            nightActive = s.isNightModeActive(nowMin)
+            kotlinx.coroutines.delay(5_000L)
+        }
+    }
+
     // Auto-advance with progress tracking
-    // For images: fixed timer. For videos: VideoPlayer drives advancing
-    // (advances when the video ends, not on the interval timer).
+    // For images: the timer starts only once the image has finished decoding
+    // (coil onState = Success/Error). This prevents the timer from counting
+    // down during a slow decode (e.g. a 77MB GIF) — the user sees the photo
+    // for the full interval, not whatever's left after decode.
+    // For videos: VideoPlayer drives advancing (calls viewModel.next() when
+    // the video ends, not the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds) {
+    // false = image still decoding; true = video or image ready.
+    // Reset to false on every index change so the timer waits for decode.
+    var imageReady by remember { mutableStateOf(false) }
+    LaunchedEffect(state.currentIndex) {
+        // Videos are immediately "ready" — ExoPlayer handles its own timeline.
+        imageReady = state.assets.getOrNull(state.currentIndex)?.type == AssetType.VIDEO
+    }
+    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady) {
         progress = 0f
-        if (!isPaused && state.assets.isNotEmpty()) {
+        if (!isPaused && !nightActive && imageReady && state.assets.isNotEmpty()) {
             val currentAsset = state.assets[state.currentIndex]
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
@@ -192,29 +227,90 @@ fun SlideshowScreen(
         view.keepScreenOn = s.keepScreenOn
     }
 
-    // Clock
-    var currentTime by remember { mutableStateOf("") }
-    if (s.showClock) {
-        LaunchedEffect(Unit) {
-            while (true) {
-                currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                delay(30_000)
+    // Night Mode brightness application — dim the screen when nightActive.
+    // Uses per-window brightness (WindowManager.LayoutParams.screenBrightness).
+    // BRIGHTNESS_OVERRIDE_NONE (-1f) = defer to the system/user brightness.
+    // nightActive is declared + polled above, alongside the auto-advance timer.
+    DisposableEffect(nightActive, s.nightModeBrightness) {
+        val window = (view.context as? Activity)?.window
+        if (window != null) {
+            val params = window.attributes
+            params.screenBrightness = if (nightActive) {
+                s.nightModeBrightness / 100f
+            } else {
+                android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            }
+            window.attributes = params
+        }
+        onDispose {
+            // Restore system brightness when leaving the slideshow
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                val params = window.attributes
+                params.screenBrightness =
+                    android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                window.attributes = params
             }
         }
     }
 
-    // Adaptive background — extract dominant color from current image
-    var dominantColor by remember { mutableStateOf(Color.Black) }
+    // Clock
+    var currentTime by remember { mutableStateOf("") }
+    if (s.showClock) {
+        LaunchedEffect(s.clockSeconds, s.clockFormat) {
+            while (true) {
+                val hourToken = if (s.clockFormat == ClockFormat.H12) "hh" else "HH"
+                val secToken = if (s.clockSeconds) ":ss" else ""
+                val amPm = if (s.clockFormat == ClockFormat.H12) " a" else ""
+                val pattern = "$hourToken:mm$secToken$amPm"
+                currentTime = SimpleDateFormat(pattern, Locale.getDefault()).format(Date())
+                // With seconds: update every 1s. Without: every 10s is enough
+                // (the minute changes at most once per 60s, and the 10s tick
+                // ensures we roll over promptly without drifting).
+                delay(if (s.clockSeconds) 1_000L else 10_000L)
+            }
+        }
+    }
+
+    // Adaptive background — extract edge colors from current image's thumbnail.
+    // We sample the top/bottom and left/right halves so the letterbox bars can
+    // be painted as a gradient that matches the adjacent slice of the photo.
+    var borderColors by remember { mutableStateOf<BorderColors?>(null) }
     val context = LocalContext.current
     LaunchedEffect(state.currentIndex, s.adaptiveBackground, state.assets.size) {
         if (s.adaptiveBackground && state.assets.isNotEmpty()) {
             val asset = state.assets[state.currentIndex]
-            if (asset.type != AssetType.VIDEO) {
-                dominantColor = extractDominantColor(context, viewModel.imageUrl(asset.id))
-            }
+            // Always extract from the small JPEG thumbnail — it's fast for
+            // all asset types (GIFs, videos, regular images) since Coil only
+            // needs a 128px bitmap for Palette.
+            borderColors = extractBorderColors(context, viewModel.thumbnailUrl(asset.id))
         } else {
-            dominantColor = Color.Black
+            borderColors = null
         }
+    }
+
+    // Pick gradient direction based on which axis has letterbox bars.
+    // When the image is wider than the container → top/bottom bars → vertical gradient.
+    // When the image is taller than the container → left/right bars → horizontal gradient.
+    // When perfectly fitted (no bars) the gradient is hidden behind the image anyway.
+    val adaptiveBrush = if (
+        s.adaptiveBackground &&
+        !nightActive &&
+        borderColors != null &&
+        containerSize.width > 0 &&
+        containerSize.height > 0
+    ) {
+        val bc = borderColors!!
+        val containerAspect = containerSize.width.toFloat() / containerSize.height
+        if (bc.aspectRatio > containerAspect) {
+            // Image wider than container → bars on top/bottom
+            Brush.verticalGradient(listOf(bc.top, bc.bottom))
+        } else {
+            // Image taller than (or equal to) container → bars on left/right
+            Brush.horizontalGradient(listOf(bc.left, bc.right))
+        }
+    } else {
+        null
     }
 
     TourHost(
@@ -228,7 +324,7 @@ fun SlideshowScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(if (s.adaptiveBackground) dominantColor else Color.Black)
+                    .background(adaptiveBrush ?: Brush.verticalGradient(listOf(Color.Black, Color.Black)))
                     .onSizeChanged { containerSize = it }
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { controlsVisible = !controlsVisible })
@@ -236,6 +332,10 @@ fun SlideshowScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 when {
+                    // Night Mode active — black screen, no photo/video rendering.
+                    // The timer (above) is also paused via the nightActive flag.
+                    nightActive -> { /* pure black surface, nothing to render */ }
+
                     state.isLoading -> CircularProgressIndicator()
 
                     state.error != null -> Text(state.error!!, color = Color.White)
@@ -266,14 +366,15 @@ fun SlideshowScreen(
                                     isVideoPaused = isVideoPaused,
                                     fillMode = s.fillMode,
                                 )
-                            } else {
+                            } else if (currentAsset != null) {
                                 KenBurnsImage(
-                                    url = viewModel.imageUrl(assetId),
+                                    url = viewModel.imageUrl(currentAsset),
                                     contentScale = scale,
                                     assetId = assetId,
                                     photoAnimations = s.photoAnimations,
                                     enabledAnims = s.enabledAnimations,
                                     durationMs = s.intervalSeconds * 1000L,
+                                    onImageLoaded = { imageReady = true },
                                 )
                             }
                         }
@@ -290,7 +391,7 @@ fun SlideshowScreen(
                             fontSize = s.clockSize,
                             position = s.clockPosition,
                             containerSize = containerSize,
-                            clockDrift = s.photoAnimations,
+                            clockDrift = true,
                             snapToGrid = s.clockSnapToGrid,
                             onPositionChanged = { normX, normY ->
                                 viewModel.setClockPosition(ClockPosition(normX, normY))
@@ -327,8 +428,10 @@ fun SlideshowScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0x80000000))
+                            .displayCutoutPadding()
                             .statusBarsPadding()
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.photos_count, state.currentIndex + 1, state.assets.size), color = Color.White)
@@ -394,7 +497,14 @@ fun SlideshowScreen(
                             }
                         }
                         IconButton(
-                            onClick = onChangeAlbums,
+                            onClick = {
+                                biometric.launch(
+                                    title = authTitle,
+                                    subtitle = authSubtitleAlbums,
+                                    onNotSetup = { showBioNotSetup = true },
+                                    onSuccess = { onChangeAlbums() },
+                                )
+                            },
                             modifier = Modifier.tourTarget("slideshow_albums", tourState),
                         ) {
                             Icon(Icons.Default.PhotoLibrary, "Albums", tint = Color.White)
@@ -404,12 +514,6 @@ fun SlideshowScreen(
                             modifier = Modifier.tourTarget("slideshow_settings_gear", tourState),
                         ) {
                             Icon(Icons.Default.Settings, "Settings", tint = Color.White)
-                        }
-                        IconButton(
-                            onClick = onClose,
-                            modifier = Modifier.tourTarget("slideshow_close", tourState),
-                        ) {
-                            Icon(Icons.Default.Close, "Close", tint = Color.White)
                         }
                     }
                 }
@@ -448,7 +552,10 @@ fun SlideshowScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.navigationBarsPadding(),
+                        modifier = Modifier
+                            .navigationBarsPadding()
+                            .displayCutoutPadding()
+                            .padding(vertical = 24.dp),
                     ) {
                         IconButton(
                             onClick = { isPaused = !isPaused },

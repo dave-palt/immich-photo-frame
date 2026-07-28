@@ -142,6 +142,144 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-29** — Fixed Settings → Back navigation bug + removed redundant
+  slideshow close button + added Settings to onboarding flow. (1) Root cause
+  of back-nav bug: `apiKey` in `SettingsRepositoryImpl` was a cold one-shot
+  `flow { emit(...) }` that emitted once and completed — it never reacted to
+  `EncryptedSharedPreferences` writes. `NavViewModel.startRoute` (which
+  `combine`s `serverUrl`, `apiKey`, `selectedAlbumIds`) therefore permanently
+  evaluated to `SETUP` after the initial collection (where `apiKey=""`), even
+  after the user entered a key. Settings `onBack` reads `startRoute` → got
+  `SETUP` → sent user to domain page. Fix: `apiKey` is now a
+  `MutableStateFlow` backed by `EncryptedSharedPreferences`, updated in
+  `setApiKey()` and `clearAll()`. No navigation restructure needed — the
+  existing state-driven design (where `startRoute` computes the destination
+  and `onBack` uses `popUpTo(0)`) is correct once the flow is live. The same
+  `startRoute` mechanism provides "two hooks" for Settings back: during
+  onboarding (key set, no albums) → Albums; at runtime (albums selected) →
+  Slideshow. (2) Removed the X (close) button from the slideshow top bar —
+  it was redundant with the albums (PhotoLibrary) icon, both navigating back
+  to album selection. Removed `onClose` param from `SlideshowScreen`, the
+  `Icons.Default.Close` import, the `slideshow_close` tour step
+  (TourStep.kt), and `tour_slideshow_close_title` + `_body` strings from all
+  13 locale files. Tour step count: 21→20 (slideshow 8→7). (3) Inserted
+  Settings into the first-run onboarding flow: Setup → Settings → Albums →
+  Slideshow (was Setup → Albums → Slideshow). Single `SetupScreen.onSuccess`
+  change in ImmichNavHost: navigate to SETTINGS instead of ALBUMS. Settings
+  back is driven by `startRoute`, so it automatically goes to Albums
+  (first-run, no albums yet). Updated: functional-spec (F1 step 7, F7 step
+  inventory + count + slideshow behavior description).
+
+- **2026-07-28** — Biometric-gated album selection from slideshow. The
+  PhotoLibrary (albums) icon in the slideshow top bar now requires
+  biometric/device-credential auth before navigating to album selection,
+  matching the media-selection grid icon next to it. Both modify what's
+  shown on the frame and sit side-by-side in the top bar, so both should
+  require auth. Reuses the existing `biometric` launcher +
+  `showBioNotSetup` dialog already declared in the top-bar Row for media
+  selection. New string `biometric_auth_subtitle_albums` in all 13 locales.
+  Scope: slideshow top bar only — Settings → Albums and onboarding album
+  selection are NOT gated (those are already behind the Settings screen /
+  first-run flow). Updated: functional-spec (F3 album icon biometric-gated,
+  F7 tour step description).
+
+- **2026-07-28** — Animated GIF playback support. Two compounding gaps
+  prevented GIFs from playing: (1) no `coil-gif` dependency and no
+  `GifDecoder` registered with Coil's `ImageLoader`, so GIFs decoded as a
+  single static frame; (2) image URLs pointed at `/thumbnail?size=preview`,
+  which Immich transcodes to JPEG — collapsing GIF animation regardless of
+  decoder. Fix: added `io.coil-kt.coil3:coil-gif` dependency (same version
+  as coil, pinned in version catalog). `ImmichFrameApp` now implements
+  `SingletonImageLoader.Factory` and registers `GifDecoder.Factory()` +
+  crossfade in `newImageLoader()`. The `AssetDto` gained
+  `originalMimeType` (returned by `POST /search/metadata`), carried through
+  `Asset` model → `CachedAsset` → Room (`original_mime_type` column, DB
+  version bumped 1→2 with `fallbackToDestructiveMigration`).
+  `ImmichRepositoryImpl.imageUrl()` now branches: GIFs route to
+  `/original?apiKey=`, all other images stay on
+  `/thumbnail?size=preview&apiKey=`. `SlideshowViewModel.imageUrl()`
+  changed signature from `(assetId: String)` to `(asset: Asset)` so the
+  mime type is available at the call site. The media-selection grid
+  thumbnails are unaffected (they use `size=thumbnail`, always JPEG —
+  fine for GIFs as a static preview). Updated: functional-spec (F3 step
+  5 — GIF playback), technical-spec (tech stack, image caching strategy,
+  media cache schema, persistence note), api-reference (new Media URL
+  Routing section), README (feature list + tech stack).
+
+- **2026-07-27** — Night Mode feature (brightness-based display schedule).
+  Unlike a true screen-off or device power-off, this dims the screen to a
+  configurable brightness level during set hours via per-window
+  `WindowManager.LayoutParams.screenBrightness`. The screen stays on — this
+  is explicitly a fallback for devices that lack built-in scheduled power
+  on/off. The Settings UI includes a helper text under the toggle stating
+  that the device's native scheduled power on/off (if available) is
+  preferable. New settings: `night_mode` (bool, default false),
+  `night_mode_start` (int minutes, default 1320 = 22:00), `night_mode_end`
+  (int minutes, default 420 = 07:00), `night_mode_brightness` (int 0–100,
+  default 0). `SlideshowSettings.isNightModeActive(hourMinute)` handles
+  overnight wrap-around. `SlideshowScreen` has a `LaunchedEffect` polling
+  every 60s + a `DisposableEffect` applying/restoring brightness. New
+  Settings UI section "Night Mode" with toggle, two `TimePicker` dialogs
+  (24h), brightness slider, and the last-resort helper text. New strings
+  (EN + 12 locales): section_night_mode, night_mode, night_mode_desc,
+  night_mode_alt_hint, night_mode_start, night_mode_end, night_mode_brightness,
+  night_mode_brightness_hint. Updated: functional-spec (F6 settings list),
+  technical-spec (persistence table + data flow), ui-spec (mockup + section
+  list), overview (goals), README (feature list).
+
+- **2026-07-27** — Per-endpoint permission verification. After key generation
+  or manual paste, the app probes all 5 required endpoints (mirroring
+  `scripts/check-api-key.sh`) in dependency order: `GET /users/me` →
+  `GET /albums` → `POST /search/metadata` → `GET /assets/{id}/thumbnail` →
+  `GET /assets/{id}/original`. Results stored as `permission_status` (JSON)
+  in DataStore, refreshed on Settings open + "Re-check" button. Blocking
+  permissions (user/album/asset read/view) missing → setup blocked with
+  error. Optional permission (`asset.download`) missing → degraded mode:
+  Skip Videos toggle locked ON, media cache skips downloading. New
+  `RequiredPermission` enum in `domain/model/` is the single source of truth
+  (scope string, feature name, blocking flag, gated setting key). New model
+  types: `PermissionStatus` (sealed: Granted/Denied/Unknown),
+  `PermissionCheckResult` (map + computed `canProceed`/`missingBlocking`/
+  `missingOptional`). New DataStore key: `permission_status`. New repo
+  method: `ImmichRepository.checkPermissions()` returning Result. New
+  Settings UI: `PermissionStatusCard` composable with ✓/✗/? icons per
+  permission + error-colored background when blocking missing. `SwitchItem`
+  gained `enabled` param for locked toggles. Updated: functional-spec (F1
+  permission verification step, F6 permission card + feature gating),
+  technical-spec (persistence table), ui-spec (permission card mockup +
+  description), api-reference (permission verification section), README
+  (feature list).
+
+- **2026-07-27** — In-app API key generation feature. Eliminated the need for
+  external `keymgr.ts` scripts. Setup screen restructured into a two-step flow:
+  (1) Domain Validation — user enters server URL, app calls `GET /server/version`
+  + `GET /server/features` (no auth) to detect version and auth methods; (2)
+  Authentication — three options side-by-side: Generate Key (email/password →
+  `POST /auth/login` → `POST /api-keys`), Enter Manually (paste existing key),
+  OAuth (PKCE via Custom Tabs, only shown if server has OAuth enabled). Password
+  is held in ViewModel memory only for the key-generation call, then discarded —
+  never persisted. Only the resulting API key hits EncryptedSharedPreferences.
+  New separate Retrofit instance `ImmichAuthApi` (no x-api-key interceptor) for
+  login, key creation, and server probing; Bearer token passed per-call. New
+  `PkceHelper.kt` for OAuth code_verifier/challenge/state. New DataStore keys:
+  `server_version` (String), `api_key_scoped` (String bool). New dependency:
+  `androidx.browser:browser:1.8.0` (Custom Tabs). New manifest deep-link
+  intent-filter for `com.dav3.immichframe://oauth-callback`. New setup tour
+  step `setup_validate` (total: 18→19... actually 20 with the count fix). New
+  strings (EN + 12 locales): validate_server, server_version_label,
+  generate_key, enter_manually, generate_key_title, generate_key_desc, email,
+  password, login_and_generate, sign_in_with_oauth, api_key_help,
+  api_key_help_title, api_key_help_what, api_key_help_why,
+  api_key_help_password + tour_setup_validate_title/body (updated
+  tour_setup_apikey + tour_setup_connect body text). Confirmed via git
+  archaeology (v1.50→v3.0.3): Immich NEVER had a `/auth/tfa` endpoint — TFA
+  is OAuth/OIDC-only (enforced by the IdP, not the server API). Updated:
+  functional-spec (F1 rewrite, F7 step count), technical-spec (tech stack,
+  package layout, persistence table, setup description), ui-spec (setup
+  mockup redraw), api-reference (new auth endpoints section, in-app gen
+  note), overview (goals), README (features, setup, permissions table fix
+  4→5 including missing asset.download).
+
 - **2026-07-26** — Media Selection feature (PR2 of media-selection feature).
   New screen `ui/media/MediaSelectionScreen.kt` + `MediaSelectionViewModel`
   showing a grid of all album assets. Tap thumbnails to show/hide from the

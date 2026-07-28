@@ -10,6 +10,11 @@
     <string name="section_system">System</string>
     <string name="section_albums">Albums</string>
     <string name="section_connection">Connection</string>
+    <string name="api_key_permissions">API Key Permissions</string>
+    <string name="recheck_permissions">Re-check</string>
+    <string name="checking">Checking…</string>
+    <string name="missing_required_perms">Missing required permissions — some features will not work. Generate a new key or update it in Immich.</string>
+    <string name="optional_perms_missing">Some optional features are disabled due to missing permissions.</string>
 
     <!-- Playback -->
     <string name="interval">Interval</string>
@@ -17,6 +22,7 @@
     <string name="shuffle_desc">Randomize image order</string>
     <string name="skip_videos">Skip Videos</string>
     <string name="skip_videos_desc">Only show photos</string>
+    <string name="skip_videos_locked_desc">Locked — API key lacks \'asset.download\' permission</string>
     <string name="muted">Muted</string>
     <string name="muted_desc">Silence video audio</string>
     <string name="photo_animations">Photo Animations</string>
@@ -36,15 +42,30 @@
     <string name="contain">Contain</string>
     <string name="cover">Cover</string>
     <string name="adaptive_background">Adaptive Background</string>
-    <string name="adaptive_background_desc">Fill letterbox bars with average color from each photo</string>
+    <string name="adaptive_background_desc">Fill letterbox bars with a gradient from each photo\'s top/bottom colors</string>
     <string name="fullscreen">Fullscreen</string>
     <string name="fullscreen_desc">Hide system bars</string>
     <string name="keep_screen_on">Keep Screen On</string>
+
+    <!-- Night Mode -->
+    <string name="section_night_mode">Night Mode</string>
+    <string name="night_mode">Night Mode</string>
+    <string name="night_mode_desc">Dim the screen during set hours to reduce power consumption and screen wear at night</string>
+    <string name="night_mode_alt_hint">For best results, prefer your device\'s built-in scheduled power on/off (in system settings) if available. This in-app option is a fallback.</string>
+    <string name="night_mode_start">Dim screen at</string>
+    <string name="night_mode_end">Brighten screen at</string>
+    <string name="night_mode_brightness">Night brightness</string>
+    <string name="night_mode_brightness_hint">Screen brightness level during night hours. 0%% is darkest, but not fully off.</string>
 
     <!-- Clock -->
     <string name="show_clock">Show Clock</string>
     <string name="clock_size">Clock Size</string>
     <string name="drag_clock_hint">Drag the clock on the slideshow screen to reposition</string>
+    <string name="clock_seconds">Show Seconds</string>
+    <string name="clock_seconds_desc">Display seconds in the clock (updates every second)</string>
+    <string name="clock_format">Clock Format</string>
+    <string name="clock_format_24h">24h</string>
+    <string name="clock_format_12h">12h</string>
     <string name="snap_to_grid">Snap to Grid</string>
     <string name="snap_to_grid_desc">Align clock to grid based on its size when released</string>
 
@@ -96,6 +117,7 @@
     <string name="biometric_auth_title">Authenticate</string>
     <string name="biometric_auth_subtitle_key">Authenticate to view your API key</string>
     <string name="biometric_auth_subtitle_media">Authenticate to manage media selection</string>
+    <string name="biometric_auth_subtitle_albums">Authenticate to change albums</string>
     <string name="biometric_not_setup_title">Screen Lock Required</string>
     <string name="biometric_not_setup_message">This action requires a screen lock (fingerprint, face, or PIN). Set one up in your device security settings to use this feature.</string>
 
@@ -128,6 +150,23 @@
     <string name="next">Next</string>
     <string name="select_albums">Select Albums</string>
     <string name="done">Done</string>
+    <string name="validate_server">Validate Server</string>
+    <string name="server_version_label">Immich %1$s</string>
+    <string name="generate_key">Generate Key</string>
+    <string name="enter_manually">Enter Manually</string>
+    <string name="generate_key_prompt">Don\'t have an API key? Generate one automatically:</string>
+    <string name="generate_key_title">Generate API Key</string>
+    <string name="generate_key_desc">Log in with your Immich email and password. The app will create a scoped API key automatically — your password is used once and never stored.</string>
+    <string name="generate_key_account_note">Use the account meant for this photo frame — it determines which albums and photos are available. This doesn\'t have to be your personal account.</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_and_generate">Log In &amp; Generate Key</string>
+    <string name="sign_in_with_oauth">Sign in with OAuth</string>
+    <string name="api_key_help">What is an API key?</string>
+    <string name="api_key_help_title">About API Keys</string>
+    <string name="api_key_help_what">An API key is a token that lets this app access your photos on your Immich server — without storing your password.</string>
+    <string name="api_key_help_why">The app creates a scoped key with only the permissions it needs (reading albums, viewing photos). You can revoke it anytime in Immich Settings → API Keys.</string>
+    <string name="api_key_help_password">Your password is used once to create the key, then immediately discarded. It is never saved on this device.</string>
     <string name="no_albums">No albums found</string>
     <string name="no_albums_available">No albums available</string>
     <string name="no_albums_available_desc">Your Immich account doesn\'t have any albums yet. Create one in Immich, then tap retry.</string>
@@ -178,10 +217,14 @@
     <string name="tour_setup_welcome_body">Connect to your Immich server to display your photos. Let\'s walk through the setup.</string>
     <string name="tour_setup_server_title">Server Address</string>
     <string name="tour_setup_server_body">Enter your Immich server URL here. Use the format photos.example.com or 192.168.1.100:2283.</string>
-    <string name="tour_setup_apikey_title">API Key</string>
-    <string name="tour_setup_apikey_body">Create an API key in Immich under Settings → API Keys. It needs album, asset, and user read permissions.</string>
-    <string name="tour_setup_connect_title">Test &amp; Connect</string>
-    <string name="tour_setup_connect_body">Tap Test Connection to verify your credentials. Once connected, you\'ll pick which albums to display.</string>
+    <string name="tour_setup_validate_title">Validate Server</string>
+    <string name="tour_setup_validate_body">After entering your server address, tap to check the connection. The app will detect the Immich version and available login methods.</string>
+    <string name="tour_setup_generate_title">Auto-Generate Key</string>
+    <string name="tour_setup_generate_body">Prefer not to handle API keys manually? Tap here and log in with your email and password — the app creates a scoped key for you, then discards your password.</string>
+    <string name="tour_setup_apikey_title">Generate Your Key</string>
+    <string name="tour_setup_apikey_body">An API key is a token that lets this app access your photos on the Immich server — without sharing your password. You can paste an existing key here, or use the button below to generate one automatically.</string>
+    <string name="tour_setup_connect_title">Connect</string>
+    <string name="tour_setup_connect_body">Tap to test the connection and start your slideshow.</string>
 
     <!-- Albums tour steps -->
     <string name="tour_albums_select_title">Choose Your Albums</string>
@@ -206,9 +249,6 @@
     <string name="tour_slideshow_update_body">When an update is available, this icon appears here so you can install the latest version. If it\'s not showing, you\'re already up to date.</string>
     <string name="tour_slideshow_settings_title">Adjust on the Fly</string>
     <string name="tour_slideshow_settings_body">Open settings without leaving the slideshow — change interval, enable the clock, and more.</string>
-    <string name="tour_slideshow_close_title">Exit Slideshow</string>
-    <string name="tour_slideshow_close_body">Tap here to exit the slideshow and return to album selection.</string>
-
     <!-- Settings tour steps -->
     <string name="tour_settings_overview_title">Settings Overview</string>
     <string name="tour_settings_overview_body">All changes save automatically — no save button needed. Scroll down to explore each section.</string>
