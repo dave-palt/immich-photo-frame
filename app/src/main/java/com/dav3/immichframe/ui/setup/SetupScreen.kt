@@ -24,13 +24,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dav3.immichframe.R
 import com.dav3.immichframe.ui.onboarding.TourHost
 import com.dav3.immichframe.ui.onboarding.TourScreen
+import com.dav3.immichframe.ui.onboarding.TourState
 import com.dav3.immichframe.ui.onboarding.rememberTourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
+import com.dav3.immichframe.ui.theme.ImmichFrameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,69 +80,204 @@ fun SetupScreen(
         ApiKeyHelpDialog(onDismiss = { showHelpDialog = false })
     }
 
-    TourHost(
-        screen = TourScreen.SETUP,
+    SetupContent(
+        state = state,
+        showKey = showKey,
+        showPassword = showPassword,
+        onToggleShowKey = { showKey = !showKey },
+        onToggleShowPassword = { showPassword = !showPassword },
+        onShowHelp = { showHelpDialog = true },
+        onUpdateProtocol = viewModel::updateProtocol,
+        onUpdateDomain = viewModel::updateDomain,
+        onValidateServer = viewModel::validateServer,
+        onUpdateApiKey = viewModel::updateApiKey,
+        onUpdateEmail = viewModel::updateEmail,
+        onUpdatePassword = viewModel::updatePassword,
+        onTestConnection = viewModel::testConnection,
+        onGenerateKey = viewModel::generateKey,
+        onStartOAuth = viewModel::startOAuth,
+        onSetAuthMode = viewModel::setAuthMode,
+        onBackToDomain = viewModel::backToDomainStep,
+        onOpenOAuth = {
+            val intent = CustomTabsIntent.Builder().build()
+            intent.launchUrl(context, Uri.parse(it))
+        },
+        onResetOnboarding = viewModel::resetOnboarding,
         completedSteps = completedSteps,
         onStepCompleted = viewModel::markStepCompleted,
-        onSkipped = { },
         tourState = tourState,
-    ) {
-        Scaffold { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp)
-                    .imePadding()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.app_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp),
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium,
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    stringResource(R.string.setup_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                )
-                Spacer(Modifier.height(32.dp))
+    )
+}
 
-                when (state.step) {
-                    SetupStep.DOMAIN -> DomainStep(
-                        state = state,
-                        viewModel = viewModel,
-                        tourState = tourState,
-                    )
-                    SetupStep.AUTH -> AuthStep(
-                        state = state,
-                        viewModel = viewModel,
-                        showKey = showKey,
-                        showPassword = showPassword,
-                        onToggleShowKey = { showKey = !showKey },
-                        onToggleShowPassword = { showPassword = !showPassword },
-                        onShowHelp = { showHelpDialog = true },
-                        onBack = viewModel::backToDomainStep,
-                        onOpenOAuth = {
-                            val intent = CustomTabsIntent.Builder().build()
-                            intent.launchUrl(context, Uri.parse(it))
-                        },
-                        tourState = tourState,
-                    )
-                }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SetupContent(
+    state: SetupUiState,
+    showKey: Boolean,
+    showPassword: Boolean,
+    onToggleShowKey: () -> Unit,
+    onToggleShowPassword: () -> Unit,
+    onShowHelp: () -> Unit,
+    onUpdateProtocol: (Boolean) -> Unit,
+    onUpdateDomain: (String) -> Unit,
+    onValidateServer: () -> Unit,
+    onUpdateApiKey: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
+    onTestConnection: () -> Unit,
+    onGenerateKey: () -> Unit,
+    onStartOAuth: () -> Unit,
+    onSetAuthMode: (AuthMode) -> Unit,
+    onBackToDomain: () -> Unit,
+    onOpenOAuth: (String) -> Unit,
+    onResetOnboarding: () -> Unit,
+    completedSteps: Set<String> = emptySet(),
+    onStepCompleted: (String) -> Unit = {},
+    tourState: TourState? = null,
+) {
+    if (showKey) { } // suppress unused warning in previews
+    if (showPassword) { }
+    if (tourState != null) {
+        TourHost(
+            screen = TourScreen.SETUP,
+            completedSteps = completedSteps,
+            onStepCompleted = onStepCompleted,
+            onSkipped = { },
+            tourState = tourState,
+        ) {
+            SetupContentBody(
+                state = state,
+                showKey = showKey,
+                showPassword = showPassword,
+                onToggleShowKey = onToggleShowKey,
+                onToggleShowPassword = onToggleShowPassword,
+                onShowHelp = onShowHelp,
+                onUpdateProtocol = onUpdateProtocol,
+                onUpdateDomain = onUpdateDomain,
+                onValidateServer = onValidateServer,
+                onUpdateApiKey = onUpdateApiKey,
+                onUpdateEmail = onUpdateEmail,
+                onUpdatePassword = onUpdatePassword,
+                onTestConnection = onTestConnection,
+                onGenerateKey = onGenerateKey,
+                onStartOAuth = onStartOAuth,
+                onSetAuthMode = onSetAuthMode,
+                onBackToDomain = onBackToDomain,
+                onOpenOAuth = onOpenOAuth,
+                onResetOnboarding = onResetOnboarding,
+                tourState = tourState,
+            )
+        }
+    } else {
+        SetupContentBody(
+            state = state,
+            showKey = showKey,
+            showPassword = showPassword,
+            onToggleShowKey = onToggleShowKey,
+            onToggleShowPassword = onToggleShowPassword,
+            onShowHelp = onShowHelp,
+            onUpdateProtocol = onUpdateProtocol,
+            onUpdateDomain = onUpdateDomain,
+            onValidateServer = onValidateServer,
+            onUpdateApiKey = onUpdateApiKey,
+            onUpdateEmail = onUpdateEmail,
+            onUpdatePassword = onUpdatePassword,
+            onTestConnection = onTestConnection,
+            onGenerateKey = onGenerateKey,
+            onStartOAuth = onStartOAuth,
+            onSetAuthMode = onSetAuthMode,
+            onBackToDomain = onBackToDomain,
+            onOpenOAuth = onOpenOAuth,
+            onResetOnboarding = onResetOnboarding,
+            tourState = null,
+        )
+    }
+}
 
-                Spacer(Modifier.height(24.dp))
-                TextButton(onClick = viewModel::resetOnboarding) {
-                    Text(stringResource(R.string.show_tour))
-                }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SetupContentBody(
+    state: SetupUiState,
+    showKey: Boolean,
+    showPassword: Boolean,
+    onToggleShowKey: () -> Unit,
+    onToggleShowPassword: () -> Unit,
+    onShowHelp: () -> Unit,
+    onUpdateProtocol: (Boolean) -> Unit,
+    onUpdateDomain: (String) -> Unit,
+    onValidateServer: () -> Unit,
+    onUpdateApiKey: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
+    onTestConnection: () -> Unit,
+    onGenerateKey: () -> Unit,
+    onStartOAuth: () -> Unit,
+    onSetAuthMode: (AuthMode) -> Unit,
+    onBackToDomain: () -> Unit,
+    onOpenOAuth: (String) -> Unit,
+    onResetOnboarding: () -> Unit,
+    tourState: TourState?,
+) {
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(24.dp)
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.app_logo),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp),
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.setup_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            )
+            Spacer(Modifier.height(32.dp))
+
+            when (state.step) {
+                SetupStep.DOMAIN -> DomainStep(
+                    state = state,
+                    onUpdateProtocol = onUpdateProtocol,
+                    onUpdateDomain = onUpdateDomain,
+                    onValidateServer = onValidateServer,
+                    tourState = tourState,
+                )
+                SetupStep.AUTH -> AuthStep(
+                    state = state,
+                    showKey = showKey,
+                    showPassword = showPassword,
+                    onToggleShowKey = onToggleShowKey,
+                    onToggleShowPassword = onToggleShowPassword,
+                    onShowHelp = onShowHelp,
+                    onBack = onBackToDomain,
+                    onOpenOAuth = onOpenOAuth,
+                    onUpdateApiKey = onUpdateApiKey,
+                    onUpdateEmail = onUpdateEmail,
+                    onUpdatePassword = onUpdatePassword,
+                    onTestConnection = onTestConnection,
+                    onGenerateKey = onGenerateKey,
+                    onStartOAuth = onStartOAuth,
+                    onSetAuthMode = onSetAuthMode,
+                    tourState = tourState,
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+            TextButton(onClick = onResetOnboarding) {
+                Text(stringResource(R.string.show_tour))
             }
         }
     }
@@ -149,8 +287,10 @@ fun SetupScreen(
 @Composable
 private fun DomainStep(
     state: SetupUiState,
-    viewModel: SetupViewModel,
-    tourState: com.dav3.immichframe.ui.onboarding.TourState,
+    onUpdateProtocol: (Boolean) -> Unit,
+    onUpdateDomain: (String) -> Unit,
+    onValidateServer: () -> Unit,
+    tourState: TourState?,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
@@ -178,14 +318,14 @@ private fun DomainStep(
                     DropdownMenuItem(
                         text = { Text("https://") },
                         onClick = {
-                            viewModel.updateProtocol(true)
+                            onUpdateProtocol(true)
                             protocolExpanded = false
                         },
                     )
                     DropdownMenuItem(
                         text = { Text("http://") },
                         onClick = {
-                            viewModel.updateProtocol(false)
+                            onUpdateProtocol(false)
                             protocolExpanded = false
                         },
                     )
@@ -194,14 +334,14 @@ private fun DomainStep(
             Spacer(Modifier.width(8.dp))
             OutlinedTextField(
                 value = state.domain,
-                onValueChange = viewModel::updateDomain,
+                onValueChange = onUpdateDomain,
                 label = { Text(stringResource(R.string.domain)) },
                 placeholder = { Text(stringResource(R.string.domain_placeholder)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                 modifier = Modifier
                     .weight(1f)
-                    .tourTarget("setup_server", tourState),
+                    .let { if (tourState != null) it.tourTarget("setup_server", tourState) else it },
             )
         }
         if (state.domain.isNotBlank()) {
@@ -215,7 +355,7 @@ private fun DomainStep(
         Spacer(Modifier.height(24.dp))
 
         Button(
-            onClick = viewModel::validateServer,
+            onClick = onValidateServer,
             enabled = state.connectionState != ConnectionState.CONNECTING,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -244,7 +384,6 @@ private fun DomainStep(
 @Composable
 private fun AuthStep(
     state: SetupUiState,
-    viewModel: SetupViewModel,
     showKey: Boolean,
     showPassword: Boolean,
     onToggleShowKey: () -> Unit,
@@ -252,7 +391,14 @@ private fun AuthStep(
     onShowHelp: () -> Unit,
     onBack: () -> Unit,
     onOpenOAuth: (String) -> Unit,
-    tourState: com.dav3.immichframe.ui.onboarding.TourState,
+    onUpdateApiKey: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
+    onTestConnection: () -> Unit,
+    onGenerateKey: () -> Unit,
+    onStartOAuth: () -> Unit,
+    onSetAuthMode: (AuthMode) -> Unit,
+    tourState: TourState?,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Server info banner
@@ -274,21 +420,25 @@ private fun AuthStep(
         when (state.authMode) {
             AuthMode.MANUAL_KEY -> ManualKeySection(
                 state = state,
-                viewModel = viewModel,
                 showKey = showKey,
                 onToggleShowKey = onToggleShowKey,
                 onShowHelp = onShowHelp,
-                onSwitchToGenerate = { viewModel.setAuthMode(AuthMode.GENERATE) },
+                onUpdateApiKey = onUpdateApiKey,
+                onTestConnection = onTestConnection,
+                onSwitchToGenerate = { onSetAuthMode(AuthMode.GENERATE) },
                 tourState = tourState,
             )
             AuthMode.GENERATE -> GenerateKeySection(
                 state = state,
-                viewModel = viewModel,
                 showPassword = showPassword,
                 onToggleShowPassword = onToggleShowPassword,
                 onShowHelp = onShowHelp,
                 onOpenOAuth = onOpenOAuth,
-                onSwitchToManual = { viewModel.setAuthMode(AuthMode.MANUAL_KEY) },
+                onUpdateEmail = onUpdateEmail,
+                onUpdatePassword = onUpdatePassword,
+                onGenerateKey = onGenerateKey,
+                onStartOAuth = onStartOAuth,
+                onSwitchToManual = { onSetAuthMode(AuthMode.MANUAL_KEY) },
                 tourState = tourState,
             )
         }
@@ -320,18 +470,21 @@ private fun AuthStep(
 @Composable
 private fun GenerateKeySection(
     state: SetupUiState,
-    viewModel: SetupViewModel,
     showPassword: Boolean,
     onToggleShowPassword: () -> Unit,
     onShowHelp: () -> Unit,
     onOpenOAuth: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
+    onGenerateKey: () -> Unit,
+    onStartOAuth: () -> Unit,
     onSwitchToManual: () -> Unit,
-    tourState: com.dav3.immichframe.ui.onboarding.TourState,
+    tourState: TourState?,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .tourTarget("setup_apikey", tourState),
+            .let { if (tourState != null) it.tourTarget("setup_apikey", tourState) else it },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -365,7 +518,7 @@ private fun GenerateKeySection(
 
         OutlinedTextField(
             value = state.email,
-            onValueChange = viewModel::updateEmail,
+            onValueChange = onUpdateEmail,
             label = { Text(stringResource(R.string.email)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -374,7 +527,7 @@ private fun GenerateKeySection(
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = state.password,
-            onValueChange = viewModel::updatePassword,
+            onValueChange = onUpdatePassword,
             label = { Text(stringResource(R.string.password)) },
             singleLine = true,
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
@@ -392,11 +545,11 @@ private fun GenerateKeySection(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = viewModel::generateKey,
+            onClick = onGenerateKey,
             enabled = state.connectionState != ConnectionState.CONNECTING,
             modifier = Modifier
                 .fillMaxWidth()
-                .tourTarget("setup_connect", tourState),
+                .let { if (tourState != null) it.tourTarget("setup_connect", tourState) else it },
         ) {
             if (state.connectionState == ConnectionState.CONNECTING) {
                 CircularProgressIndicator(
@@ -412,7 +565,7 @@ private fun GenerateKeySection(
         if (state.showOAuthButton) {
             Spacer(Modifier.height(12.dp))
             OutlinedButton(
-                onClick = viewModel::startOAuth,
+                onClick = onStartOAuth,
                 enabled = state.connectionState != ConnectionState.CONNECTING,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -430,17 +583,18 @@ private fun GenerateKeySection(
 @Composable
 private fun ManualKeySection(
     state: SetupUiState,
-    viewModel: SetupViewModel,
     showKey: Boolean,
     onToggleShowKey: () -> Unit,
     onShowHelp: () -> Unit,
+    onUpdateApiKey: (String) -> Unit,
+    onTestConnection: () -> Unit,
     onSwitchToGenerate: () -> Unit,
-    tourState: com.dav3.immichframe.ui.onboarding.TourState,
+    tourState: TourState?,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .tourTarget("setup_apikey", tourState),
+            .let { if (tourState != null) it.tourTarget("setup_apikey", tourState) else it },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -460,7 +614,7 @@ private fun ManualKeySection(
         }
         OutlinedTextField(
             value = state.apiKey,
-            onValueChange = viewModel::updateApiKey,
+            onValueChange = onUpdateApiKey,
             label = { Text(stringResource(R.string.api_key)) },
             singleLine = true,
             visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
@@ -478,11 +632,11 @@ private fun ManualKeySection(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = viewModel::testConnection,
+            onClick = onTestConnection,
             enabled = state.connectionState != ConnectionState.CONNECTING,
             modifier = Modifier
                 .fillMaxWidth()
-                .tourTarget("setup_connect", tourState),
+                .let { if (tourState != null) it.tourTarget("setup_connect", tourState) else it },
         ) {
             if (state.connectionState == ConnectionState.CONNECTING) {
                 CircularProgressIndicator(
@@ -511,7 +665,7 @@ private fun ManualKeySection(
         TextButton(
             onClick = onSwitchToGenerate,
             modifier = Modifier
-                .tourTarget("setup_generate_key", tourState),
+                .let { if (tourState != null) it.tourTarget("setup_generate_key", tourState) else it },
         ) {
             Icon(
                 Icons.Default.AutoAwesome,
@@ -552,3 +706,265 @@ private fun ApiKeyHelpDialog(onDismiss: () -> Unit) {
         },
     )
 }
+
+// region Previews
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun SetupContentPreview_DomainEmpty() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun SetupContentPreview_DomainFilled() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(domain = "photos.example.com"),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun SetupContentPreview_DomainConnecting() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "photos.example.com",
+                connectionState = ConnectionState.CONNECTING,
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun SetupContentPreview_DomainError() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "bad-server.example.com",
+                connectionState = ConnectionState.ERROR,
+                errorMessage = "Server unreachable — check the URL and try again",
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun SetupContentPreview_AuthManualKey() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "photos.example.com",
+                step = SetupStep.AUTH,
+                serverVersionDisplay = "v1.129.0",
+                apiKey = "xLK9_sampleApiKey_abc123def456",
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 900)
+@Composable
+private fun SetupContentPreview_AuthGenerateKey() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "photos.example.com",
+                step = SetupStep.AUTH,
+                authMode = AuthMode.GENERATE,
+                serverVersionDisplay = "v1.129.0",
+                email = "user@example.com",
+                password = "••••••••",
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 900)
+@Composable
+private fun SetupContentPreview_AuthOAuth() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "photos.example.com",
+                step = SetupStep.AUTH,
+                authMode = AuthMode.GENERATE,
+                serverVersionDisplay = "v1.129.0",
+                email = "user@example.com",
+                showOAuthButton = true,
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 900)
+@Composable
+private fun SetupContentPreview_AuthSuccess() {
+    ImmichFrameTheme {
+        SetupContent(
+            state = SetupUiState(
+                domain = "photos.example.com",
+                step = SetupStep.AUTH,
+                authMode = AuthMode.GENERATE,
+                serverVersionDisplay = "v1.129.0",
+                email = "user@example.com",
+                connectionState = ConnectionState.SUCCESS,
+                connectedEmail = "user@example.com",
+            ),
+            showKey = false,
+            showPassword = false,
+            onToggleShowKey = {},
+            onToggleShowPassword = {},
+            onShowHelp = {},
+            onUpdateProtocol = {},
+            onUpdateDomain = {},
+            onValidateServer = {},
+            onUpdateApiKey = {},
+            onUpdateEmail = {},
+            onUpdatePassword = {},
+            onTestConnection = {},
+            onGenerateKey = {},
+            onStartOAuth = {},
+            onSetAuthMode = {},
+            onBackToDomain = {},
+            onOpenOAuth = {},
+            onResetOnboarding = {},
+        )
+    }
+}
+
+// endregion
