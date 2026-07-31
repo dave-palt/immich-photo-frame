@@ -142,6 +142,32 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-07-30** — Screenshot testing infrastructure (all 5 screens).
+  Added Roborazzi 1.70.0 + ComposablePreviewScanner 0.9.1 + Robolectric 4.17
+  for JVM-based screenshot generation from Compose `@Preview` functions — no
+  device/emulator needed. Screens are decomposed into a state-driven inner
+  composable (`*Content(state, lambdas, tourState?)`) that takes plain data
+  + lambdas instead of a ViewModel, making them previewable. TourHost stays
+  in the outer screen composable (has ViewModel access); the inner content
+  takes an optional `tourState: TourState?` — null in previews, non-null in
+  production. Decomposed: `AlbumSelectionContent` (AlbumSelectionScreen.kt),
+  `SetupContent` (SetupScreen.kt), `SlideshowContent` (SlideshowContent.kt),
+  `SettingsContent` (SettingsContent.kt), `MediaSelectionContent`
+  (MediaSelectionScreen.kt). Robolectric uses
+  `application = android.app.Application` (not our Hilt `ImmichFrameApp`) to
+  avoid AndroidKeyStore crashes on JVM. Demo photos from Picsum bundled in
+  `app/src/main/assets/demo/` for preview thumbnails. Image URLs use
+  `file:///android_asset/demo/photo_N.jpg` so Coil renders bundled assets in
+  Robolectric (no network). Run `./gradlew recordRoborazziDebug` → PNGs in
+  `app/build/outputs/roborazzi/` → copied to `docs/screenshots/<screen>/`.
+  30 screenshots across 5 screens: albums (4), setup (8), slideshow (7),
+  settings (8), media_selection (3). All Full HD (1080×1920). Settings
+  decomposed into 8 per-section previews (playback, photo_animations,
+  display, night_mode, clock, system, media_cache, connection) with dark
+  backgrounds matching the app theme. Updated: technical-spec (tech stack,
+  screenshot testing section with inventory + decomposition table), ui-spec
+  (screenshot reference).
+
 - **2026-07-29** — Fixed Settings → Back navigation bug + removed redundant
   slideshow close button + added Settings to onboarding flow. (1) Root cause
   of back-nav bug: `apiKey` in `SettingsRepositoryImpl` was a cold one-shot

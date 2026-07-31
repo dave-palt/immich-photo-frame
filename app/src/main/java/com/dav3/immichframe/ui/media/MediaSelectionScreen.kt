@@ -41,12 +41,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
+import com.dav3.immichframe.ui.theme.ImmichFrameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +60,28 @@ fun MediaSelectionScreen(
 
     LaunchedEffect(Unit) { viewModel.load() }
 
+    MediaSelectionContent(
+        state = state,
+        thumbnailUrl = { viewModel.thumbnailUrl(it) },
+        onBack = onBack,
+        onToggleNewItemsShown = { viewModel.toggleNewItemsShown() },
+        onSelectAll = { viewModel.selectAll() },
+        onSelectNone = { viewModel.selectNone() },
+        onToggleAsset = { viewModel.toggleAsset(it) },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MediaSelectionContent(
+    state: MediaSelectionUiState,
+    thumbnailUrl: (String) -> String,
+    onBack: () -> Unit,
+    onToggleNewItemsShown: () -> Unit,
+    onSelectAll: () -> Unit,
+    onSelectNone: () -> Unit,
+    onToggleAsset: (String) -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -101,7 +125,7 @@ fun MediaSelectionScreen(
                 )
                 Switch(
                     checked = state.newItemsShown,
-                    onCheckedChange = { viewModel.toggleNewItemsShown() },
+                    onCheckedChange = { onToggleNewItemsShown() },
                 )
             }
             Row(
@@ -110,10 +134,10 @@ fun MediaSelectionScreen(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                TextButton(onClick = { viewModel.selectAll() }) {
+                TextButton(onClick = onSelectAll) {
                     Text(stringResource(R.string.media_selection_select_all))
                 }
-                TextButton(onClick = { viewModel.selectNone() }) {
+                TextButton(onClick = onSelectNone) {
                     Text(stringResource(R.string.media_selection_select_none))
                 }
             }
@@ -133,6 +157,19 @@ fun MediaSelectionScreen(
                     ) { Text(state.error!!, color = MaterialTheme.colorScheme.error) }
                 }
 
+                state.assets.isEmpty() && !state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            "No photos in this album",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(120.dp),
@@ -144,9 +181,9 @@ fun MediaSelectionScreen(
                         ) { asset ->
                             MediaThumbnail(
                                 asset = asset,
-                                url = viewModel.thumbnailUrl(asset.id),
+                                url = thumbnailUrl(asset.id),
                                 isShown = state.isShown(asset.id),
-                                onClick = { viewModel.toggleAsset(asset.id) },
+                                onClick = { onToggleAsset(asset.id) },
                             )
                         }
                     }
@@ -239,3 +276,73 @@ private fun MediaThumbnail(
         }
     }
 }
+
+// region Previews
+
+private val demoAssets = listOf(
+    Asset(id = "asset-1", type = AssetType.IMAGE),
+    Asset(id = "asset-2", type = AssetType.IMAGE),
+    Asset(id = "asset-3", type = AssetType.VIDEO),
+    Asset(id = "asset-4", type = AssetType.IMAGE),
+    Asset(id = "asset-5", type = AssetType.IMAGE),
+    Asset(id = "asset-6", type = AssetType.IMAGE),
+)
+
+private fun demoThumbnailUrl(id: String) = "file:///android_asset/demo/${id.replace("asset-", "photo_")}.jpg"
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun MediaSelectionContentPreview_AllShown() {
+    ImmichFrameTheme {
+        MediaSelectionContent(
+            state = MediaSelectionUiState(
+                assets = demoAssets,
+                newItemsShown = true,
+            ),
+            thumbnailUrl = ::demoThumbnailUrl,
+            onBack = {},
+            onToggleNewItemsShown = {},
+            onSelectAll = {},
+            onSelectNone = {},
+            onToggleAsset = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun MediaSelectionContentPreview_SomeHidden() {
+    ImmichFrameTheme {
+        MediaSelectionContent(
+            state = MediaSelectionUiState(
+                assets = demoAssets,
+                newItemsShown = true,
+                toggledIds = setOf("asset-3", "asset-5"),
+            ),
+            thumbnailUrl = ::demoThumbnailUrl,
+            onBack = {},
+            onToggleNewItemsShown = {},
+            onSelectAll = {},
+            onSelectNone = {},
+            onToggleAsset = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun MediaSelectionContentPreview_Loading() {
+    ImmichFrameTheme {
+        MediaSelectionContent(
+            state = MediaSelectionUiState(isLoading = true),
+            thumbnailUrl = ::demoThumbnailUrl,
+            onBack = {},
+            onToggleNewItemsShown = {},
+            onSelectAll = {},
+            onSelectNone = {},
+            onToggleAsset = {},
+        )
+    }
+}
+
+// endregion

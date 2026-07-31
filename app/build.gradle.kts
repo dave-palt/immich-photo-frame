@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -99,6 +100,27 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+}
+
+@OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
+roborazzi {
+    generateComposePreviewRobolectricTests {
+        enable = true
+        packages = listOf("com.dav3.immichframe")
+        includePrivatePreviews = true
+        robolectricConfig =
+            mapOf(
+                "sdk" to "[34]",
+                "application" to "android.app.Application::class",
+            )
+    }
+    outputDir.set(file("build/outputs/roborazzi"))
 }
 
 dependencies {
@@ -172,4 +194,18 @@ dependencies {
 
     // Custom Tabs (OAuth browser flow during setup)
     implementation(libs.androidx.browser)
+
+    // Screenshot testing (JVM — renders Compose Previews without an emulator)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
+    testImplementation(libs.composable.preview.scanner)
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose-preview-scanner-support:${libs.versions.roborazzi.get()}")
+    // Compose tooling + preview support needed in test for @Preview rendering
+    testImplementation(libs.androidx.compose.ui.tooling.preview)
+    testImplementation("androidx.compose.material3:material3")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
 }
