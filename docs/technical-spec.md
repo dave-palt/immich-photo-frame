@@ -8,21 +8,21 @@
 | UI Framework | Jetpack Compose | BOM 2024.12+ |
 | Min SDK | API 26 (Android 8.0) | ~95% device coverage |
 | Target SDK | API 35 (Android 15) | Latest stable |
-| HTTP Client | Retrofit 2 + OkHttp | 2.11+ / 4.12+ |
+| HTTP Client | Retrofit 3 + OkHttp | 3.0 / 5.4 |
 | JSON Parsing | Kotlinx Serialization | 1.7+ |
-| Image Loading | Coil 3 (Compose) + GifDecoder | 3.0+ |
+| Image Loading | Coil 3 (Compose) + GifDecoder | 3.5 |
 | Video Playback | Media3 ExoPlayer | 1.5.1 |
 | Color Extraction | AndroidX Palette | 1.0+ |
 | Animation | Compose Animation Core | (BOM) |
 | Local Storage | DataStore (Preferences) | 1.1+ |
-| Media Cache DB | Room | 2.7.1 |
+| Media Cache DB | Room | 2.8.4 |
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Biometric Auth | AndroidX Biometric | 1.1.0 |
 | OAuth Browser | AndroidX Browser (Custom Tabs) | 1.8.0 |
 | Screenshot Testing | Roborazzi + ComposablePreviewScanner | 1.70.0 / 0.9.1 |
 | Dependency Injection | Hilt | 2.52+ |
-| Worker Injection | Hilt-Work | 1.2.0 |
+| Worker Injection | Hilt-Work | 1.4.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
 | Build System | Gradle Kotlin DSL | 8.10.2 (AGP 8.7.3) |
 | JDK | OpenJDK 17 | Required for builds |
