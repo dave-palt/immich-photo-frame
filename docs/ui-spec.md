@@ -347,3 +347,9 @@ Material 3 dynamic colors are NOT used (frame context needs consistent dark back
 - Settings controls labeled for TalkBack.
 - High contrast between text and background.
 - Album cards have text labels (not images-only).
+
+## Screenshot Reference
+
+Automated screenshots for all screens are generated via Roborazzi and stored
+in `docs/screenshots/<screen>/`. See `docs/technical-spec.md` → Screenshot
+Testing for the full inventory and generation instructions.

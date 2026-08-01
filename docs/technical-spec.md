@@ -8,20 +8,21 @@
 | UI Framework | Jetpack Compose | BOM 2024.12+ |
 | Min SDK | API 26 (Android 8.0) | ~95% device coverage |
 | Target SDK | API 35 (Android 15) | Latest stable |
-| HTTP Client | Retrofit 2 + OkHttp | 2.11+ / 4.12+ |
+| HTTP Client | Retrofit 3 + OkHttp | 3.0 / 5.4 |
 | JSON Parsing | Kotlinx Serialization | 1.7+ |
-| Image Loading | Coil 3 (Compose) + GifDecoder | 3.0+ |
+| Image Loading | Coil 3 (Compose) + GifDecoder | 3.5 |
 | Video Playback | Media3 ExoPlayer | 1.5.1 |
 | Color Extraction | AndroidX Palette | 1.0+ |
 | Animation | Compose Animation Core | (BOM) |
 | Local Storage | DataStore (Preferences) | 1.1+ |
-| Media Cache DB | Room | 2.7.1 |
+| Media Cache DB | Room | 2.8.4 |
 | Background Sync | WorkManager | 2.9.1 |
 | Credential Storage | EncryptedSharedPreferences (Tink) | 1.1+ |
 | Biometric Auth | AndroidX Biometric | 1.1.0 |
 | OAuth Browser | AndroidX Browser (Custom Tabs) | 1.8.0 |
+| Screenshot Testing | Roborazzi + ComposablePreviewScanner | 1.70.0 / 0.9.1 |
 | Dependency Injection | Hilt | 2.52+ |
-| Worker Injection | Hilt-Work | 1.2.0 |
+| Worker Injection | Hilt-Work | 1.4.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
 | Build System | Gradle Kotlin DSL | 8.10.2 (AGP 8.7.3) |
 | JDK | OpenJDK 17 | Required for builds |
@@ -96,8 +97,10 @@ immich-android/
 │   ├── src/debug/res/
 │   │   ├── drawable/ic_launcher_foreground.xml  # Debug variant (amber bg #FFB400, navy replaces orange)
 │   │   └── values/colors.xml                    # ic_launcher_background = #FFB400 (debug)
-│   └── build.gradle.kts
+│   ├── src/main/assets/demo/     # Sample photos (Picsum) for @Preview screenshot tests
+│   └── build.gradle.kts          # Includes roborazzi {} block for Compose Preview screenshot gen
 ├── docs/                        # This documentation
+│   └── screenshots/             # Generated screenshots (from recordRoborazziDebug)
 ├── .github/workflows/           # dev-build.yml, prod-build.yml
 ├── build.gradle.kts             # Root build file
 ├── settings.gradle.kts
@@ -364,3 +367,68 @@ The app is localized into 13 languages. String resources live in
 
 `MissingTranslation` lint is disabled to allow incremental localization —
 new strings fall back to English until translated.
+
+## Screenshot Testing
+
+Automated screenshot generation via [Roborazzi](https://github.com/takahirom/roborazzi)
++ [ComposablePreviewScanner](https://github.com/sergio-sastre/ComposablePreviewScanner).
+Renders Compose `@Preview` composables on the JVM (Robolectric) — no device or
+emulator needed.
+
+### How it works
+
+1. Screens are decomposed into a state-driven inner composable (e.g.
+   `AlbumSelectionContent(state, thumbnailUrl, …)`) that accepts plain data
+   + lambdas, no ViewModel or Hilt dependency.
+2. `@Preview` functions construct fake `UiState` objects with demo data
+   (album names, sample thumbnails from `app/src/main/assets/demo/`).
+3. Roborazzi's `generateComposePreviewRobolectricTests` plugin auto-generates
+   a parameterized JUnit test that scans the `com.dav3.immichframe` package
+   tree and renders each preview to PNG.
+
+### Commands
+
+```bash
+# Generate screenshots → app/build/outputs/roborazzi/*.png
+./gradlew recordRoborazziDebug
+
+# Verify screenshots match checked-in baselines
+./gradlew verifyRoborazziDebug
+```
+
+### Output
+
+Screenshots are copied to `docs/screenshots/<screen>/` for use in GitHub
+README and Play Store listings.
+
+### Screenshot inventory
+
+| Screen | Folder | Variants |
+|--------|--------|----------|
+| Album Selection | `docs/screenshots/albums/` | `albums_loaded`, `albums_loading`, `albums_no_albums`, `albums_error` |
+| Setup (landing/connect) | `docs/screenshots/setup/` | `domain_empty`, `domain_filled`, `domain_connecting`, `domain_error`, `auth_manual_key`, `auth_generate_key`, `auth_oauth`, `auth_success` |
+| Slideshow | `docs/screenshots/slideshow/` | `photo_contain`, `photo_cover`, `with_clock`, `controls_visible`, `night_mode`, `paused`, `loading` |
+| Settings | `docs/screenshots/settings/` | `playback`, `photo_animations`, `display`, `night_mode`, `clock`, `system`, `media_cache`, `connection` |
+| Media Selection | `docs/screenshots/media_selection/` | `all_shown`, `some_hidden`, `loading` |
+
+### Decomposition pattern
+
+Each screen follows the same pattern to enable JVM previews:
+
+1. Extract a `*Content` composable (e.g. `AlbumSelectionContent`,
+   `SlideshowContent`, `SettingsContent`) that takes plain `UiState` +
+   lambdas + an optional `TourState?` — no ViewModel, no Hilt, no lifecycle.
+2. Production `*Screen` wraps the content in `TourHost` and wires up
+   ViewModels, biometric launchers, system intents, lifecycle effects.
+3. `@Preview` functions construct fake `UiState` with bundled demo data
+   (Picsum photos in `assets/demo/`) and call the `*Content` composable.
+4. Image URLs use `file:///android_asset/demo/photo_N.jpg` format so
+   Coil renders bundled assets in Robolectric (no network).
+
+| Screen | Content composable | Preview file |
+|--------|--------------------|--------------|
+| Album Selection | `AlbumSelectionContent` | `AlbumSelectionScreen.kt` |
+| Setup | `SetupContent` | `SetupScreen.kt` |
+| Slideshow | `SlideshowContent` | `SlideshowContent.kt` |
+| Settings | `SettingsContent` | `SettingsContent.kt` |
+| Media Selection | `MediaSelectionContent` | `MediaSelectionScreen.kt` |

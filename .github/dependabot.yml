@@ -5,6 +5,7 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    target-branch: "develop"
     labels:
       - "dependencies"
       - "gradle"
@@ -16,6 +17,7 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    target-branch: "develop"
     labels:
       - "dependencies"
       - "github-actions"

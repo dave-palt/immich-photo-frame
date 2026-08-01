@@ -4,25 +4,28 @@ kotlin = "2.4.10"
 ksp = "2.3.10"
 hilt = "2.60.1"
 hiltNavCompose = "1.4.0"
-hiltWork = "1.2.0"
+hiltWork = "1.4.0"
 composeBom = "2026.06.01"
 lifecycle = "2.8.7"
 navCompose = "2.8.5"
-retrofit = "2.11.0"
-okhttp = "4.12.0"
+retrofit = "3.0.0"
+okhttp = "5.4.0"
 kotlinxSerialization = "1.7.3"
 retrofitKotlinxSerialization = "1.0.0"
-coil = "3.0.4"
+coil = "3.5.0"
 datastore = "1.1.1"
 securityCrypto = "1.1.0-alpha06"
 coreKtx = "1.15.0"
 activityCompose = "1.9.3"
 media3 = "1.10.1"
 workManager = "2.9.1"
-room = "2.7.1"
+room = "2.8.4"
 biometric = "1.1.0"
 browser = "1.8.0"
 spotless = "8.8.0"
+robolectric = "4.17-beta-2"
+roborazzi = "1.70.0"
+composablePreviewScanner = "0.9.1"
 
 [libraries]
 # AndroidX core
@@ -91,6 +94,17 @@ androidx-biometric = { group = "androidx.biometric", name = "biometric", version
 # Custom Tabs (OAuth browser flow)
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
+# Screenshot testing (JVM — no emulator needed)
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
+roborazzi-annotations = { group = "io.github.takahirom.roborazzi", name = "roborazzi-annotations", version.ref = "roborazzi" }
+composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "composablePreviewScanner" }
+
+# JVM unit testing
+junit = { group = "junit", name = "junit", version = "4.13.2" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -99,3 +113,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
