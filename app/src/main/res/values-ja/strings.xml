@@ -45,6 +45,17 @@
     <string name="fullscreen">全画面</string>
     <string name="fullscreen_desc">システムバーを非表示</string>
     <string name="keep_screen_on">画面をオンのままにする</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">写真メタデータ</string>
+    <string name="show_photo_date">撮影日</string>
+    <string name="show_photo_date_desc">撮影日を表示（EXIFから取得）</string>
+    <string name="show_location">場所</string>
+    <string name="show_location_desc">都市、州、国を表示（EXIF GPSデータから取得）</string>
+    <string name="show_description">説明</string>
+    <string name="show_description_desc">写真の説明を表示（EXIFメタデータから取得）</string>
+    <string name="show_tags">タグ</string>
+    <string name="show_tags_desc">Immichで割り当てられたタグを表示</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">ナイトモード</string>

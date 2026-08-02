@@ -45,6 +45,17 @@
     <string name="fullscreen">Pantalla completa</string>
     <string name="fullscreen_desc">Ocultar barras del sistema</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Metadatos de foto</string>
+    <string name="show_photo_date">Fecha de la foto</string>
+    <string name="show_photo_date_desc">Mostrar la fecha de captura (de EXIF)</string>
+    <string name="show_location">Ubicación</string>
+    <string name="show_location_desc">Mostrar ciudad, estado y país (de datos GPS EXIF)</string>
+    <string name="show_description">Descripción</string>
+    <string name="show_description_desc">Mostrar la descripción de la foto (de metadatos EXIF)</string>
+    <string name="show_tags">Etiquetas</string>
+    <string name="show_tags_desc">Mostrar etiquetas asignadas en Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Modo Noche</string>

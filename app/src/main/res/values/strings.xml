@@ -46,6 +46,17 @@
     <string name="fullscreen">Fullscreen</string>
     <string name="fullscreen_desc">Hide system bars</string>
     <string name="keep_screen_on">Keep Screen On</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Photo Metadata</string>
+    <string name="show_photo_date">Photo Date</string>
+    <string name="show_photo_date_desc">Show the date the photo was taken (from EXIF)</string>
+    <string name="show_location">Location</string>
+    <string name="show_location_desc">Show the city, state, and country (from EXIF GPS data)</string>
+    <string name="show_description">Description</string>
+    <string name="show_description_desc">Show the photo description (from EXIF metadata)</string>
+    <string name="show_tags">Tags</string>
+    <string name="show_tags_desc">Show tags assigned to the photo in Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Night Mode</string>

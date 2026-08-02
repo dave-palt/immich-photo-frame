@@ -290,6 +290,12 @@ class MediaCacheWorker @AssistedInject constructor(
                     lastModified = System.currentTimeMillis(),
                     cachedAt = System.currentTimeMillis(),
                     originalMimeType = asset.originalMimeType,
+                    exifDateTimeOriginal = asset.exif?.dateTimeOriginal,
+                    exifDescription = asset.exif?.description,
+                    exifCity = asset.exif?.city,
+                    exifState = asset.exif?.state,
+                    exifCountry = asset.exif?.country,
+                    tags = asset.tags,
                 ),
             )
         } catch (e: Exception) {

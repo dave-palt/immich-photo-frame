@@ -45,6 +45,17 @@
     <string name="fullscreen">ملء الشاشة</string>
     <string name="fullscreen_desc">إخفاء أشرطة النظام</string>
     <string name="keep_screen_on">إبقاء الشاشة قيد التشغيل</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">بيانات الصورة</string>
+    <string name="show_photo_date">تاريخ الصورة</string>
+    <string name="show_photo_date_desc">إظهار تاريخ التقاط الصورة (من EXIF)</string>
+    <string name="show_location">الموقع</string>
+    <string name="show_location_desc">إظهار المدينة والولاية والبلد (من بيانات GPS في EXIF)</string>
+    <string name="show_description">الوصف</string>
+    <string name="show_description_desc">إظهار وصف الصورة (من بيانات EXIF الوصفية)</string>
+    <string name="show_tags">الوسوم</string>
+    <string name="show_tags_desc">إظهار الوسوم المعينة في Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">الوضع الليلي</string>

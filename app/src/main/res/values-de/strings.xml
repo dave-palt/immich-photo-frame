@@ -45,6 +45,17 @@
     <string name="fullscreen">Vollbild</string>
     <string name="fullscreen_desc">Systemleisten ausblenden</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Foto-Metadaten</string>
+    <string name="show_photo_date">Foto-Datum</string>
+    <string name="show_photo_date_desc">Aufnahmedatum anzeigen (aus EXIF)</string>
+    <string name="show_location">Standort</string>
+    <string name="show_location_desc">Stadt, Bundesland und Land anzeigen (aus EXIF-GPS-Daten)</string>
+    <string name="show_description">Beschreibung</string>
+    <string name="show_description_desc">Fotobeschreibung anzeigen (aus EXIF-Metadaten)</string>
+    <string name="show_tags">Tags</string>
+    <string name="show_tags_desc">In Immich zugewiesene Tags anzeigen</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Nachtmodus</string>

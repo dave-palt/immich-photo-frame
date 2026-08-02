@@ -45,6 +45,17 @@
     <string name="fullscreen">전체 화면</string>
     <string name="fullscreen_desc">시스템 바 숨기기</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">사진 메타데이터</string>
+    <string name="show_photo_date">사진 날짜</string>
+    <string name="show_photo_date_desc">촬영 날짜 표시 (EXIF에서)</string>
+    <string name="show_location">위치</string>
+    <string name="show_location_desc">도시, 주, 국가 표시 (EXIF GPS 데이터에서)</string>
+    <string name="show_description">설명</string>
+    <string name="show_description_desc">사진 설명 표시 (EXIF 메타데이터에서)</string>
+    <string name="show_tags">태그</string>
+    <string name="show_tags_desc">Immich에서 할당된 태그 표시</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">나이트 모드</string>

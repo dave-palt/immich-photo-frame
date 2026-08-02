@@ -403,6 +403,16 @@ fun SlideshowScreen(
                     }
                 }
 
+                // Photo metadata overlay (date, location, description, tags)
+                if (!nightActive && !state.isLoading && state.error == null && state.assets.isNotEmpty()) {
+                    val currentAsset = state.assets[state.currentIndex]
+                    PhotoMetadataOverlay(
+                        asset = currentAsset,
+                        settings = s,
+                        modifier = Modifier.align(Alignment.BottomEnd),
+                    )
+                }
+
                 // Draggable clock overlay — positioned from top-left via absolute offset
                 if (s.showClock && currentTime.isNotEmpty()) {
                     Box(

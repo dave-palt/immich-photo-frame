@@ -31,6 +31,24 @@ data class AssetDto(
     val type: String = "IMAGE",
     val updatedAt: String? = null,
     val originalMimeType: String? = null,
+    val exifInfo: ExifInfoDto? = null,
+    val tags: List<TagDto>? = null,
+)
+
+@Serializable
+data class ExifInfoDto(
+    val dateTimeOriginal: String? = null,
+    val description: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+)
+
+@Serializable
+data class TagDto(
+    val id: String = "",
+    val name: String = "",
+    val value: String? = null,
 )
 
 // --- Search endpoint (POST /search/metadata) ---
@@ -39,6 +57,8 @@ data class AssetDto(
 data class SearchMetadataRequest(
     val albumIds: List<String>,
     val size: Int = 1000,
+    val withExif: Boolean = true,
+    val withTags: Boolean = true,
 )
 
 @Serializable

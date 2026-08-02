@@ -214,6 +214,14 @@ constructor(
 
     fun toggleAdaptiveBackground() = update { it.copy(adaptiveBackground = !it.adaptiveBackground) }
 
+    fun togglePhotoDate() = update { it.copy(showPhotoDate = !it.showPhotoDate) }
+
+    fun toggleLocation() = update { it.copy(showLocation = !it.showLocation) }
+
+    fun toggleDescription() = update { it.copy(showDescription = !it.showDescription) }
+
+    fun toggleTags() = update { it.copy(showTags = !it.showTags) }
+
     fun togglePhotoAnimations() = update { it.copy(photoAnimations = !it.photoAnimations) }
 
     fun toggleAnimation(anim: PhotoAnimation) = update {

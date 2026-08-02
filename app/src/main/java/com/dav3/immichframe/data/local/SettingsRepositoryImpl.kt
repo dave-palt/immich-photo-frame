@@ -60,6 +60,10 @@ constructor(
         val AUTO_UPDATE = stringPreferencesKey("auto_update")
         val CLOCK_SNAP_TO_GRID = stringPreferencesKey("clock_snap_to_grid")
         val ADAPTIVE_BACKGROUND = stringPreferencesKey("adaptive_background")
+        val SHOW_PHOTO_DATE = stringPreferencesKey("show_photo_date")
+        val SHOW_LOCATION = stringPreferencesKey("show_location")
+        val SHOW_DESCRIPTION = stringPreferencesKey("show_description")
+        val SHOW_TAGS = stringPreferencesKey("show_tags")
         val PHOTO_ANIMATIONS = stringPreferencesKey("photo_animations")
         val ANIM_ZOOM_IN = stringPreferencesKey("anim_zoom_in")
         val ANIM_ZOOM_OUT = stringPreferencesKey("anim_zoom_out")
@@ -140,6 +144,10 @@ constructor(
                 autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
                 clockSnapToGrid = prefs[Keys.CLOCK_SNAP_TO_GRID]?.toBoolean() ?: true,
                 adaptiveBackground = prefs[Keys.ADAPTIVE_BACKGROUND]?.toBoolean() ?: false,
+                showPhotoDate = prefs[Keys.SHOW_PHOTO_DATE]?.toBoolean() ?: false,
+                showLocation = prefs[Keys.SHOW_LOCATION]?.toBoolean() ?: false,
+                showDescription = prefs[Keys.SHOW_DESCRIPTION]?.toBoolean() ?: false,
+                showTags = prefs[Keys.SHOW_TAGS]?.toBoolean() ?: false,
                 photoAnimations = prefs[Keys.PHOTO_ANIMATIONS]?.toBoolean() ?: false,
                 animZoomIn = prefs[Keys.ANIM_ZOOM_IN]?.toBoolean() ?: true,
                 animZoomOut = prefs[Keys.ANIM_ZOOM_OUT]?.toBoolean() ?: true,
@@ -234,6 +242,10 @@ constructor(
             it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
             it[Keys.CLOCK_SNAP_TO_GRID] = settings.clockSnapToGrid.toString()
             it[Keys.ADAPTIVE_BACKGROUND] = settings.adaptiveBackground.toString()
+            it[Keys.SHOW_PHOTO_DATE] = settings.showPhotoDate.toString()
+            it[Keys.SHOW_LOCATION] = settings.showLocation.toString()
+            it[Keys.SHOW_DESCRIPTION] = settings.showDescription.toString()
+            it[Keys.SHOW_TAGS] = settings.showTags.toString()
             it[Keys.PHOTO_ANIMATIONS] = settings.photoAnimations.toString()
             it[Keys.ANIM_ZOOM_IN] = settings.animZoomIn.toString()
             it[Keys.ANIM_ZOOM_OUT] = settings.animZoomOut.toString()

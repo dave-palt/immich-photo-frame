@@ -142,6 +142,28 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-02** — Photo Metadata overlay feature. Added EXIF-based
+  metadata overlays to the slideshow (photo date, location, description,
+  Immich tags). `POST /search/metadata` now sends `withExif: true` and
+  `withTags: true` — the API always returns EXIF and tag data. New
+  `ExifInfoDto` and `TagDto` DTOs; `AssetDto` gained `exifInfo` + `tags`
+  fields. Domain model `Asset` gained `exif: AssetExif?` and
+  `tags: List<String>`. New domain model `AssetExif` with
+  `formattedLocation()`. `CachedAsset` model + `CachedAssetEntity`
+  (Room) gained 6 new columns for offline persistence
+  (`exif_date_time_original`, `exif_description`, `exif_city`,
+  `exif_state`, `exif_country`, `tags`). Room DB bumped v2→v3
+  (fallbackToDestructiveMigration). New `List<String>` TypeConverter in
+  `Converters.kt` (using `||` separator). New
+  `PhotoMetadataOverlay.kt` composable in `ui/slideshow/` showing
+  icon+text rows in bottom-right corner. 4 new settings toggles
+  (`show_photo_date`, `show_location`, `show_description`, `show_tags`,
+  all default false). New "Photo Metadata" section in Settings between
+  "Display" and "Night Mode". New strings (EN + 12 locales). Slideshow
+  filter preference: no people, only tags. Updated: functional-spec (F6),
+  technical-spec (persistence table, media cache schema), ui-spec
+  (mockup + section list), README (feature list).
+
 - **2026-07-30** — Screenshot testing infrastructure (all 5 screens).
   Added Roborazzi 1.70.0 + ComposablePreviewScanner 0.9.1 + Robolectric 4.17
   for JVM-based screenshot generation from Compose `@Preview` functions — no

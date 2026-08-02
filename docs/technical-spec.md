@@ -194,8 +194,14 @@ loading.
 
 - **`cached_assets`** — one row per downloaded asset: `id`, `album_id`,
   `type` (IMAGE/VIDEO), `file_path`, `thumbnail_path`, `file_size`,
-  `checksum`, `last_modified`, `cached_at`, `original_mime_type`. Indexed
-  on `album_id`, `cached_at`, `last_modified`.
+  `checksum`, `last_modified`, `cached_at`, `original_mime_type`,
+  `exif_date_time_original`, `exif_description`, `exif_city`, `exif_state`,
+  `exif_country`, `tags` (stored as `||`-separated string via TypeConverter).
+  Indexed on `album_id`, `cached_at`, `last_modified`.
+- **DB version**: 3 (v2 added `original_mime_type` for GIF support; v3 added
+  the EXIF + tags columns for the Photo Metadata overlay). Uses
+  `fallbackToDestructiveMigration` — a cache wipe is harmless since it
+  re-downloads on next sync.
 - **`album_sync_states`** — per-album sync metadata: `album_id` (PK),
   `last_synced_at`, `last_cursor`, `asset_count`.
 
@@ -291,6 +297,10 @@ Setup → Albums → Slideshow
 | Boot verified | DataStore | `boot_verified` | String bool (self-test: BootReceiver sets true on successful fire) |
 | Auto-update | DataStore | `auto_update` | String bool |
 | Adaptive background | DataStore | `adaptive_background` | String bool |
+| Show photo date | DataStore | `show_photo_date` | String bool (default false) |
+| Show location | DataStore | `show_location` | String bool (default false) |
+| Show description | DataStore | `show_description` | String bool (default false) |
+| Show tags | DataStore | `show_tags` | String bool (default false) |
 | Photo animations | DataStore | `photo_animations` | String bool |
 | Anim: Zoom In | DataStore | `anim_zoom_in` | String bool |
 | Anim: Zoom Out | DataStore | `anim_zoom_out` | String bool |

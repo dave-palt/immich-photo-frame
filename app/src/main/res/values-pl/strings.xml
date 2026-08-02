@@ -45,6 +45,17 @@
     <string name="fullscreen">Pełny ekran</string>
     <string name="fullscreen_desc">Ukryj paski systemowe</string>
     <string name="keep_screen_on">Utrzymuj ekran włączony</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Metadane zdjęcia</string>
+    <string name="show_photo_date">Data zdjęcia</string>
+    <string name="show_photo_date_desc">Pokaż datę wykonania zdjęcia (z EXIF)</string>
+    <string name="show_location">Lokalizacja</string>
+    <string name="show_location_desc">Pokaż miasto, stan i kraj (z danych GPS EXIF)</string>
+    <string name="show_description">Opis</string>
+    <string name="show_description_desc">Pokaż opis zdjęcia (z metadanych EXIF)</string>
+    <string name="show_tags">Tagi</string>
+    <string name="show_tags_desc">Pokaż tagi przypisane w Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Tryb Nocny</string>

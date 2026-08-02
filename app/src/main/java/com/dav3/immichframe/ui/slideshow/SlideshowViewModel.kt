@@ -259,6 +259,14 @@ fun com.dav3.immichframe.domain.model.CachedAsset.toAsset(): Asset = Asset(
     type = type,
     lastModified = lastModified,
     originalMimeType = originalMimeType,
+    exif = com.dav3.immichframe.domain.model.AssetExif(
+        dateTimeOriginal = exifDateTimeOriginal,
+        description = exifDescription,
+        city = exifCity,
+        state = exifState,
+        country = exifCountry,
+    ),
+    tags = tags,
 )
 
 /**

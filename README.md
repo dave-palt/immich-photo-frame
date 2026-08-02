@@ -30,6 +30,7 @@ lets you pick which album(s) to display, and remembers your choice.
 - Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's edge colors as a gradient)
+- Photo metadata overlay — EXIF-based date, location, description, and Immich tags, each independently toggleable, shown in the bottom-right corner of the slideshow
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
 - Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)

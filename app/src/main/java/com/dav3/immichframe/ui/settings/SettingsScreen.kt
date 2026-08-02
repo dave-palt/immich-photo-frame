@@ -323,6 +323,35 @@ fun SettingsScreen(
 
                 HorizontalDivider()
 
+                // ============================= PHOTO METADATA =============================
+                SectionHeader(stringResource(R.string.section_photo_metadata))
+                SwitchItem(
+                    title = stringResource(R.string.show_photo_date),
+                    subtitle = stringResource(R.string.show_photo_date_desc),
+                    checked = s.showPhotoDate,
+                    onToggle = { viewModel.togglePhotoDate() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_location),
+                    subtitle = stringResource(R.string.show_location_desc),
+                    checked = s.showLocation,
+                    onToggle = { viewModel.toggleLocation() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_description),
+                    subtitle = stringResource(R.string.show_description_desc),
+                    checked = s.showDescription,
+                    onToggle = { viewModel.toggleDescription() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_tags),
+                    subtitle = stringResource(R.string.show_tags_desc),
+                    checked = s.showTags,
+                    onToggle = { viewModel.toggleTags() },
+                )
+
+                HorizontalDivider()
+
                 // ============================= NIGHT MODE =============================
                 SectionHeader(stringResource(R.string.section_night_mode))
                 SwitchItem(

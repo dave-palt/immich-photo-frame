@@ -45,6 +45,17 @@
     <string name="fullscreen">Volledig scherm</string>
     <string name="fullscreen_desc">Systeembalken verbergen</string>
     <string name="keep_screen_on">Scherm aan laten</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Foto-metadata</string>
+    <string name="show_photo_date">Foto-datum</string>
+    <string name="show_photo_date_desc">Toon de opnamedatum (uit EXIF)</string>
+    <string name="show_location">Locatie</string>
+    <string name="show_location_desc">Toon stad, staat en land (uit EXIF GPS-gegevens)</string>
+    <string name="show_description">Beschrijving</string>
+    <string name="show_description_desc">Toon de fotobeschrijving (uit EXIF-metadata)</string>
+    <string name="show_tags">Tags</string>
+    <string name="show_tags_desc">Toon in Immich toegewezen tags</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Nachtmodus</string>

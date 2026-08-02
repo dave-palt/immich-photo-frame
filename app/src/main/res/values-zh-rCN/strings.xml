@@ -45,6 +45,17 @@
     <string name="fullscreen">全屏</string>
     <string name="fullscreen_desc">隐藏系统栏</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">照片元数据</string>
+    <string name="show_photo_date">拍摄日期</string>
+    <string name="show_photo_date_desc">显示照片拍摄日期（来自 EXIF）</string>
+    <string name="show_location">位置</string>
+    <string name="show_location_desc">显示城市、省份和国家（来自 EXIF GPS 数据）</string>
+    <string name="show_description">描述</string>
+    <string name="show_description_desc">显示照片描述（来自 EXIF 元数据）</string>
+    <string name="show_tags">标签</string>
+    <string name="show_tags_desc">显示在 Immich 中分配的标签</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">夜间模式</string>

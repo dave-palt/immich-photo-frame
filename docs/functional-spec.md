@@ -251,6 +251,15 @@ Options:
 - **Adaptive Background** — fill letterbox bars with a gradient derived from
   each photo's edge colors (top/bottom for horizontal bars, left/right for
   vertical bars; uses Palette API, default off)
+- **Photo Metadata** section (EXIF-based overlays on the slideshow):
+  - **Photo Date** — show the date the photo was taken, parsed from EXIF
+    `dateTimeOriginal` (default off)
+  - **Location** — show city, state, and country from EXIF GPS data (default off)
+  - **Description** — show the photo description from EXIF metadata (default off)
+  - **Tags** — show tags assigned to the photo in Immich (default off)
+  - Each field renders as an icon+text row in the bottom-right corner of the
+    slideshow. Fields with no data are hidden automatically. The overlay is
+    always visible during playback (not tied to controls visibility).
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)
