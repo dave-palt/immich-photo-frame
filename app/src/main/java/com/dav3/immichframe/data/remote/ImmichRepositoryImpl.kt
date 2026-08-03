@@ -32,7 +32,10 @@ class ImmichRepositoryImpl
 constructor(
     private val settings: SettingsRepository,
 ) : ImmichRepository {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     private var cachedApi: ImmichApi? = null
     private var cachedBaseUrl: String? = null

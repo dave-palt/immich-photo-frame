@@ -56,8 +56,10 @@ fun PhotoMetadataOverlay(
 
     Column(
         modifier = modifier
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+            .padding(24.dp)
+            .background(Color(0xCC000000), RoundedCornerShape(12.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
         horizontalAlignment = Alignment.End,
     ) {
         formattedDate?.let { MetadataRow(Icons.Default.CalendarMonth, it) }
@@ -73,9 +75,6 @@ private fun MetadataRow(
     text: String,
 ) {
     Row(
-        modifier = Modifier
-            .background(Color(0x99000000), RoundedCornerShape(8.dp))
-            .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
