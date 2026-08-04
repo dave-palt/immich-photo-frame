@@ -13,10 +13,12 @@ import com.dav3.immichframe.domain.model.SlideshowSettings
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
+import com.dav3.immichframe.domain.system.LocationHelper
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.setLauncherModeEnabled
 import com.dav3.immichframe.ui.onboarding.TourSteps
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,12 +42,24 @@ data class SettingsUiState(
 class SettingsViewModel
 @Inject
 constructor(
+    @ApplicationContext private val appContext: Context,
     private val settingsRepo: SettingsRepository,
     private val immichRepo: ImmichRepository,
     private val mediaCacheRepo: MediaCacheRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
     private val permissionCheckingFlow = MutableStateFlow(false)
+
+    // --- Weather location search state ---
+    private val _locationSearchQuery = MutableStateFlow("")
+    private val _locationSearchResults = MutableStateFlow<List<LocationHelper.GeoResult>>(emptyList())
+    private val _locationSearching = MutableStateFlow(false)
+    private val _gpsLocating = MutableStateFlow(false)
+
+    val locationSearchQuery: StateFlow<String> = _locationSearchQuery
+    val locationSearchResults: StateFlow<List<LocationHelper.GeoResult>> = _locationSearchResults
+    val locationSearching: StateFlow<Boolean> = _locationSearching
+    val gpsLocating: StateFlow<Boolean> = _gpsLocating
 
     val uiState: StateFlow<SettingsUiState> =
         combine(
@@ -231,6 +245,76 @@ constructor(
     fun setWeatherUnit(unit: com.dav3.immichframe.domain.model.TemperatureUnit) = update { it.copy(weatherUnit = unit) }
 
     fun toggleWeatherDescription() = update { it.copy(showWeatherDescription = !it.showWeatherDescription) }
+
+    /** Called when the user types in the address search field. */
+    fun onLocationSearchQueryChange(query: String) {
+        _locationSearchQuery.value = query
+    }
+
+    /** Runs an OSM Nominatim address search for the current query. */
+    fun searchLocations() {
+        val query = _locationSearchQuery.value.trim()
+        if (query.isBlank()) {
+            _locationSearchResults.value = emptyList()
+            return
+        }
+        viewModelScope.launch {
+            _locationSearching.value = true
+            try {
+                _locationSearchResults.value = LocationHelper.searchLocations(query)
+            } finally {
+                _locationSearching.value = false
+            }
+        }
+    }
+
+    /** Applies a search result to the settings lat/long. */
+    fun selectLocation(result: LocationHelper.GeoResult) {
+        update { it.copy(weatherLatitude = result.latitude, weatherLongitude = result.longitude) }
+        _locationSearchQuery.value = result.displayName
+        _locationSearchResults.value = emptyList()
+    }
+
+    /**
+     * Gets the current GPS location and applies it to settings.
+     * Returns false if no permission (caller should request it).
+     */
+    fun useCurrentLocation(onResult: (success: Boolean) -> Unit = {}) {
+        if (!LocationHelper.hasLocationPermission(appContext)) {
+            onResult(false)
+            return
+        }
+        viewModelScope.launch {
+            _gpsLocating.value = true
+            try {
+                val location = LocationHelper.getCurrentLocation(appContext)
+                if (location != null) {
+                    update {
+                        it.copy(
+                            weatherLatitude = location.latitude,
+                            weatherLongitude = location.longitude,
+                        )
+                    }
+                    // Reverse-geocode for a friendly label
+                    val label = LocationHelper.reverseGeocode(location.latitude, location.longitude)
+                    _locationSearchQuery.value = label ?: "%.4f, %.4f".format(location.latitude, location.longitude)
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } finally {
+                _gpsLocating.value = false
+            }
+        }
+    }
+
+    /** Clears search results when the user dismisses the search. */
+    fun clearLocationSearch() {
+        _locationSearchResults.value = emptyList()
+        _locationSearchQuery.value = ""
+    }
+
+    fun hasLocationPermission(): Boolean = LocationHelper.hasLocationPermission(appContext)
 
     fun togglePhotoAnimations() = update { it.copy(photoAnimations = !it.photoAnimations) }
 

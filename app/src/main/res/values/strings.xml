@@ -278,4 +278,8 @@
     <string name="weather_unit_label">Temperature unit</string>
     <string name="show_weather_description">Show weather description</string>
     <string name="show_weather_description_desc">Show text like \"Partly cloudy\" below the temperature</string>
+    <string name="weather_use_gps">Use current location</string>
+    <string name="weather_search_address">Search address or city</string>
+    <string name="weather_search">Search</string>
+    <string name="weather_enter_manually">Enter coordinates manually</string>
 </resources>

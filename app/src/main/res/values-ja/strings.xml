@@ -248,4 +248,8 @@
     <string name="weather_unit_label">温度単位</string>
     <string name="show_weather_description">天気の説明を表示</string>
     <string name="show_weather_description_desc">気温の下に「一部曇り」などのテキストを表示</string>
+    <string name="weather_use_gps">現在地を使用</string>
+    <string name="weather_search_address">住所または都市を検索</string>
+    <string name="weather_search">検索</string>
+    <string name="weather_enter_manually">座標を手動入力</string>
 </resources>

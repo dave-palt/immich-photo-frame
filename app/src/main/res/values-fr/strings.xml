@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Unité de température</string>
     <string name="show_weather_description">Afficher la description</string>
     <string name="show_weather_description_desc">Afficher le texte comme « Partiellement nuageux » sous la température</string>
+    <string name="weather_use_gps">Utiliser ma position</string>
+    <string name="weather_search_address">Rechercher une adresse ou ville</string>
+    <string name="weather_search">Rechercher</string>
+    <string name="weather_enter_manually">Saisir les coordonnées manuellement</string>
 </resources>

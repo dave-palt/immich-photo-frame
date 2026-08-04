@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Unidad de temperatura</string>
     <string name="show_weather_description">Mostrar descripción del clima</string>
     <string name="show_weather_description_desc">Mostrar texto como «Parcialmente nublado» debajo de la temperatura</string>
+    <string name="weather_use_gps">Usar ubicación actual</string>
+    <string name="weather_search_address">Buscar dirección o ciudad</string>
+    <string name="weather_search">Buscar</string>
+    <string name="weather_enter_manually">Introducir coordenadas manualmente</string>
 </resources>

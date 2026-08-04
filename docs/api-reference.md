@@ -356,6 +356,29 @@ WMO weather codes are mapped to human-readable descriptions client-side
 (`wmoWeatherDescription()` in `WeatherData.kt`). Weather is fetched on
 slideshow entry and refreshed every 10 minutes.
 
+## OSM Nominatim (Address Search + Reverse Geocode)
+
+The weather location picker uses [OpenStreetMap
+Nominatim](https://nominatim.openstreetmap.org/) for free-text address
+search and reverse-geocoding GPS coordinates to a friendly label. No API
+key required.
+
+**Address search** (when the user types a query):
+```
+GET https://nominatim.openstreetmap.org/search
+    ?format=json&q={query}&limit=5&addressdetails=0
+```
+
+**Reverse geocode** (after a GPS fix):
+```
+GET https://nominatim.openstreetmap.org/reverse
+    ?format=json&lat={lat}&lon={lon}&zoom=14&addressdetails=0
+```
+
+Both calls send `User-Agent: ImmichFrame/1.0 (photo-frame app)` per
+Nominatim's usage policy. Calls are user-initiated (button tap) — no
+background polling, well within rate limits.
+
 ## GitHub API (Self-Update)
 
 The self-update feature uses the GitHub API (not Immich). The update path

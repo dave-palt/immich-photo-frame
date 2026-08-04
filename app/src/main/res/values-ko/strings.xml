@@ -248,4 +248,8 @@
     <string name="weather_unit_label">온도 단위</string>
     <string name="show_weather_description">날씨 설명 표시</string>
     <string name="show_weather_description_desc">온도 아래에 «부분적으로 흐림»과 같은 텍스트 표시</string>
+    <string name="weather_use_gps">현재 위치 사용</string>
+    <string name="weather_search_address">주소 또는 도시 검색</string>
+    <string name="weather_search">검색</string>
+    <string name="weather_enter_manually">좌표 수동 입력</string>
 </resources>

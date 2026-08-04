@@ -69,7 +69,7 @@ immich-android/
 │   │   │   │   ├── Models.kt            # Album, Asset, SlideshowSettings, SyncProgress
 │   │   │   │   └── RequiredPermission.kt # Permission registry + PermissionCheckResult
 │   │   │   ├── repository/      # Repository interfaces
-│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt, LocationHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
@@ -360,6 +360,8 @@ or Android throws `IllegalStateException`.
 | `RECEIVE_BOOT_COMPLETED` | Start-on-boot feature |
 | `REQUEST_INSTALL_PACKAGES` | Self-update via GitHub releases (APK install) |
 | `SYSTEM_ALERT_WINDOW` | Background Activity Launch exemption — required on Android 10+ (API 29+) for `BootReceiver` to call `startActivity()` from a `BOOT_COMPLETED` broadcast. Without it the OS silently blocks the launch. |
+| `ACCESS_COARSE_LOCATION` | Optional. Weather overlay "Use current location" — city-level GPS for one-shot location fix. No background tracking. |
+| `ACCESS_FINE_LOCATION` | Optional. Weather overlay "Use current location" — precise GPS (tablets without network positioning). No background tracking. |
 
 ## Localization
 

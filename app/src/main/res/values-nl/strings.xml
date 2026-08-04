@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Temperatuureenheid</string>
     <string name="show_weather_description">Weerbeschrijving tonen</string>
     <string name="show_weather_description_desc">Toon tekst zoals «Half bewolkt» onder de temperatuur</string>
+    <string name="weather_use_gps">Huidige locatie gebruiken</string>
+    <string name="weather_search_address">Adres of stad zoeken</string>
+    <string name="weather_search">Zoeken</string>
+    <string name="weather_enter_manually">Coördinaten handmatig invoeren</string>
 </resources>

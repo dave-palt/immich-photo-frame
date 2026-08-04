@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Jednostka temperatury</string>
     <string name="show_weather_description">Pokaż opis pogody</string>
     <string name="show_weather_description_desc">Pokaż tekst taki jak «Częściowe zachmurzenie» pod temperaturą</string>
+    <string name="weather_use_gps">Użyj bieżącej lokalizacji</string>
+    <string name="weather_search_address">Szukaj adresu lub miasta</string>
+    <string name="weather_search">Szukaj</string>
+    <string name="weather_enter_manually">Wprowadź współrzędne ręcznie</string>
 </resources>

@@ -248,4 +248,8 @@
     <string name="weather_unit_label">وحدة درجة الحرارة</string>
     <string name="show_weather_description">إظهار وصف الطقس</string>
     <string name="show_weather_description_desc">إظهار نص مثل «غائم جزئياً» أسفل درجة الحرارة</string>
+    <string name="weather_use_gps">استخدام الموقع الحالي</string>
+    <string name="weather_search_address">البحث عن عنوان أو مدينة</string>
+    <string name="weather_search">بحث</string>
+    <string name="weather_enter_manually">إدخال الإحداثيات يدويًا</string>
 </resources>

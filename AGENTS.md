@@ -142,6 +142,24 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-04** — Weather location picker (GPS + OSM Nominatim address
+  search + manual lat/long). Added three alternative ways to set the
+  weather location, all resolving to the same stored lat/long: (1)
+  **GPS** — "Use current location" button requests
+  `ACCESS_COARSE_LOCATION` / `ACCESS_FINE_LOCATION` (new manifest
+  permissions), gets a one-shot fix via platform `LocationManager` (no
+  Google Play Services dependency — FLOSS-friendly), reverse-geocodes
+  to a label via Nominatim; (2) **Address search** — free-text search
+  box → OSM Nominatim `/search` → pick result; (3) **Manual** —
+  collapsible lat/long text fields (the old UI, kept as fallback).
+  New `LocationHelper.kt` in `domain/system/` with
+  `getCurrentLocation()` (GPS), `searchLocations()` (Nominatim), and
+  `reverseGeocode()` (Nominatim). `SettingsViewModel` gained
+  `@ApplicationContext` injection + location search StateFlow + GPS
+  functions. 3 new strings × 13 locales. Updated: functional-spec (F6
+  weather location options), technical-spec (permissions table, package
+  layout), api-reference (Nominatim section), README (feature list).
+
 - **2026-08-04** — Weather overlay feature (phase 2). Added current-weather
   overlay to the slideshow using Open-Meteo (free, no API key, no auth
   header). New `OpenMeteoApi` Retrofit interface + `WeatherRepositoryImpl`

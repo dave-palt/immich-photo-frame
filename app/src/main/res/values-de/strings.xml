@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Temperatureinheit</string>
     <string name="show_weather_description">Wetterbeschreibung anzeigen</string>
     <string name="show_weather_description_desc">Text wie „Teilweise bewölkt\" unter der Temperatur anzeigen</string>
+    <string name="weather_use_gps">Aktuellen Standort verwenden</string>
+    <string name="weather_search_address">Adresse oder Stadt suchen</string>
+    <string name="weather_search">Suchen</string>
+    <string name="weather_enter_manually">Koordinaten manuell eingeben</string>
 </resources>

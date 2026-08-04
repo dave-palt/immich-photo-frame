@@ -263,8 +263,15 @@ Options:
 - **Weather** section (Open-Meteo, free, no API key):
   - **Show Weather** toggle (default off). Displays current temperature in
     the bottom-left corner of the slideshow.
-  - **Latitude / Longitude** — manual coordinate entry (find at
-    openstreetmap.org). No GPS permission needed for a stationary frame.
+  - **Use current location** button — requests `ACCESS_COARSE_LOCATION` /
+    `ACCESS_FINE_LOCATION` permission (if not yet granted), then reads the
+    device GPS (one-shot, no background tracking). Reverse-geocoded to a
+    friendly label via OSM Nominatim.
+  - **Address search** — free-text search box powered by OpenStreetMap
+    Nominatim geocoding. Type a city or address → pick from results →
+    lat/long is stored.
+  - **Manual lat/long** — collapsible manual entry as a fallback (find
+    coordinates at openstreetmap.org).
   - **Temperature Unit** — Celsius or Fahrenheit (°C / °F chips).
   - **Show Weather Description** — show text like "Partly cloudy" below the
     temperature (default on).

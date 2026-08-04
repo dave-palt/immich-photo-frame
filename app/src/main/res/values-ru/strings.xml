@@ -248,4 +248,8 @@
     <string name="weather_unit_label">Единица температуры</string>
     <string name="show_weather_description">Показать описание погоды</string>
     <string name="show_weather_description_desc">Показывать текст вроде «Переменная облачность» под температурой</string>
+    <string name="weather_use_gps">Использовать текущее местоположение</string>
+    <string name="weather_search_address">Поиск адреса или города</string>
+    <string name="weather_search">Найти</string>
+    <string name="weather_enter_manually">Ввести координаты вручную</string>
 </resources>
