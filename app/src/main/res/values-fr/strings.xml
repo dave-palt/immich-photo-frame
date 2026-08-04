@@ -239,4 +239,13 @@
     <string name="api_key_help_what">Une clé API est un jeton qui permet à cette app d\'accéder à vos photos sur votre serveur Immich — sans stocker votre mot de passe.</string>
     <string name="api_key_help_why">L\'app crée une clé avec uniquement les permissions nécessaires (lire les albums, voir les photos). Vous pouvez la révoquer à tout moment dans Paramètres Immich → Clés API.</string>
     <string name="api_key_help_password">Votre mot de passe est utilisé une fois pour créer la clé, puis immédiatement effacé. Il n\'est jamais enregistré sur cet appareil.</string>
+    <string name="section_weather">Météo</string>
+    <string name="show_weather">Afficher la météo</string>
+    <string name="show_weather_desc">Afficher la température actuelle sur le diaporama</string>
+    <string name="weather_location_hint">Entrez les coordonnées de votre position (trouvez-les sur openstreetmap.org)</string>
+    <string name="weather_latitude">Latitude</string>
+    <string name="weather_longitude">Longitude</string>
+    <string name="weather_unit_label">Unité de température</string>
+    <string name="show_weather_description">Afficher la description</string>
+    <string name="show_weather_description_desc">Afficher le texte comme « Partiellement nuageux » sous la température</string>
 </resources>

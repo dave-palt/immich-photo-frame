@@ -47,7 +47,9 @@ immich-android/
 │   │   │   │   ├── PkceHelper.kt       # PKCE code verifier/challenge
 │   │   │   │   ├── Dtos.kt            # Immich DTOs
 │   │   │   │   ├── GitHubDtos.kt      # GitHub DTOs
-│   │   │   │   └── ImmichRepositoryImpl.kt
+│   │   │   │   ├── OpenMeteoApi.kt    # Weather API (Open-Meteo, no auth)
+│   │   │   │   ├── ImmichRepositoryImpl.kt
+│   │   │   │   └── WeatherRepositoryImpl.kt
 │   │   │   ├── local/           # DataStore, EncryptedPrefs, Room cache
 │   │   │   │   ├── DataStoreProvider.kt  # Shared DataStore singleton
 │   │   │   │   ├── SettingsRepositoryImpl.kt
@@ -314,6 +316,11 @@ Setup → Albums → Slideshow
 | Night Mode Start | DataStore | `night_mode_start` | Int (minutes since midnight, default 1320 = 22:00) |
 | Night Mode End | DataStore | `night_mode_end` | Int (minutes since midnight, default 420 = 07:00) |
 | Night Mode Brightness | DataStore | `night_mode_brightness` | Int (0–100 percent, default 0) |
+| Show Weather | DataStore | `show_weather` | String bool (default false) |
+| Weather Latitude | DataStore | `weather_latitude` | String double (-90 to 90, default 0.0) |
+| Weather Longitude | DataStore | `weather_longitude` | String double (-180 to 180, default 0.0) |
+| Weather Unit | DataStore | `weather_unit` | String enum (`CELSIUS`/`FAHRENHEIT`, default `CELSIUS`) |
+| Show Weather Description | DataStore | `show_weather_description` | String bool (default true) |
 | Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 | Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |

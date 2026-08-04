@@ -260,6 +260,15 @@ Options:
   - Each field renders as an icon+text row in the bottom-right corner of the
     slideshow. Fields with no data are hidden automatically. The overlay is
     always visible during playback (not tied to controls visibility).
+- **Weather** section (Open-Meteo, free, no API key):
+  - **Show Weather** toggle (default off). Displays current temperature in
+    the bottom-left corner of the slideshow.
+  - **Latitude / Longitude** — manual coordinate entry (find at
+    openstreetmap.org). No GPS permission needed for a stationary frame.
+  - **Temperature Unit** — Celsius or Fahrenheit (°C / °F chips).
+  - **Show Weather Description** — show text like "Partly cloudy" below the
+    temperature (default on).
+  - Weather is fetched on slideshow entry and refreshed every 10 minutes.
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)

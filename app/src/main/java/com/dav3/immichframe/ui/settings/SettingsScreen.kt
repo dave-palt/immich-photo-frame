@@ -30,6 +30,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -386,6 +387,63 @@ fun SettingsScreen(
                         stringResource(R.string.night_mode_brightness_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                HorizontalDivider()
+
+                // ============================= WEATHER =============================
+                SectionHeader(stringResource(R.string.section_weather))
+                SwitchItem(
+                    title = stringResource(R.string.show_weather),
+                    subtitle = stringResource(R.string.show_weather_desc),
+                    checked = s.showWeather,
+                    onToggle = { viewModel.toggleWeather() },
+                )
+                if (s.showWeather) {
+                    Text(
+                        stringResource(R.string.weather_location_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedTextField(
+                        value = if (s.weatherLatitude != 0.0) s.weatherLatitude.toString() else "",
+                        onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setWeatherLatitude(it) } },
+                        label = { Text(stringResource(R.string.weather_latitude)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = if (s.weatherLongitude != 0.0) s.weatherLongitude.toString() else "",
+                        onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setWeatherLongitude(it) } },
+                        label = { Text(stringResource(R.string.weather_longitude)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(
+                        stringResource(R.string.weather_unit_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        com.dav3.immichframe.domain.model.TemperatureUnit.entries.forEach { unit ->
+                            FilterChip(
+                                selected = s.weatherUnit == unit,
+                                onClick = { viewModel.setWeatherUnit(unit) },
+                                label = {
+                                    Text("°${unit.symbol}")
+                                },
+                            )
+                        }
+                    }
+                    SwitchItem(
+                        title = stringResource(R.string.show_weather_description),
+                        subtitle = stringResource(R.string.show_weather_description_desc),
+                        checked = s.showWeatherDescription,
+                        onToggle = { viewModel.toggleWeatherDescription() },
                     )
                 }
 

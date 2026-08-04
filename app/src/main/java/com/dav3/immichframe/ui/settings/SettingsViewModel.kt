@@ -222,6 +222,16 @@ constructor(
 
     fun toggleTags() = update { it.copy(showTags = !it.showTags) }
 
+    fun toggleWeather() = update { it.copy(showWeather = !it.showWeather) }
+
+    fun setWeatherLatitude(lat: Double) = update { it.copy(weatherLatitude = lat.coerceIn(-90.0, 90.0)) }
+
+    fun setWeatherLongitude(lon: Double) = update { it.copy(weatherLongitude = lon.coerceIn(-180.0, 180.0)) }
+
+    fun setWeatherUnit(unit: com.dav3.immichframe.domain.model.TemperatureUnit) = update { it.copy(weatherUnit = unit) }
+
+    fun toggleWeatherDescription() = update { it.copy(showWeatherDescription = !it.showWeatherDescription) }
+
     fun togglePhotoAnimations() = update { it.copy(photoAnimations = !it.photoAnimations) }
 
     fun toggleAnimation(anim: PhotoAnimation) = update {

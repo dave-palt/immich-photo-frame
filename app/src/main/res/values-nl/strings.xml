@@ -239,4 +239,13 @@
     <string name="api_key_help_what">Een API-sleutel is een token waarmee deze app toegang krijgt tot je foto\'s op je Immich-server — zonder je wachtwoord op te slaan.</string>
     <string name="api_key_help_why">De app maakt een sleutel met alleen de benodigde rechten (albums lezen, foto\'s bekijken). Je kunt deze altijd intrekken in Immich-instellingen → API-sleutels.</string>
     <string name="api_key_help_password">Je wachtwoord wordt één keer gebruikt om de sleutel te maken en daarna direct verwijderd. Het wordt nooit op dit apparaat opgeslagen.</string>
+    <string name="section_weather">Weer</string>
+    <string name="show_weather">Weer tonen</string>
+    <string name="show_weather_desc">Toon huidige temperatuur op de diavoorstelling</string>
+    <string name="weather_location_hint">Voer uw locatiecoördinaten in (vind ze op openstreetmap.org)</string>
+    <string name="weather_latitude">Breedtegraad</string>
+    <string name="weather_longitude">Lengtegraad</string>
+    <string name="weather_unit_label">Temperatuureenheid</string>
+    <string name="show_weather_description">Weerbeschrijving tonen</string>
+    <string name="show_weather_description_desc">Toon tekst zoals «Half bewolkt» onder de temperatuur</string>
 </resources>

@@ -271,7 +271,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 └──────────────────────────────┘
 ```
 
-- Organized into sections: Slideshow, Image, Media Cache, Photo Metadata, Night Mode, Clock, Albums, Connection, Permissions.
+- Organized into sections: Slideshow, Image, Media Cache, Photo Metadata, Weather, Night Mode, Clock, Albums, Connection, Permissions.
 - **Albums section**: "Change Albums" button is biometric-gated (fingerprint / face / device PIN).
   Tapping it triggers authentication before navigating to the album picker.
 - Changes saved immediately to DataStore (no save button needed).

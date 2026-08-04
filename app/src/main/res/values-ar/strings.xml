@@ -239,4 +239,13 @@
     <string name="api_key_help_what">مفتاح API هو رمز يسمح لهذا التطبيق بالوصول إلى صورك على خادم Immich — دون تخزين كلمة المرور.</string>
     <string name="api_key_help_why">ينشئ التطبيق مفتاحًا محدود الصلاحيات بالأذونات التي يحتاجها فقط (قراءة الألبومات، عرض الصور). يمكنك إلغاؤه في أي وقت من إعدادات Immich → مفاتيح API.</string>
     <string name="api_key_help_password">تُستخدم كلمة المرور مرة واحدة لإنشاء المفتاح، ثم تُحذف فورًا. لا تُحفظ على هذا الجهاز أبدًا.</string>
+    <string name="section_weather">الطقس</string>
+    <string name="show_weather">إظهار الطقس</string>
+    <string name="show_weather_desc">عرض درجة الحرارة الحالية في العرض</string>
+    <string name="weather_location_hint">أدخل إحداثيات موقعك (ابحث عنها على openstreetmap.org)</string>
+    <string name="weather_latitude">خط العرض</string>
+    <string name="weather_longitude">خط الطول</string>
+    <string name="weather_unit_label">وحدة درجة الحرارة</string>
+    <string name="show_weather_description">إظهار وصف الطقس</string>
+    <string name="show_weather_description_desc">إظهار نص مثل «غائم جزئياً» أسفل درجة الحرارة</string>
 </resources>

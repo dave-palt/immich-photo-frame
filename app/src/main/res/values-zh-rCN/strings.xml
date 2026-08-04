@@ -239,4 +239,13 @@
     <string name="api_key_help_what">API 密钥是一个令牌，让本应用可以访问您 Immich 服务器上的照片 — 无需保存您的密码。</string>
     <string name="api_key_help_why">应用创建的密钥仅具有所需权限（读取相册、查看照片）。您可以随时在 Immich 设置 → API 密钥中撤销它。</string>
     <string name="api_key_help_password">您的密码仅用于创建密钥一次，然后立即丢弃。它永远不会保存在此设备上。</string>
+    <string name="section_weather">天气</string>
+    <string name="show_weather">显示天气</string>
+    <string name="show_weather_desc">在幻灯片上显示当前温度</string>
+    <string name="weather_location_hint">输入您的位置坐标（在 openstreetmap.org 查找）</string>
+    <string name="weather_latitude">纬度</string>
+    <string name="weather_longitude">经度</string>
+    <string name="weather_unit_label">温度单位</string>
+    <string name="show_weather_description">显示天气描述</string>
+    <string name="show_weather_description_desc">在温度下方显示如“局部多云”等文本</string>
 </resources>

@@ -105,6 +105,12 @@ data class SlideshowSettings(
     val nightModeStart: Int = 1320, // minutes since midnight (22:00)
     val nightModeEnd: Int = 420, // minutes since midnight (07:00)
     val nightModeBrightness: Int = 0, // 0-100 percent
+    // Weather overlay (Open-Meteo, free, no API key)
+    val showWeather: Boolean = false,
+    val weatherLatitude: Double = 0.0,
+    val weatherLongitude: Double = 0.0,
+    val weatherUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
+    val showWeatherDescription: Boolean = true,
 ) {
     /**
      * Whether the current wall-clock time falls inside the configured night-mode

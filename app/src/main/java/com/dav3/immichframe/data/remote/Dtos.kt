@@ -188,3 +188,18 @@ data class OAuthCallbackDto(
     val codeVerifier: String? = null,
     val state: String? = null,
 )
+
+// --- Open-Meteo (weather, no auth required) ---
+
+@Serializable
+data class OpenMeteoResponseDto(
+    val current: OpenMeteoCurrentDto? = null,
+)
+
+@Serializable
+data class OpenMeteoCurrentDto(
+    val temperature: Double? = null,
+    val weatherCode: Int? = null,
+    @SerialName("temperature_2m") val temperature2m: Double? = null,
+    @SerialName("weather_code") val wmoWeatherCode: Int? = null,
+)

@@ -239,4 +239,13 @@
     <string name="api_key_help_what">APIキーは、このアプリがImmichサーバー上の写真にアクセスするためのトークンです — パスワードを保存しません。</string>
     <string name="api_key_help_why">アプリは必要な権限（アルバムの読み取り、写真の表示）のみを持つキーを作成します。Immich設定 → APIキーからいつでも取り消せます。</string>
     <string name="api_key_help_password">パスワードはキー作成のために一度だけ使用され、すぐに破棄されます。このデバイスに保存されることはありません。</string>
+    <string name="section_weather">天気</string>
+    <string name="show_weather">天気を表示</string>
+    <string name="show_weather_desc">スライドショーに現在の気温を表示</string>
+    <string name="weather_location_hint">位置座標を入力してください（openstreetmap.orgで検索）</string>
+    <string name="weather_latitude">緯度</string>
+    <string name="weather_longitude">経度</string>
+    <string name="weather_unit_label">温度単位</string>
+    <string name="show_weather_description">天気の説明を表示</string>
+    <string name="show_weather_description_desc">気温の下に「一部曇り」などのテキストを表示</string>
 </resources>

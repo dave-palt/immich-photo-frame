@@ -239,4 +239,13 @@
     <string name="api_key_help_what">Uma chave API é um token que permite a esta app acessar as suas fotos no seu servidor Immich — sem armazenar a sua palavra-passe.</string>
     <string name="api_key_help_why">A app cria uma chave apenas com as permissões necessárias (ler álbuns, ver fotos). Pode revogá-la a qualquer momento em Configurações Immich → Chaves API.</string>
     <string name="api_key_help_password">A sua palavra-passe é usada uma vez para criar a chave e depois imediatamente descartada. Nunca é guardada neste dispositivo.</string>
+    <string name="section_weather">Clima</string>
+    <string name="show_weather">Mostrar clima</string>
+    <string name="show_weather_desc">Mostrar temperatura atual na apresentação</string>
+    <string name="weather_location_hint">Insira as coordenadas da sua localização (encontre-as em openstreetmap.org)</string>
+    <string name="weather_latitude">Latitude</string>
+    <string name="weather_longitude">Longitude</string>
+    <string name="weather_unit_label">Unidade de temperatura</string>
+    <string name="show_weather_description">Mostrar descrição do clima</string>
+    <string name="show_weather_description_desc">Mostrar texto como «Parcialmente nublado» abaixo da temperatura</string>
 </resources>

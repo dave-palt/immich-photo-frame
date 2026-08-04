@@ -77,6 +77,11 @@ constructor(
         val NIGHT_MODE_START = intPreferencesKey("night_mode_start")
         val NIGHT_MODE_END = intPreferencesKey("night_mode_end")
         val NIGHT_MODE_BRIGHTNESS = intPreferencesKey("night_mode_brightness")
+        val SHOW_WEATHER = stringPreferencesKey("show_weather")
+        val WEATHER_LATITUDE = stringPreferencesKey("weather_latitude")
+        val WEATHER_LONGITUDE = stringPreferencesKey("weather_longitude")
+        val WEATHER_UNIT = stringPreferencesKey("weather_unit")
+        val SHOW_WEATHER_DESCRIPTION = stringPreferencesKey("show_weather_description")
         val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
         val SERVER_VERSION = stringPreferencesKey("server_version")
@@ -161,6 +166,14 @@ constructor(
                 nightModeStart = prefs[Keys.NIGHT_MODE_START] ?: 1320,
                 nightModeEnd = prefs[Keys.NIGHT_MODE_END] ?: 420,
                 nightModeBrightness = prefs[Keys.NIGHT_MODE_BRIGHTNESS] ?: 0,
+                showWeather = prefs[Keys.SHOW_WEATHER]?.toBoolean() ?: false,
+                weatherLatitude = prefs[Keys.WEATHER_LATITUDE]?.toDoubleOrNull() ?: 0.0,
+                weatherLongitude = prefs[Keys.WEATHER_LONGITUDE]?.toDoubleOrNull() ?: 0.0,
+                weatherUnit = prefs[Keys.WEATHER_UNIT]?.let {
+                    runCatching { com.dav3.immichframe.domain.model.TemperatureUnit.valueOf(it) }
+                        .getOrNull()
+                } ?: com.dav3.immichframe.domain.model.TemperatureUnit.CELSIUS,
+                showWeatherDescription = prefs[Keys.SHOW_WEATHER_DESCRIPTION]?.toBoolean() ?: true,
             )
         }
 
@@ -259,6 +272,11 @@ constructor(
             it[Keys.NIGHT_MODE_START] = settings.nightModeStart
             it[Keys.NIGHT_MODE_END] = settings.nightModeEnd
             it[Keys.NIGHT_MODE_BRIGHTNESS] = settings.nightModeBrightness
+            it[Keys.SHOW_WEATHER] = settings.showWeather.toString()
+            it[Keys.WEATHER_LATITUDE] = settings.weatherLatitude.toString()
+            it[Keys.WEATHER_LONGITUDE] = settings.weatherLongitude.toString()
+            it[Keys.WEATHER_UNIT] = settings.weatherUnit.name
+            it[Keys.SHOW_WEATHER_DESCRIPTION] = settings.showWeatherDescription.toString()
         }
     }
 

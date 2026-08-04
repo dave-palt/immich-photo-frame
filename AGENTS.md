@@ -142,6 +142,24 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-04** — Weather overlay feature (phase 2). Added current-weather
+  overlay to the slideshow using Open-Meteo (free, no API key, no auth
+  header). New `OpenMeteoApi` Retrofit interface + `WeatherRepositoryImpl`
+  (separate Retrofit instance, no `x-api-key` interceptor). New domain
+  model `WeatherData` + `TemperatureUnit` enum + `wmoWeatherDescription()`
+  WMO code → text mapping. New `WeatherOverlay.kt` composable in
+  `ui/slideshow/` showing temperature + optional description in the
+  bottom-left corner. `SlideshowViewModel` gained `weather: StateFlow<WeatherData?>`
+  + `refreshWeather()`. `SlideshowScreen` fetches on entry + every 10 min.
+  5 new settings (`show_weather`, `weather_latitude`, `weather_longitude`,
+  `weather_unit`, `show_weather_description`; all default off/false except
+  description which defaults on). New "Weather" section in Settings between
+  "Photo Metadata" and "Night Mode". Manual lat/long entry (no GPS
+  permission — stationary frame). 9 new strings (EN + 12 locales).
+  Updated: functional-spec (F6), technical-spec (persistence table +
+  package layout), api-reference (Weather API section), ui-spec (section
+  list), README (feature list).
+
 - **2026-08-02** — Photo Metadata overlay feature. Added EXIF-based
   metadata overlays to the slideshow (photo date, location, description,
   Immich tags). `POST /search/metadata` now sends `withExif: true` and

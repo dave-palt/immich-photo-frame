@@ -85,6 +85,7 @@ fun SlideshowContent(
     containerSize: IntSize,
     adaptiveBrush: Brush?,
     tourState: TourState?,
+    weather: com.dav3.immichframe.domain.model.WeatherData? = null,
     onToggleControls: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
@@ -166,6 +167,15 @@ fun SlideshowContent(
                     asset = currentAsset,
                     settings = s,
                     modifier = Modifier.align(Alignment.BottomEnd),
+                )
+            }
+
+            // Weather overlay (Open-Meteo, bottom-left)
+            if (!nightActive && s.showWeather && weather != null) {
+                WeatherOverlay(
+                    weather = weather,
+                    showDescription = s.showWeatherDescription,
+                    modifier = Modifier.align(Alignment.BottomStart),
                 )
             }
 

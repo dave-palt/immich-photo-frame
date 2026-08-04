@@ -239,4 +239,13 @@
     <string name="api_key_help_what">Ein API-Schlüssel ist ein Token, der dieser App den Zugriff auf Ihre Fotos auf Ihrem Immich-Server ermöglicht — ohne Ihr Passwort zu speichern.</string>
     <string name="api_key_help_why">Die App erstellt einen Schlüssel nur mit den benötigten Berechtigungen (Alben lesen, Fotos ansehen). Sie können ihn jederzeit in Immich-Einstellungen → API-Schlüssel widerrufen.</string>
     <string name="api_key_help_password">Ihr Passwort wird einmalig zum Erstellen des Schlüssels verwendet und dann sofort verworfen. Es wird nie auf diesem Gerät gespeichert.</string>
+    <string name="section_weather">Wetter</string>
+    <string name="show_weather">Wetter anzeigen</string>
+    <string name="show_weather_desc">Aktuelle Temperatur auf der Diashow anzeigen</string>
+    <string name="weather_location_hint">Geben Sie Ihre Standortkoordinaten ein (zu finden auf openstreetmap.org)</string>
+    <string name="weather_latitude">Breitengrad</string>
+    <string name="weather_longitude">Längengrad</string>
+    <string name="weather_unit_label">Temperatureinheit</string>
+    <string name="show_weather_description">Wetterbeschreibung anzeigen</string>
+    <string name="show_weather_description_desc">Text wie „Teilweise bewölkt\" unter der Temperatur anzeigen</string>
 </resources>

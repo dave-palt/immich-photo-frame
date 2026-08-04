@@ -239,4 +239,13 @@
     <string name="api_key_help_what">API 키는 이 앱이 Immich 서버의 사진에 접근할 수 있게 하는 토큰입니다 — 비밀번호를 저장하지 않습니다.</string>
     <string name="api_key_help_why">앱은 필요한 권한(앨범 읽기, 사진 보기)만 가진 키를 생성합니다. Immich 설정 → API 키에서 언제든지 취소할 수 있습니다.</string>
     <string name="api_key_help_password">비밀번호는 키 생성을 위해 한 번만 사용되고 즉시 폐기됩니다. 이 기기에 저장되지 않습니다.</string>
+    <string name="section_weather">날씨</string>
+    <string name="show_weather">날씨 표시</string>
+    <string name="show_weather_desc">슬라이드 쇼에 현재 온도 표시</string>
+    <string name="weather_location_hint">위치 좌표를 입력하세요 (openstreetmap.org에서 찾기)</string>
+    <string name="weather_latitude">위도</string>
+    <string name="weather_longitude">경도</string>
+    <string name="weather_unit_label">온도 단위</string>
+    <string name="show_weather_description">날씨 설명 표시</string>
+    <string name="show_weather_description_desc">온도 아래에 «부분적으로 흐림»과 같은 텍스트 표시</string>
 </resources>

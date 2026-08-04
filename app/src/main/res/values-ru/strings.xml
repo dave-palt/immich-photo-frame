@@ -239,4 +239,13 @@
     <string name="api_key_help_what">Ключ API — это токен, который позволяет этому приложению получать доступ к вашим фото на вашем сервере Immich — без сохранения вашего пароля.</string>
     <string name="api_key_help_why">Приложение создаёт ключ только с необходимыми разрешениями (чтение альбомов, просмотр фото). Вы можете отозвать его в любой момент в Настройках Immich → Ключи API.</string>
     <string name="api_key_help_password">Ваш пароль используется один раз для создания ключа, а затем немедленно удаляется. Он никогда не сохраняется на этом устройстве.</string>
+    <string name="section_weather">Погода</string>
+    <string name="show_weather">Показать погоду</string>
+    <string name="show_weather_desc">Отображать текущую температуру в слайд-шоу</string>
+    <string name="weather_location_hint">Введите координаты вашего местоположения (найдите их на openstreetmap.org)</string>
+    <string name="weather_latitude">Широта</string>
+    <string name="weather_longitude">Долгота</string>
+    <string name="weather_unit_label">Единица температуры</string>
+    <string name="show_weather_description">Показать описание погоды</string>
+    <string name="show_weather_description_desc">Показывать текст вроде «Переменная облачность» под температурой</string>
 </resources>

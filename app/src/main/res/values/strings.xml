@@ -269,4 +269,13 @@
     <string name="tour_settings_cache_body">Auto Sync downloads photos in the background so the slideshow works offline and loads instantly.</string>
     <string name="tour_settings_connection_title">Connection</string>
     <string name="tour_settings_connection_body">Update your server URL or API key here if your Immich setup changes.</string>
+    <string name="section_weather">Weather</string>
+    <string name="show_weather">Show weather</string>
+    <string name="show_weather_desc">Display current temperature on the slideshow</string>
+    <string name="weather_location_hint">Enter your location coordinates (find them at openstreetmap.org)</string>
+    <string name="weather_latitude">Latitude</string>
+    <string name="weather_longitude">Longitude</string>
+    <string name="weather_unit_label">Temperature unit</string>
+    <string name="show_weather_description">Show weather description</string>
+    <string name="show_weather_description_desc">Show text like \"Partly cloudy\" below the temperature</string>
 </resources>

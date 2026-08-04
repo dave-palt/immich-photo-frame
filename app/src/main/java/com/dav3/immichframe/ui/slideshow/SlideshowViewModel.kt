@@ -6,9 +6,11 @@ import com.dav3.immichframe.data.sync.SyncScheduler
 import com.dav3.immichframe.domain.model.Asset
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.ClockPosition
+import com.dav3.immichframe.domain.model.WeatherData
 import com.dav3.immichframe.domain.repository.ImmichRepository
 import com.dav3.immichframe.domain.repository.MediaCacheRepository
 import com.dav3.immichframe.domain.repository.SettingsRepository
+import com.dav3.immichframe.domain.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,9 +41,13 @@ constructor(
     private val cacheRepo: MediaCacheRepository,
     private val settingsRepo: SettingsRepository,
     private val syncScheduler: SyncScheduler,
+    private val weatherRepo: WeatherRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SlideshowUiState())
     val uiState: StateFlow<SlideshowUiState> = _uiState
+
+    private val _weather = MutableStateFlow<WeatherData?>(null)
+    val weather: StateFlow<WeatherData?> = _weather
 
     /**
      * Asset ID → local cached file path. Populated in [load] so that
@@ -197,6 +203,25 @@ constructor(
     fun setClockPosition(pos: ClockPosition) {
         viewModelScope.launch {
             settingsRepo.setSlideshowSettings(settings.value.copy(clockPosition = pos))
+        }
+    }
+
+    /**
+     * Fetches current weather from Open-Meteo. Called on slideshow entry and
+     * then on a 10-minute interval by [SlideshowScreen]. No-op if weather is
+     * disabled or coordinates are unset (0,0).
+     */
+    fun refreshWeather() {
+        viewModelScope.launch {
+            val s = settings.value
+            if (!s.showWeather) {
+                _weather.value = null
+                return@launch
+            }
+            // (0,0) means unset — skip the network call
+            if (s.weatherLatitude == 0.0 && s.weatherLongitude == 0.0) return@launch
+            val data = weatherRepo.getCurrentWeather(s.weatherLatitude, s.weatherLongitude, s.weatherUnit)
+            if (data != null) _weather.value = data
         }
     }
 

@@ -326,6 +326,38 @@ rather than crash. Version compatibility can be checked via
 
 ## GitHub API (Self-Update)
 
+## Weather API (Open-Meteo)
+
+The weather overlay uses the [Open-Meteo](https://open-meteo.com) API — free,
+no API key required, no auth header. Calls are made directly from the Android
+client via a dedicated Retrofit instance (`WeatherRepositoryImpl`) that does
+NOT use the `x-api-key` header.
+
+```
+GET https://api.open-meteo.com/v1/forecast
+    ?latitude={lat}
+    &longitude={lon}
+    &current=temperature_2m,weather_code
+    &temperature_unit={celsius|fahrenheit}
+    &timezone=auto
+```
+
+Response (abbreviated):
+```json
+{
+  "current": {
+    "temperature_2m": 21.3,
+    "weather_code": 2
+  }
+}
+```
+
+WMO weather codes are mapped to human-readable descriptions client-side
+(`wmoWeatherDescription()` in `WeatherData.kt`). Weather is fetched on
+slideshow entry and refreshed every 10 minutes.
+
+## GitHub API (Self-Update)
+
 The self-update feature uses the GitHub API (not Immich). The update path
 depends on build type:
 
