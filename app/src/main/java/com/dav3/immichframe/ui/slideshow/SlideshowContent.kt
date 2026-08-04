@@ -59,6 +59,8 @@ import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
+import com.dav3.immichframe.domain.model.TemperatureUnit
+import com.dav3.immichframe.domain.model.WeatherData
 import com.dav3.immichframe.ui.onboarding.TourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.theme.ImmichFrameTheme
@@ -626,6 +628,46 @@ private fun SlideshowContentPreview_WithMetadata() {
             containerSize = demoImageSize,
             adaptiveBrush = null,
             tourState = null,
+            onToggleControls = {},
+            onPrevious = {},
+            onNext = {},
+            onTogglePause = {},
+            onToggleMute = {},
+            onSettings = {},
+            onChangeAlbums = {},
+            onMediaSelection = {},
+            onSetClockPosition = { _, _ -> },
+            onImageLoaded = {},
+            onContainerSizeChanged = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 640)
+@Composable
+private fun SlideshowContentPreview_WithWeather() {
+    ImmichFrameTheme {
+        SlideshowContent(
+            state = demoState,
+            settings = SlideshowSettings(
+                showWeather = true,
+                showWeatherDescription = true,
+            ),
+            imageUrl = ::demoImageUrl,
+            controlsVisible = false,
+            isPaused = false,
+            progress = 0f,
+            nightActive = false,
+            currentTime = "",
+            containerSize = demoImageSize,
+            adaptiveBrush = null,
+            tourState = null,
+            weather = WeatherData(
+                temperature = 21.0,
+                unit = TemperatureUnit.CELSIUS,
+                weatherCode = 2,
+                description = "Partly cloudy",
+            ),
             onToggleControls = {},
             onPrevious = {},
             onNext = {},
