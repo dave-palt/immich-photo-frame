@@ -30,6 +30,8 @@ lets you pick which album(s) to display, and remembers your choice.
 - Draggable clock overlay with configurable size, 12h/24h format, optional seconds, snap-to-grid, and orbital burn-in motion (when photo animations are enabled)
 - Photo animations (Ken Burns: zoom in/out, pan left/right/up/down, or random) — also serves as burn-in protection
 - Adaptive background (fills letterbox bars with each photo's edge colors as a gradient)
+- Photo metadata overlay — EXIF-based date, location, description, and Immich tags, each independently toggleable, shown in the bottom-right corner of the slideshow
+- Weather overlay — current temperature and conditions from Open-Meteo (free, no API key), shown in the bottom-left corner. Location can be set via GPS ("Use current location"), address search (OpenStreetMap Nominatim), or manual lat/long entry.
 - Shuffle mode for randomized image order
 - Progress bar showing time remaining per image
 - Start on boot (with SYSTEM_ALERT_WINDOW permission for Android 10+ BAL exemption, plus OEM autostart permission detection)
@@ -50,17 +52,21 @@ lets you pick which album(s) to display, and remembers your choice.
 
 ## Screenshots
 
-| Slideshow | Clock overlay | Night mode |
+| Slideshow | Metadata overlay | Night mode |
 |:---:|:---:|:---:|
-| ![Slideshow](docs/screenshots/slideshow/photo_contain.png) | ![Clock](docs/screenshots/slideshow/with_clock.png) | ![Night mode](docs/screenshots/slideshow/nightmode.png) |
+| ![Slideshow](docs/screenshots/slideshow/photo_contain.png) | ![Metadata](docs/screenshots/slideshow/with_metadata.png) | ![Night mode](docs/screenshots/slideshow/nightmode.png) |
 
-| Album selection | Media selection | Setup |
+| Clock overlay | Album selection | Media selection |
 |:---:|:---:|:---:|
-| ![Albums](docs/screenshots/albums/albums_loaded.png) | ![Media](docs/screenshots/media_selection/some_hidden.png) | ![Setup](docs/screenshots/setup/domain_filled.png) |
+| ![Clock](docs/screenshots/slideshow/with_clock.png) | ![Albums](docs/screenshots/albums/albums_loaded.png) | ![Media](docs/screenshots/media_selection/some_hidden.png) |
 
-| Settings — Playback | Settings — Clock | Settings — Night mode |
+| Setup | Settings — Playback | Settings — Photo Metadata |
 |:---:|:---:|:---:|
-| ![Playback](docs/screenshots/settings/playback.png) | ![Clock settings](docs/screenshots/settings/clock.png) | ![Night mode settings](docs/screenshots/settings/night_mode.png) |
+| ![Setup](docs/screenshots/setup/domain_filled.png) | ![Playback](docs/screenshots/settings/playback.png) | ![Photo metadata](docs/screenshots/settings/photo_metadata.png) |
+
+| Settings — Clock | Settings — Night mode | |
+|:---:|:---:|:---:|
+| ![Clock settings](docs/screenshots/settings/clock.png) | ![Night mode settings](docs/screenshots/settings/night_mode.png) | |
 
 > All screenshots are Full HD (1080×1920), generated on JVM via Roborazzi from Compose `@Preview` functions — no device or emulator needed. See [`docs/technical-spec.md`](docs/technical-spec.md) → Screenshot Testing for the full inventory.
 

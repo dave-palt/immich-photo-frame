@@ -3,6 +3,7 @@ package com.dav3.immichframe.data.remote
 import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.domain.model.Album
 import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.AssetExif
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.PermissionCheckResult
 import com.dav3.immichframe.domain.model.PermissionStatus
@@ -31,7 +32,10 @@ class ImmichRepositoryImpl
 constructor(
     private val settings: SettingsRepository,
 ) : ImmichRepository {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     private var cachedApi: ImmichApi? = null
     private var cachedBaseUrl: String? = null
@@ -265,14 +269,7 @@ constructor(
             .searchAssets(SearchMetadataRequest(albumIds = listOf(albumId)))
             .assets
             .items
-            .map { dto ->
-                Asset(
-                    dto.id,
-                    if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
-                    dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
-                    dto.originalMimeType,
-                )
-            }
+            .map { dto -> dto.toAsset() }
     }
 
     override suspend fun getAlbumAssets(albumId: String, cursor: String?): Result<List<Asset>> = runCatching {
@@ -285,15 +282,25 @@ constructor(
             .searchAssets(request)
             .assets
             .items
-            .map { dto ->
-                Asset(
-                    dto.id,
-                    if (dto.type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
-                    dto.updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
-                    dto.originalMimeType,
-                )
-            }
+            .map { dto -> dto.toAsset() }
     }
+
+    private fun AssetDto.toAsset(): Asset = Asset(
+        id = id,
+        type = if (type.equals("VIDEO", ignoreCase = true)) AssetType.VIDEO else AssetType.IMAGE,
+        lastModified = updatedAt?.let { java.time.Instant.parse(it).toEpochMilli() } ?: 0,
+        originalMimeType = originalMimeType,
+        exif = exifInfo?.toAssetExif(),
+        tags = tags?.mapNotNull { it.name.takeIf { n -> n.isNotBlank() } } ?: emptyList(),
+    )
+
+    private fun ExifInfoDto.toAssetExif(): AssetExif = AssetExif(
+        dateTimeOriginal = dateTimeOriginal,
+        description = description,
+        city = city,
+        state = state,
+        country = country,
+    )
 
     override fun imageUrl(assetId: String, mimeType: String?): String {
         val base = cachedBaseUrl ?: runBlocking { settings.serverUrl.first() }

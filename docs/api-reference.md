@@ -326,6 +326,61 @@ rather than crash. Version compatibility can be checked via
 
 ## GitHub API (Self-Update)
 
+## Weather API (Open-Meteo)
+
+The weather overlay uses the [Open-Meteo](https://open-meteo.com) API — free,
+no API key required, no auth header. Calls are made directly from the Android
+client via a dedicated Retrofit instance (`WeatherRepositoryImpl`) that does
+NOT use the `x-api-key` header.
+
+```
+GET https://api.open-meteo.com/v1/forecast
+    ?latitude={lat}
+    &longitude={lon}
+    &current=temperature_2m,weather_code
+    &temperature_unit={celsius|fahrenheit}
+    &timezone=auto
+```
+
+Response (abbreviated):
+```json
+{
+  "current": {
+    "temperature_2m": 21.3,
+    "weather_code": 2
+  }
+}
+```
+
+WMO weather codes are mapped to human-readable descriptions client-side
+(`wmoWeatherDescription()` in `WeatherData.kt`). Weather is fetched on
+slideshow entry and refreshed every 10 minutes.
+
+## OSM Nominatim (Address Search + Reverse Geocode)
+
+The weather location picker uses [OpenStreetMap
+Nominatim](https://nominatim.openstreetmap.org/) for free-text address
+search and reverse-geocoding GPS coordinates to a friendly label. No API
+key required.
+
+**Address search** (when the user types a query):
+```
+GET https://nominatim.openstreetmap.org/search
+    ?format=json&q={query}&limit=5&addressdetails=0
+```
+
+**Reverse geocode** (after a GPS fix):
+```
+GET https://nominatim.openstreetmap.org/reverse
+    ?format=json&lat={lat}&lon={lon}&zoom=14&addressdetails=0
+```
+
+Both calls send `User-Agent: ImmichFrame/1.0 (photo-frame app)` per
+Nominatim's usage policy. Calls are user-initiated (button tap) — no
+background polling, well within rate limits.
+
+## GitHub API (Self-Update)
+
 The self-update feature uses the GitHub API (not Immich). The update path
 depends on build type:
 

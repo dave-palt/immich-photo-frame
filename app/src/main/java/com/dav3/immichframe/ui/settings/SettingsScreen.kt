@@ -1,9 +1,13 @@
 package com.dav3.immichframe.ui.settings
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,13 +27,19 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.LocationOff
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -323,6 +333,35 @@ fun SettingsScreen(
 
                 HorizontalDivider()
 
+                // ============================= PHOTO METADATA =============================
+                SectionHeader(stringResource(R.string.section_photo_metadata))
+                SwitchItem(
+                    title = stringResource(R.string.show_photo_date),
+                    subtitle = stringResource(R.string.show_photo_date_desc),
+                    checked = s.showPhotoDate,
+                    onToggle = { viewModel.togglePhotoDate() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_location),
+                    subtitle = stringResource(R.string.show_location_desc),
+                    checked = s.showLocation,
+                    onToggle = { viewModel.toggleLocation() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_description),
+                    subtitle = stringResource(R.string.show_description_desc),
+                    checked = s.showDescription,
+                    onToggle = { viewModel.toggleDescription() },
+                )
+                SwitchItem(
+                    title = stringResource(R.string.show_tags),
+                    subtitle = stringResource(R.string.show_tags_desc),
+                    checked = s.showTags,
+                    onToggle = { viewModel.toggleTags() },
+                )
+
+                HorizontalDivider()
+
                 // ============================= NIGHT MODE =============================
                 SectionHeader(stringResource(R.string.section_night_mode))
                 SwitchItem(
@@ -357,6 +396,212 @@ fun SettingsScreen(
                         stringResource(R.string.night_mode_brightness_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                HorizontalDivider()
+
+                // ============================= WEATHER =============================
+                SectionHeader(stringResource(R.string.section_weather))
+                SwitchItem(
+                    title = stringResource(R.string.show_weather),
+                    subtitle = stringResource(R.string.show_weather_desc),
+                    checked = s.showWeather,
+                    onToggle = { viewModel.toggleWeather() },
+                )
+                if (s.showWeather) {
+                    // --- Location picker: GPS button + address search + manual ---
+                    val locationQuery by viewModel.locationSearchQuery.collectAsState()
+                    val searchResults by viewModel.locationSearchResults.collectAsState()
+                    val locationSearching by viewModel.locationSearching.collectAsState()
+                    val gpsLocating by viewModel.gpsLocating.collectAsState()
+                    var showManual by remember { mutableStateOf(false) }
+
+                    Text(
+                        stringResource(R.string.weather_location_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    // GPS one-shot button
+                    val gpsLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.RequestMultiplePermissions(),
+                    ) { result ->
+                        val granted = result.values.any { it }
+                        if (granted) {
+                            viewModel.useCurrentLocation()
+                        }
+                    }
+                    Button(
+                        onClick = {
+                            if (viewModel.hasLocationPermission()) {
+                                viewModel.useCurrentLocation()
+                            } else {
+                                gpsLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                    ),
+                                )
+                            }
+                        },
+                        enabled = !gpsLocating,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        if (gpsLocating) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        } else {
+                            Icon(Icons.Default.MyLocation, contentDescription = null)
+                        }
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.weather_use_gps))
+                    }
+
+                    // Address search
+                    OutlinedTextField(
+                        value = locationQuery,
+                        onValueChange = { viewModel.onLocationSearchQueryChange(it) },
+                        label = { Text(stringResource(R.string.weather_search_address)) },
+                        singleLine = true,
+                        trailingIcon = {
+                            if (locationSearching) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                )
+                            } else if (locationQuery.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.clearLocationSearch() }) {
+                                    Icon(Icons.Default.Close, contentDescription = null)
+                                }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    if (locationQuery.isNotBlank() && locationQuery.length >= 3) {
+                        Button(
+                            onClick = { viewModel.searchLocations() },
+                            enabled = !locationSearching,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(Icons.Default.Search, contentDescription = null)
+                            Spacer(Modifier.size(8.dp))
+                            Text(stringResource(R.string.weather_search))
+                        }
+                    }
+                    // Search results dropdown
+                    if (searchResults.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            ),
+                        ) {
+                            Column {
+                                searchResults.forEach { result ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { viewModel.selectLocation(result) }
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Icon(
+                                            Icons.Default.LocationOn,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp),
+                                        )
+                                        Spacer(Modifier.size(12.dp))
+                                        Text(
+                                            result.displayName,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            maxLines = 2,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Current location display
+                    if (s.weatherLatitude != 0.0 || s.weatherLongitude != 0.0) {
+                        Spacer(Modifier.size(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(Modifier.size(8.dp))
+                            Text(
+                                "%.4f, %.4f".format(s.weatherLatitude, s.weatherLongitude),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+
+                    // Collapsible manual lat/long entry
+                    TextButton(
+                        onClick = { showManual = !showManual },
+                    ) {
+                        Icon(
+                            if (showManual) Icons.Default.Close else Icons.Default.LocationOff,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.weather_enter_manually))
+                    }
+                    if (showManual) {
+                        OutlinedTextField(
+                            value = if (s.weatherLatitude != 0.0) s.weatherLatitude.toString() else "",
+                            onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setWeatherLatitude(it) } },
+                            label = { Text(stringResource(R.string.weather_latitude)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = if (s.weatherLongitude != 0.0) s.weatherLongitude.toString() else "",
+                            onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setWeatherLongitude(it) } },
+                            label = { Text(stringResource(R.string.weather_longitude)) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+
+                    Text(
+                        stringResource(R.string.weather_unit_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        com.dav3.immichframe.domain.model.TemperatureUnit.entries.forEach { unit ->
+                            FilterChip(
+                                selected = s.weatherUnit == unit,
+                                onClick = { viewModel.setWeatherUnit(unit) },
+                                label = {
+                                    Text("°${unit.symbol}")
+                                },
+                            )
+                        }
+                    }
+                    SwitchItem(
+                        title = stringResource(R.string.show_weather_description),
+                        subtitle = stringResource(R.string.show_weather_description_desc),
+                        checked = s.showWeatherDescription,
+                        onToggle = { viewModel.toggleWeatherDescription() },
                     )
                 }
 

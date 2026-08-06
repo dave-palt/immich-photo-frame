@@ -31,6 +31,24 @@ data class AssetDto(
     val type: String = "IMAGE",
     val updatedAt: String? = null,
     val originalMimeType: String? = null,
+    val exifInfo: ExifInfoDto? = null,
+    val tags: List<TagDto>? = null,
+)
+
+@Serializable
+data class ExifInfoDto(
+    val dateTimeOriginal: String? = null,
+    val description: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+)
+
+@Serializable
+data class TagDto(
+    val id: String = "",
+    val name: String = "",
+    val value: String? = null,
 )
 
 // --- Search endpoint (POST /search/metadata) ---
@@ -39,6 +57,8 @@ data class AssetDto(
 data class SearchMetadataRequest(
     val albumIds: List<String>,
     val size: Int = 1000,
+    val withExif: Boolean = true,
+    val withTags: Boolean = true,
 )
 
 @Serializable
@@ -167,4 +187,19 @@ data class OAuthCallbackDto(
     val url: String,
     val codeVerifier: String? = null,
     val state: String? = null,
+)
+
+// --- Open-Meteo (weather, no auth required) ---
+
+@Serializable
+data class OpenMeteoResponseDto(
+    val current: OpenMeteoCurrentDto? = null,
+)
+
+@Serializable
+data class OpenMeteoCurrentDto(
+    val temperature: Double? = null,
+    val weatherCode: Int? = null,
+    @SerialName("temperature_2m") val temperature2m: Double? = null,
+    @SerialName("weather_code") val wmoWeatherCode: Int? = null,
 )

@@ -45,6 +45,17 @@
     <string name="fullscreen">Полноэкранный режим</string>
     <string name="fullscreen_desc">Скрыть системные панели</string>
     <string name="keep_screen_on">Не выключать экран</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Метаданные фото</string>
+    <string name="show_photo_date">Дата фото</string>
+    <string name="show_photo_date_desc">Показывать дату съёмки (из EXIF)</string>
+    <string name="show_location">Местоположение</string>
+    <string name="show_location_desc">Показывать город, штат и страну (из GPS-данных EXIF)</string>
+    <string name="show_description">Описание</string>
+    <string name="show_description_desc">Показывать описание фото (из метаданных EXIF)</string>
+    <string name="show_tags">Теги</string>
+    <string name="show_tags_desc">Показывать теги, назначенные в Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Ночной режим</string>
@@ -228,4 +239,17 @@
     <string name="api_key_help_what">Ключ API — это токен, который позволяет этому приложению получать доступ к вашим фото на вашем сервере Immich — без сохранения вашего пароля.</string>
     <string name="api_key_help_why">Приложение создаёт ключ только с необходимыми разрешениями (чтение альбомов, просмотр фото). Вы можете отозвать его в любой момент в Настройках Immich → Ключи API.</string>
     <string name="api_key_help_password">Ваш пароль используется один раз для создания ключа, а затем немедленно удаляется. Он никогда не сохраняется на этом устройстве.</string>
+    <string name="section_weather">Погода</string>
+    <string name="show_weather">Показать погоду</string>
+    <string name="show_weather_desc">Отображать текущую температуру в слайд-шоу</string>
+    <string name="weather_location_hint">Введите координаты вашего местоположения (найдите их на openstreetmap.org)</string>
+    <string name="weather_latitude">Широта</string>
+    <string name="weather_longitude">Долгота</string>
+    <string name="weather_unit_label">Единица температуры</string>
+    <string name="show_weather_description">Показать описание погоды</string>
+    <string name="show_weather_description_desc">Показывать текст вроде «Переменная облачность» под температурой</string>
+    <string name="weather_use_gps">Использовать текущее местоположение</string>
+    <string name="weather_search_address">Поиск адреса или города</string>
+    <string name="weather_search">Найти</string>
+    <string name="weather_enter_manually">Ввести координаты вручную</string>
 </resources>

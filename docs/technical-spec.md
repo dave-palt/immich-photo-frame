@@ -47,7 +47,9 @@ immich-android/
 │   │   │   │   ├── PkceHelper.kt       # PKCE code verifier/challenge
 │   │   │   │   ├── Dtos.kt            # Immich DTOs
 │   │   │   │   ├── GitHubDtos.kt      # GitHub DTOs
-│   │   │   │   └── ImmichRepositoryImpl.kt
+│   │   │   │   ├── OpenMeteoApi.kt    # Weather API (Open-Meteo, no auth)
+│   │   │   │   ├── ImmichRepositoryImpl.kt
+│   │   │   │   └── WeatherRepositoryImpl.kt
 │   │   │   ├── local/           # DataStore, EncryptedPrefs, Room cache
 │   │   │   │   ├── DataStoreProvider.kt  # Shared DataStore singleton
 │   │   │   │   ├── SettingsRepositoryImpl.kt
@@ -67,7 +69,7 @@ immich-android/
 │   │   │   │   ├── Models.kt            # Album, Asset, SlideshowSettings, SyncProgress
 │   │   │   │   └── RequiredPermission.kt # Permission registry + PermissionCheckResult
 │   │   │   ├── repository/      # Repository interfaces
-│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt
+│   │   │   ├── system/          # AutostartPermissions.kt, LauncherHelper.kt, BiometricHelper.kt, LocationHelper.kt
 │   │   │   └── sync/            # MediaCacheWorker, SyncScheduler
 │   │   ├── di/                  # Hilt modules
 │   │   ├── ui/
@@ -194,8 +196,14 @@ loading.
 
 - **`cached_assets`** — one row per downloaded asset: `id`, `album_id`,
   `type` (IMAGE/VIDEO), `file_path`, `thumbnail_path`, `file_size`,
-  `checksum`, `last_modified`, `cached_at`, `original_mime_type`. Indexed
-  on `album_id`, `cached_at`, `last_modified`.
+  `checksum`, `last_modified`, `cached_at`, `original_mime_type`,
+  `exif_date_time_original`, `exif_description`, `exif_city`, `exif_state`,
+  `exif_country`, `tags` (stored as `||`-separated string via TypeConverter).
+  Indexed on `album_id`, `cached_at`, `last_modified`.
+- **DB version**: 3 (v2 added `original_mime_type` for GIF support; v3 added
+  the EXIF + tags columns for the Photo Metadata overlay). Uses
+  `fallbackToDestructiveMigration` — a cache wipe is harmless since it
+  re-downloads on next sync.
 - **`album_sync_states`** — per-album sync metadata: `album_id` (PK),
   `last_synced_at`, `last_cursor`, `asset_count`.
 
@@ -291,6 +299,10 @@ Setup → Albums → Slideshow
 | Boot verified | DataStore | `boot_verified` | String bool (self-test: BootReceiver sets true on successful fire) |
 | Auto-update | DataStore | `auto_update` | String bool |
 | Adaptive background | DataStore | `adaptive_background` | String bool |
+| Show photo date | DataStore | `show_photo_date` | String bool (default false) |
+| Show location | DataStore | `show_location` | String bool (default false) |
+| Show description | DataStore | `show_description` | String bool (default false) |
+| Show tags | DataStore | `show_tags` | String bool (default false) |
 | Photo animations | DataStore | `photo_animations` | String bool |
 | Anim: Zoom In | DataStore | `anim_zoom_in` | String bool |
 | Anim: Zoom Out | DataStore | `anim_zoom_out` | String bool |
@@ -304,6 +316,11 @@ Setup → Albums → Slideshow
 | Night Mode Start | DataStore | `night_mode_start` | Int (minutes since midnight, default 1320 = 22:00) |
 | Night Mode End | DataStore | `night_mode_end` | Int (minutes since midnight, default 420 = 07:00) |
 | Night Mode Brightness | DataStore | `night_mode_brightness` | Int (0–100 percent, default 0) |
+| Show Weather | DataStore | `show_weather` | String bool (default false) |
+| Weather Latitude | DataStore | `weather_latitude` | String double (-90 to 90, default 0.0) |
+| Weather Longitude | DataStore | `weather_longitude` | String double (-180 to 180, default 0.0) |
+| Weather Unit | DataStore | `weather_unit` | String enum (`CELSIUS`/`FAHRENHEIT`, default `CELSIUS`) |
+| Show Weather Description | DataStore | `show_weather_description` | String bool (default true) |
 | Media Selection: Toggled IDs | DataStore | `media_selection_toggled_ids` | StringSet |
 | Media Selection: New Items Shown | DataStore | `media_selection_new_shown` | String bool (default true) |
 | Server Version | DataStore | `server_version` | String (e.g. "v1.135.0") |
@@ -343,6 +360,8 @@ or Android throws `IllegalStateException`.
 | `RECEIVE_BOOT_COMPLETED` | Start-on-boot feature |
 | `REQUEST_INSTALL_PACKAGES` | Self-update via GitHub releases (APK install) |
 | `SYSTEM_ALERT_WINDOW` | Background Activity Launch exemption — required on Android 10+ (API 29+) for `BootReceiver` to call `startActivity()` from a `BOOT_COMPLETED` broadcast. Without it the OS silently blocks the launch. |
+| `ACCESS_COARSE_LOCATION` | Optional. Weather overlay "Use current location" — city-level GPS for one-shot location fix. No background tracking. |
+| `ACCESS_FINE_LOCATION` | Optional. Weather overlay "Use current location" — precise GPS (tablets without network positioning). No background tracking. |
 
 ## Localization
 

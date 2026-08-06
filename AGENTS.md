@@ -142,6 +142,64 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-04** — Weather location picker (GPS + OSM Nominatim address
+  search + manual lat/long). Added three alternative ways to set the
+  weather location, all resolving to the same stored lat/long: (1)
+  **GPS** — "Use current location" button requests
+  `ACCESS_COARSE_LOCATION` / `ACCESS_FINE_LOCATION` (new manifest
+  permissions), gets a one-shot fix via platform `LocationManager` (no
+  Google Play Services dependency — FLOSS-friendly), reverse-geocodes
+  to a label via Nominatim; (2) **Address search** — free-text search
+  box → OSM Nominatim `/search` → pick result; (3) **Manual** —
+  collapsible lat/long text fields (the old UI, kept as fallback).
+  New `LocationHelper.kt` in `domain/system/` with
+  `getCurrentLocation()` (GPS), `searchLocations()` (Nominatim), and
+  `reverseGeocode()` (Nominatim). `SettingsViewModel` gained
+  `@ApplicationContext` injection + location search StateFlow + GPS
+  functions. 3 new strings × 13 locales. Updated: functional-spec (F6
+  weather location options), technical-spec (permissions table, package
+  layout), api-reference (Nominatim section), README (feature list).
+
+- **2026-08-04** — Weather overlay feature (phase 2). Added current-weather
+  overlay to the slideshow using Open-Meteo (free, no API key, no auth
+  header). New `OpenMeteoApi` Retrofit interface + `WeatherRepositoryImpl`
+  (separate Retrofit instance, no `x-api-key` interceptor). New domain
+  model `WeatherData` + `TemperatureUnit` enum + `wmoWeatherDescription()`
+  WMO code → text mapping. New `WeatherOverlay.kt` composable in
+  `ui/slideshow/` showing temperature + optional description in the
+  bottom-left corner. `SlideshowViewModel` gained `weather: StateFlow<WeatherData?>`
+  + `refreshWeather()`. `SlideshowScreen` fetches on entry + every 10 min.
+  5 new settings (`show_weather`, `weather_latitude`, `weather_longitude`,
+  `weather_unit`, `show_weather_description`; all default off/false except
+  description which defaults on). New "Weather" section in Settings between
+  "Photo Metadata" and "Night Mode". Manual lat/long entry (no GPS
+  permission — stationary frame). 9 new strings (EN + 12 locales).
+  Updated: functional-spec (F6), technical-spec (persistence table +
+  package layout), api-reference (Weather API section), ui-spec (section
+  list), README (feature list).
+
+- **2026-08-02** — Photo Metadata overlay feature. Added EXIF-based
+  metadata overlays to the slideshow (photo date, location, description,
+  Immich tags). `POST /search/metadata` now sends `withExif: true` and
+  `withTags: true` — the API always returns EXIF and tag data. New
+  `ExifInfoDto` and `TagDto` DTOs; `AssetDto` gained `exifInfo` + `tags`
+  fields. Domain model `Asset` gained `exif: AssetExif?` and
+  `tags: List<String>`. New domain model `AssetExif` with
+  `formattedLocation()`. `CachedAsset` model + `CachedAssetEntity`
+  (Room) gained 6 new columns for offline persistence
+  (`exif_date_time_original`, `exif_description`, `exif_city`,
+  `exif_state`, `exif_country`, `tags`). Room DB bumped v2→v3
+  (fallbackToDestructiveMigration). New `List<String>` TypeConverter in
+  `Converters.kt` (using `||` separator). New
+  `PhotoMetadataOverlay.kt` composable in `ui/slideshow/` showing
+  icon+text rows in bottom-right corner. 4 new settings toggles
+  (`show_photo_date`, `show_location`, `show_description`, `show_tags`,
+  all default false). New "Photo Metadata" section in Settings between
+  "Display" and "Night Mode". New strings (EN + 12 locales). Slideshow
+  filter preference: no people, only tags. Updated: functional-spec (F6),
+  technical-spec (persistence table, media cache schema), ui-spec
+  (mockup + section list), README (feature list).
+
 - **2026-07-30** — Screenshot testing infrastructure (all 5 screens).
   Added Roborazzi 1.70.0 + ComposablePreviewScanner 0.9.1 + Robolectric 4.17
   for JVM-based screenshot generation from Compose `@Preview` functions — no

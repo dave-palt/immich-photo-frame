@@ -60,6 +60,10 @@ constructor(
         val AUTO_UPDATE = stringPreferencesKey("auto_update")
         val CLOCK_SNAP_TO_GRID = stringPreferencesKey("clock_snap_to_grid")
         val ADAPTIVE_BACKGROUND = stringPreferencesKey("adaptive_background")
+        val SHOW_PHOTO_DATE = stringPreferencesKey("show_photo_date")
+        val SHOW_LOCATION = stringPreferencesKey("show_location")
+        val SHOW_DESCRIPTION = stringPreferencesKey("show_description")
+        val SHOW_TAGS = stringPreferencesKey("show_tags")
         val PHOTO_ANIMATIONS = stringPreferencesKey("photo_animations")
         val ANIM_ZOOM_IN = stringPreferencesKey("anim_zoom_in")
         val ANIM_ZOOM_OUT = stringPreferencesKey("anim_zoom_out")
@@ -73,6 +77,11 @@ constructor(
         val NIGHT_MODE_START = intPreferencesKey("night_mode_start")
         val NIGHT_MODE_END = intPreferencesKey("night_mode_end")
         val NIGHT_MODE_BRIGHTNESS = intPreferencesKey("night_mode_brightness")
+        val SHOW_WEATHER = stringPreferencesKey("show_weather")
+        val WEATHER_LATITUDE = stringPreferencesKey("weather_latitude")
+        val WEATHER_LONGITUDE = stringPreferencesKey("weather_longitude")
+        val WEATHER_UNIT = stringPreferencesKey("weather_unit")
+        val SHOW_WEATHER_DESCRIPTION = stringPreferencesKey("show_weather_description")
         val MEDIA_SELECTION_TOGGLED = stringSetPreferencesKey("media_selection_toggled_ids")
         val MEDIA_SELECTION_NEW_SHOWN = stringPreferencesKey("media_selection_new_shown")
         val SERVER_VERSION = stringPreferencesKey("server_version")
@@ -140,6 +149,10 @@ constructor(
                 autoUpdate = prefs[Keys.AUTO_UPDATE]?.toBoolean() ?: true,
                 clockSnapToGrid = prefs[Keys.CLOCK_SNAP_TO_GRID]?.toBoolean() ?: true,
                 adaptiveBackground = prefs[Keys.ADAPTIVE_BACKGROUND]?.toBoolean() ?: false,
+                showPhotoDate = prefs[Keys.SHOW_PHOTO_DATE]?.toBoolean() ?: false,
+                showLocation = prefs[Keys.SHOW_LOCATION]?.toBoolean() ?: false,
+                showDescription = prefs[Keys.SHOW_DESCRIPTION]?.toBoolean() ?: false,
+                showTags = prefs[Keys.SHOW_TAGS]?.toBoolean() ?: false,
                 photoAnimations = prefs[Keys.PHOTO_ANIMATIONS]?.toBoolean() ?: false,
                 animZoomIn = prefs[Keys.ANIM_ZOOM_IN]?.toBoolean() ?: true,
                 animZoomOut = prefs[Keys.ANIM_ZOOM_OUT]?.toBoolean() ?: true,
@@ -153,6 +166,14 @@ constructor(
                 nightModeStart = prefs[Keys.NIGHT_MODE_START] ?: 1320,
                 nightModeEnd = prefs[Keys.NIGHT_MODE_END] ?: 420,
                 nightModeBrightness = prefs[Keys.NIGHT_MODE_BRIGHTNESS] ?: 0,
+                showWeather = prefs[Keys.SHOW_WEATHER]?.toBoolean() ?: false,
+                weatherLatitude = prefs[Keys.WEATHER_LATITUDE]?.toDoubleOrNull() ?: 0.0,
+                weatherLongitude = prefs[Keys.WEATHER_LONGITUDE]?.toDoubleOrNull() ?: 0.0,
+                weatherUnit = prefs[Keys.WEATHER_UNIT]?.let {
+                    runCatching { com.dav3.immichframe.domain.model.TemperatureUnit.valueOf(it) }
+                        .getOrNull()
+                } ?: com.dav3.immichframe.domain.model.TemperatureUnit.CELSIUS,
+                showWeatherDescription = prefs[Keys.SHOW_WEATHER_DESCRIPTION]?.toBoolean() ?: true,
             )
         }
 
@@ -234,6 +255,10 @@ constructor(
             it[Keys.AUTO_UPDATE] = settings.autoUpdate.toString()
             it[Keys.CLOCK_SNAP_TO_GRID] = settings.clockSnapToGrid.toString()
             it[Keys.ADAPTIVE_BACKGROUND] = settings.adaptiveBackground.toString()
+            it[Keys.SHOW_PHOTO_DATE] = settings.showPhotoDate.toString()
+            it[Keys.SHOW_LOCATION] = settings.showLocation.toString()
+            it[Keys.SHOW_DESCRIPTION] = settings.showDescription.toString()
+            it[Keys.SHOW_TAGS] = settings.showTags.toString()
             it[Keys.PHOTO_ANIMATIONS] = settings.photoAnimations.toString()
             it[Keys.ANIM_ZOOM_IN] = settings.animZoomIn.toString()
             it[Keys.ANIM_ZOOM_OUT] = settings.animZoomOut.toString()
@@ -247,6 +272,11 @@ constructor(
             it[Keys.NIGHT_MODE_START] = settings.nightModeStart
             it[Keys.NIGHT_MODE_END] = settings.nightModeEnd
             it[Keys.NIGHT_MODE_BRIGHTNESS] = settings.nightModeBrightness
+            it[Keys.SHOW_WEATHER] = settings.showWeather.toString()
+            it[Keys.WEATHER_LATITUDE] = settings.weatherLatitude.toString()
+            it[Keys.WEATHER_LONGITUDE] = settings.weatherLongitude.toString()
+            it[Keys.WEATHER_UNIT] = settings.weatherUnit.name
+            it[Keys.SHOW_WEATHER_DESCRIPTION] = settings.showWeatherDescription.toString()
         }
     }
 

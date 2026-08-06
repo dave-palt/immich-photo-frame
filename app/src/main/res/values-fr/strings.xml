@@ -45,6 +45,17 @@
     <string name="fullscreen">Plein écran</string>
     <string name="fullscreen_desc">Masquer les barres système</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Métadonnées photo</string>
+    <string name="show_photo_date">Date de la photo</string>
+    <string name="show_photo_date_desc">Afficher la date de prise de vue (EXIF)</string>
+    <string name="show_location">Emplacement</string>
+    <string name="show_location_desc">Afficher la ville, la région et le pays (données GPS EXIF)</string>
+    <string name="show_description">Description</string>
+    <string name="show_description_desc">Afficher la description de la photo (métadonnées EXIF)</string>
+    <string name="show_tags">Étiquettes</string>
+    <string name="show_tags_desc">Afficher les étiquettes attribuées dans Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Mode Nuit</string>
@@ -228,4 +239,17 @@
     <string name="api_key_help_what">Une clé API est un jeton qui permet à cette app d\'accéder à vos photos sur votre serveur Immich — sans stocker votre mot de passe.</string>
     <string name="api_key_help_why">L\'app crée une clé avec uniquement les permissions nécessaires (lire les albums, voir les photos). Vous pouvez la révoquer à tout moment dans Paramètres Immich → Clés API.</string>
     <string name="api_key_help_password">Votre mot de passe est utilisé une fois pour créer la clé, puis immédiatement effacé. Il n\'est jamais enregistré sur cet appareil.</string>
+    <string name="section_weather">Météo</string>
+    <string name="show_weather">Afficher la météo</string>
+    <string name="show_weather_desc">Afficher la température actuelle sur le diaporama</string>
+    <string name="weather_location_hint">Entrez les coordonnées de votre position (trouvez-les sur openstreetmap.org)</string>
+    <string name="weather_latitude">Latitude</string>
+    <string name="weather_longitude">Longitude</string>
+    <string name="weather_unit_label">Unité de température</string>
+    <string name="show_weather_description">Afficher la description</string>
+    <string name="show_weather_description_desc">Afficher le texte comme « Partiellement nuageux » sous la température</string>
+    <string name="weather_use_gps">Utiliser ma position</string>
+    <string name="weather_search_address">Rechercher une adresse ou ville</string>
+    <string name="weather_search">Rechercher</string>
+    <string name="weather_enter_manually">Saisir les coordonnées manuellement</string>
 </resources>

@@ -7,11 +7,34 @@ data class Album(
     val thumbnailAssetId: String?,
 )
 
+/**
+ * EXIF metadata for a photo, used by the slideshow metadata overlay.
+ * Populated from the Immich search endpoint's `exifInfo` block.
+ */
+data class AssetExif(
+    val dateTimeOriginal: String? = null,
+    val description: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+) {
+    /** Human-readable location string, e.g. "Paris, France". Empty if no location data. */
+    fun formattedLocation(): String? {
+        val parts = mutableListOf<String>()
+        city?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
+        state?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
+        country?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
+        return if (parts.isEmpty()) null else parts.joinToString(", ")
+    }
+}
+
 data class Asset(
     val id: String,
     val type: AssetType,
     val lastModified: Long = 0,
     val originalMimeType: String? = null,
+    val exif: AssetExif? = null,
+    val tags: List<String> = emptyList(),
 ) {
     /** Whether this asset is an animated GIF (needs the /original endpoint for Coil's GifDecoder). */
     val isGif: Boolean get() = originalMimeType?.equals("image/gif", ignoreCase = true) == true
@@ -61,6 +84,11 @@ data class SlideshowSettings(
     val autoUpdate: Boolean = true,
     val clockSnapToGrid: Boolean = true,
     val adaptiveBackground: Boolean = false,
+    // Metadata overlay (photo date, location, description, tags)
+    val showPhotoDate: Boolean = false,
+    val showLocation: Boolean = false,
+    val showDescription: Boolean = false,
+    val showTags: Boolean = false,
     // Ken Burns
     val photoAnimations: Boolean = false,
     val animZoomIn: Boolean = true,
@@ -77,6 +105,12 @@ data class SlideshowSettings(
     val nightModeStart: Int = 1320, // minutes since midnight (22:00)
     val nightModeEnd: Int = 420, // minutes since midnight (07:00)
     val nightModeBrightness: Int = 0, // 0-100 percent
+    // Weather overlay (Open-Meteo, free, no API key)
+    val showWeather: Boolean = false,
+    val weatherLatitude: Double = 0.0,
+    val weatherLongitude: Double = 0.0,
+    val weatherUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
+    val showWeatherDescription: Boolean = true,
 ) {
     /**
      * Whether the current wall-clock time falls inside the configured night-mode
@@ -133,6 +167,12 @@ data class CachedAsset(
     val lastModified: Long,
     val cachedAt: Long,
     val originalMimeType: String? = null,
+    val exifDateTimeOriginal: String? = null,
+    val exifDescription: String? = null,
+    val exifCity: String? = null,
+    val exifState: String? = null,
+    val exifCountry: String? = null,
+    val tags: List<String> = emptyList(),
 )
 
 data class AlbumSyncState(

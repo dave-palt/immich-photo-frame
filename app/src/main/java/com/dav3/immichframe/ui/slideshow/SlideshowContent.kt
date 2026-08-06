@@ -53,11 +53,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.dav3.immichframe.R
 import com.dav3.immichframe.domain.model.Asset
+import com.dav3.immichframe.domain.model.AssetExif
 import com.dav3.immichframe.domain.model.AssetType
 import com.dav3.immichframe.domain.model.ClockFormat
 import com.dav3.immichframe.domain.model.ClockPosition
 import com.dav3.immichframe.domain.model.FillMode
 import com.dav3.immichframe.domain.model.SlideshowSettings
+import com.dav3.immichframe.domain.model.TemperatureUnit
+import com.dav3.immichframe.domain.model.WeatherData
 import com.dav3.immichframe.ui.onboarding.TourState
 import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.theme.ImmichFrameTheme
@@ -84,6 +87,7 @@ fun SlideshowContent(
     containerSize: IntSize,
     adaptiveBrush: Brush?,
     tourState: TourState?,
+    weather: com.dav3.immichframe.domain.model.WeatherData? = null,
     onToggleControls: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
@@ -156,6 +160,25 @@ fun SlideshowContent(
                         }
                     }
                 }
+            }
+
+            // Photo metadata overlay (date, location, description, tags)
+            if (!nightActive && !state.isLoading && state.error == null && state.assets.isNotEmpty()) {
+                val currentAsset = state.assets[state.currentIndex]
+                PhotoMetadataOverlay(
+                    asset = currentAsset,
+                    settings = s,
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                )
+            }
+
+            // Weather overlay (Open-Meteo, bottom-left)
+            if (!nightActive && s.showWeather && weather != null) {
+                WeatherOverlay(
+                    weather = weather,
+                    showDescription = s.showWeatherDescription,
+                    modifier = Modifier.align(Alignment.BottomStart),
+                )
             }
 
             // Draggable clock overlay
@@ -344,7 +367,17 @@ fun SlideshowContent(
 
 // region Previews
 
-private val demoAsset = Asset(id = "asset-1", type = AssetType.IMAGE)
+private val demoAsset = Asset(
+    id = "asset-1",
+    type = AssetType.IMAGE,
+    exif = AssetExif(
+        dateTimeOriginal = "2024-07-15T14:30:00.000Z",
+        description = "Sunset at the beach",
+        city = "Amalfi",
+        country = "Italy",
+    ),
+    tags = listOf("vacation", "summer"),
+)
 private val demoState = SlideshowUiState(
     assets = listOf(demoAsset),
     currentIndex = 0,
@@ -559,6 +592,82 @@ private fun SlideshowContentPreview_Loading() {
             containerSize = demoImageSize,
             adaptiveBrush = null,
             tourState = null,
+            onToggleControls = {},
+            onPrevious = {},
+            onNext = {},
+            onTogglePause = {},
+            onToggleMute = {},
+            onSettings = {},
+            onChangeAlbums = {},
+            onMediaSelection = {},
+            onSetClockPosition = { _, _ -> },
+            onImageLoaded = {},
+            onContainerSizeChanged = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 640)
+@Composable
+private fun SlideshowContentPreview_WithMetadata() {
+    ImmichFrameTheme {
+        SlideshowContent(
+            state = demoState,
+            settings = SlideshowSettings(
+                showPhotoDate = true,
+                showLocation = true,
+                showDescription = true,
+                showTags = true,
+            ),
+            imageUrl = ::demoImageUrl,
+            controlsVisible = false,
+            isPaused = false,
+            progress = 0f,
+            nightActive = false,
+            currentTime = "",
+            containerSize = demoImageSize,
+            adaptiveBrush = null,
+            tourState = null,
+            onToggleControls = {},
+            onPrevious = {},
+            onNext = {},
+            onTogglePause = {},
+            onToggleMute = {},
+            onSettings = {},
+            onChangeAlbums = {},
+            onMediaSelection = {},
+            onSetClockPosition = { _, _ -> },
+            onImageLoaded = {},
+            onContainerSizeChanged = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 640)
+@Composable
+private fun SlideshowContentPreview_WithWeather() {
+    ImmichFrameTheme {
+        SlideshowContent(
+            state = demoState,
+            settings = SlideshowSettings(
+                showWeather = true,
+                showWeatherDescription = true,
+            ),
+            imageUrl = ::demoImageUrl,
+            controlsVisible = false,
+            isPaused = false,
+            progress = 0f,
+            nightActive = false,
+            currentTime = "",
+            containerSize = demoImageSize,
+            adaptiveBrush = null,
+            tourState = null,
+            weather = WeatherData(
+                temperature = 21.0,
+                unit = TemperatureUnit.CELSIUS,
+                weatherCode = 2,
+                description = "Partly cloudy",
+            ),
             onToggleControls = {},
             onPrevious = {},
             onNext = {},

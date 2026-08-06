@@ -45,6 +45,17 @@
     <string name="fullscreen">Pantalla completa</string>
     <string name="fullscreen_desc">Ocultar barras del sistema</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
+    <!-- Photo Metadata -->
+    <string name="section_photo_metadata">Metadatos de foto</string>
+    <string name="show_photo_date">Fecha de la foto</string>
+    <string name="show_photo_date_desc">Mostrar la fecha de captura (de EXIF)</string>
+    <string name="show_location">Ubicación</string>
+    <string name="show_location_desc">Mostrar ciudad, estado y país (de datos GPS EXIF)</string>
+    <string name="show_description">Descripción</string>
+    <string name="show_description_desc">Mostrar la descripción de la foto (de metadatos EXIF)</string>
+    <string name="show_tags">Etiquetas</string>
+    <string name="show_tags_desc">Mostrar etiquetas asignadas en Immich</string>
+
 
     <!-- Night Mode -->
     <string name="section_night_mode">Modo Noche</string>
@@ -228,4 +239,17 @@
     <string name="api_key_help_what">Una clave API es un token que permite a esta app acceder a tus fotos en tu servidor Immich — sin almacenar tu contraseña.</string>
     <string name="api_key_help_why">La app crea una clave con permisos solo para lo necesario (leer álbumes, ver fotos). Puedes revocarla cuando quieras en Ajustes de Immich → Claves API.</string>
     <string name="api_key_help_password">Tu contraseña se usa una vez para crear la clave y luego se descarta inmediatamente. Nunca se guarda en este dispositivo.</string>
+    <string name="section_weather">Clima</string>
+    <string name="show_weather">Mostrar clima</string>
+    <string name="show_weather_desc">Mostrar temperatura actual en la presentación</string>
+    <string name="weather_location_hint">Ingrese las coordenadas de su ubicación (encuéntrelas en openstreetmap.org)</string>
+    <string name="weather_latitude">Latitud</string>
+    <string name="weather_longitude">Longitud</string>
+    <string name="weather_unit_label">Unidad de temperatura</string>
+    <string name="show_weather_description">Mostrar descripción del clima</string>
+    <string name="show_weather_description_desc">Mostrar texto como «Parcialmente nublado» debajo de la temperatura</string>
+    <string name="weather_use_gps">Usar ubicación actual</string>
+    <string name="weather_search_address">Buscar dirección o ciudad</string>
+    <string name="weather_search">Buscar</string>
+    <string name="weather_enter_manually">Introducir coordenadas manualmente</string>
 </resources>

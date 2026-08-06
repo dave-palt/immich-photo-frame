@@ -101,6 +101,7 @@ fun SlideshowScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val settings by viewModel.settings.collectAsState(initial = SlideshowSettings())
+    val weather by viewModel.weather.collectAsState()
     val s = settings
 
     val tourState = rememberTourState()
@@ -119,6 +120,17 @@ fun SlideshowScreen(
     val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
 
     LaunchedEffect(Unit) { viewModel.load() }
+
+    // Weather: fetch on entry, then every 10 minutes
+    LaunchedEffect(s.showWeather, s.weatherLatitude, s.weatherLongitude, s.weatherUnit) {
+        if (s.showWeather) {
+            viewModel.refreshWeather()
+            while (true) {
+                kotlinx.coroutines.delay(10 * 60 * 1000L)
+                viewModel.refreshWeather()
+            }
+        }
+    }
 
     // Album deleted on server — bounce back to album selection so the user
     // can pick again. Only fires once per load() that sets the flag.
@@ -401,6 +413,26 @@ fun SlideshowScreen(
                             }
                         }
                     }
+                }
+
+                // Photo metadata overlay (date, location, description, tags)
+                if (!nightActive && !state.isLoading && state.error == null && state.assets.isNotEmpty()) {
+                    val currentAsset = state.assets[state.currentIndex]
+                    PhotoMetadataOverlay(
+                        asset = currentAsset,
+                        settings = s,
+                        modifier = Modifier.align(Alignment.BottomEnd),
+                    )
+                }
+
+                // Weather overlay (Open-Meteo, bottom-left)
+                val weatherData = weather
+                if (!nightActive && s.showWeather && weatherData != null) {
+                    WeatherOverlay(
+                        weather = weatherData,
+                        showDescription = s.showWeatherDescription,
+                        modifier = Modifier.align(Alignment.BottomStart),
+                    )
                 }
 
                 // Draggable clock overlay — positioned from top-left via absolute offset
