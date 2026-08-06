@@ -143,8 +143,7 @@ Format:
 <!-- Append new clarifications below this line. -->
 
 - **2026-08-07** — Android 6 (API 23) support. Lowered `minSdk` from 26 → 23,
-  reaching ~99% of Android devices (was ~95%). No multi-APK / ABI splits
-  needed — a single universal APK covers API 23–37. Changes: (1) added
+  reaching ~99% of Android devices (was ~95%). Changes: (1) added
   `desugar_jdk_libs` 2.1.5 (`coreLibraryDesugaring`) so `java.time`
   (used in `PhotoMetadataOverlay.kt` + `ImmichRepositoryImpl.kt`) works on
   API < 26; (2) two API 26+ calls guarded with `Build.VERSION.SDK_INT`
