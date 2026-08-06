@@ -142,6 +142,22 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-07** — Android 6 (API 23) support. Lowered `minSdk` from 26 → 23,
+  reaching ~99% of Android devices (was ~95%). No multi-APK / ABI splits
+  needed — a single universal APK covers API 23–37. Changes: (1) added
+  `desugar_jdk_libs` 2.1.5 (`coreLibraryDesugaring`) so `java.time`
+  (used in `PhotoMetadataOverlay.kt` + `ImmichRepositoryImpl.kt`) works on
+  API < 26; (2) two API 26+ calls guarded with `Build.VERSION.SDK_INT`
+  checks — `Bitmap.Config.HARDWARE` in `ImageUtils.kt:35` (pre-26 never
+  returns HARDWARE bitmaps) and `PackageManager.canRequestPackageInstalls()`
+  in `UpdateManager.kt:89` (pre-26 uses the global "Unknown sources"
+  setting, so returns `true`). All AndroidX libs (Compose, Room, WorkManager,
+  Coil, DataStore, Media3, Biometric, EncryptedSharedPreferences) already
+  support API 21+. Biometric degrades gracefully on pre-28 (fingerprint on
+  23–27; the existing `AuthCapability` path handles devices without
+  biometric/credential). Updated: technical-spec (min SDK row, desugar row
+  in tech stack table), README (requirements).
+
 - **2026-07-30** — Screenshot testing infrastructure (all 5 screens).
   Added Roborazzi 1.70.0 + ComposablePreviewScanner 0.9.1 + Robolectric 4.17
   for JVM-based screenshot generation from Compose `@Preview` functions — no

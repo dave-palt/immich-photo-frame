@@ -26,6 +26,7 @@ spotless = "8.8.0"
 robolectric = "4.17-beta-2"
 roborazzi = "1.70.0"
 composablePreviewScanner = "0.9.1"
+desugarJdklibs = "2.1.5"
 
 [libraries]
 # AndroidX core
@@ -101,6 +102,9 @@ roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi
 roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
 roborazzi-annotations = { group = "io.github.takahirom.roborazzi", name = "roborazzi-annotations", version.ref = "roborazzi" }
 composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "composablePreviewScanner" }
+
+# Java 8+ API desugaring for API 23+ (java.time support below API 26)
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdklibs" }
 
 # JVM unit testing
 junit = { group = "junit", name = "junit", version = "4.13.2" }

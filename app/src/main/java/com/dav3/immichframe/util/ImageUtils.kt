@@ -2,6 +2,7 @@ package com.dav3.immichframe.util
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
@@ -32,7 +33,10 @@ suspend fun extractBorderColors(
     val image = result.image as? BitmapImage
     if (image != null) {
         // Palette needs a software bitmap — Coil 3 returns HARDWARE by default
-        val bitmap = if (image.bitmap.config == Bitmap.Config.HARDWARE) {
+        // (API 26+). Pre-26 never produces HARDWARE bitmaps, so no copy needed.
+        val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            image.bitmap.config == Bitmap.Config.HARDWARE
+        ) {
             image.bitmap.copy(Bitmap.Config.ARGB_8888, false)
         } else {
             image.bitmap
