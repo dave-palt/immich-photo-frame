@@ -85,8 +85,15 @@ constructor(
      * Returns true if the user has granted "Install unknown apps" permission
      * (REQUEST_INSTALL_PACKAGES). If false, the installer intent will silently
      * fail with "App not installed".
+     *
+     * On pre-O (API < 26) there is no per-app install permission — the global
+     * "Unknown sources" system setting controls sideloading, so we return true.
      */
-    fun canRequestInstalls(): Boolean = context.packageManager.canRequestPackageInstalls()
+    fun canRequestInstalls(): Boolean = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        context.packageManager.canRequestPackageInstalls()
+    } else {
+        true
+    }
 
     /**
      * Check GitHub for a newer release. Downloads APK silently if found.

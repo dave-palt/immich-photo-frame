@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dav3.immichframe"
-        minSdk = 26
+        minSdk = 23
         targetSdk = 37
         versionCode = (System.currentTimeMillis() / 1000).toInt()
         versionName = "0.6.0"
@@ -75,6 +75,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -128,6 +129,9 @@ dependencies {
     // (Room/KSP pull in old stdlib; AGP 9.1.0 binary-store serialization fails
     // on the constraint graph if versions are inconsistent)
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:${libs.versions.kotlin.get()}"))
+
+    // Java 8+ API desugaring (java.time on API 23+)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // AndroidX core
     implementation(libs.androidx.core.ktx)

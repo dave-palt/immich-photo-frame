@@ -132,7 +132,7 @@ Kotlin 2.1 · Jetpack Compose · Retrofit 2 · Coil 3 (+ GifDecoder) · Media3 E
 ## Requirements
 
 - Immich server (v1.120+; v3 supported, see API docs for a query-param caveat)
-- Android 8.0+ (API 26)
+- Android 6.0+ (API 23)
 - JDK 17 for building
 
 ## Documentation

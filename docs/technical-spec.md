@@ -6,8 +6,9 @@
 |---|---|---|
 | Language | Kotlin | 2.1.0 |
 | UI Framework | Jetpack Compose | BOM 2024.12+ |
-| Min SDK | API 26 (Android 8.0) | ~95% device coverage |
+| Min SDK | API 23 (Android 6.0) | ~99% device coverage |
 | Target SDK | API 35 (Android 15) | Latest stable |
+| Java 8+ API desugaring | `desugar_jdk_libs` 2.1.5 | `java.time` on API < 26 |
 | HTTP Client | Retrofit 3 + OkHttp | 3.0 / 5.4 |
 | JSON Parsing | Kotlinx Serialization | 1.7+ |
 | Image Loading | Coil 3 (Compose) + GifDecoder | 3.5 |
