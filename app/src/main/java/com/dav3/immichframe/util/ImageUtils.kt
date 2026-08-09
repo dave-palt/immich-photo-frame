@@ -3,13 +3,13 @@ package com.dav3.immichframe.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
 import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import com.dav3.immichframe.domain.model.BorderColors
+import timber.log.Timber
 
 private val FALLBACK = BorderColors(Color.Black, Color.Black, Color.Black, Color.Black, 1f)
 
@@ -61,10 +61,10 @@ suspend fun extractBorderColors(
             aspectRatio = if (h > 0) w.toFloat() / h else 1f,
         )
     } else {
-        Log.w("AdaptiveBg", "Coil returned no image for $url")
+        Timber.w("Coil returned no image for $url")
         FALLBACK
     }
 } catch (e: Exception) {
-    Log.e("AdaptiveBg", "Failed to extract border colors", e)
+    Timber.e(e, "Failed to extract border colors")
     FALLBACK
 }

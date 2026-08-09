@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -117,7 +118,7 @@ constructor(
                 // Show cached assets immediately
                 val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
                 val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
-                android.util.Log.d("SlideshowLoad", "Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
+                Timber.d("Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
                 val filteredAssets = applyMediaSelection(cachedAssets, toggledIds, newItemsShown)
                     .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
@@ -157,7 +158,7 @@ constructor(
 
                 val filteredAssets = applyMediaSelection(allAssets, toggledIds, newItemsShown)
                     .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
-                android.util.Log.d("SlideshowLoad", "Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
+                Timber.d("Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
 
                 _uiState.value = when {

@@ -27,6 +27,7 @@ robolectric = "4.17-beta-2"
 roborazzi = "1.70.0"
 composablePreviewScanner = "0.9.1"
 desugarJdklibs = "2.1.5"
+timber = "5.0.1"
 
 [libraries]
 # AndroidX core
@@ -105,6 +106,9 @@ composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePrevie
 
 # Java 8+ API desugaring for API 23+ (java.time support below API 26)
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdklibs" }
+
+# Logging (file + logcat via Timber)
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # JVM unit testing
 junit = { group = "junit", name = "junit", version = "4.13.2" }

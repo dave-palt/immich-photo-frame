@@ -172,6 +172,10 @@
     <string name="tour_step_counter">Passo %1$d di %2$d</string>
     <string name="reset_all_tours">Reimposta tutte le guide</string>
     <string name="show_tour">Mostra tour di nuovo</string>
+    <!-- Diagnostics -->
+    <string name="share_logs">Condividi log</string>
+    <string name="share_logs_desc">Esporta il log dell\'app e i rapporti di crash per condividerli o allegarli a una segnalazione.</string>
+    <string name="no_logs_available">Nessun file di log ancora disponibile.</string>
     <string name="tour_setup_welcome_title">Benvenuto in Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Connettiti al tuo server Immich per mostrare le foto. Vediamo la configurazione.</string>
     <string name="tour_setup_server_title">Indirizzo server</string>

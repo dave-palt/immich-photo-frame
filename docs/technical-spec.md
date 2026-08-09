@@ -22,6 +22,7 @@
 | Biometric Auth | AndroidX Biometric | 1.1.0 |
 | OAuth Browser | AndroidX Browser (Custom Tabs) | 1.8.0 |
 | Screenshot Testing | Roborazzi + ComposablePreviewScanner | 1.70.0 / 0.9.1 |
+| Logging | Timber | 5.0.1 |
 | Dependency Injection | Hilt | 2.52+ |
 | Worker Injection | Hilt-Work | 1.4.0 |
 | Code Formatting | Spotless + ktlint | 7.0.2 / 1.4.1 |
@@ -82,8 +83,13 @@ immich-android/
 │   │   │   ├── onboarding/      # Coachmark tour system (TourStep, TourState, CoachmarkOverlay)
 │   │   │   ├── nav/             # Navigation graph
 │   │   │   └── theme/           # Material 3 theme
+│   │   ├── logging/             # File logging + crash capture
+│   │   │   ├── LogConfig.kt         # Log directory + constants (app.log, crash_*.txt)
+│   │   │   ├── FileLoggingTree.kt   # Timber Tree → file with size-based rollover
+│   │   │   ├── CrashHandler.kt      # Global UncaughtExceptionHandler → crash report file
+│   │   │   └── LogShareHelper.kt    # ACTION_SEND intent builder for log files
 │   │   ├── BootReceiver.kt      # BOOT_COMPLETED → launch slideshow (guards startActivity with SYSTEM_ALERT_WINDOW check)
-│   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp)
+│   │   ├── ImmichFrameApp.kt    # Application class (@HiltAndroidApp, plants Timber + installs CrashHandler)
 │   │   └── MainActivity.kt      # Single activity (also target of LauncherAlias)
 │   ├── src/main/res/
 │   │   ├── drawable/app_logo.xml             # In-app logo (no bg fill): frame + sun + mountain
@@ -94,7 +100,7 @@ immich-android/
 │   │   ├── values-night/colors.xml    # ic_launcher_background = #1A1A2E (night)
 │   │   ├── mipmap-anydpi-v26/ic_launcher.xml   # Adaptive icon (background + foreground + monochrome)
 │   │   ├── mipmap-anydpi-v26/ic_launcher_round.xml
-│   │   └── xml/file_paths.xml   # FileProvider config for APK install
+│   │   └── xml/file_paths.xml   # FileProvider config (APK install + log sharing)
 │   ├── src/debug/res/
 │   │   ├── drawable/ic_launcher_foreground.xml  # Debug variant (amber bg #FFB400, navy replaces orange)
 │   │   └── values/colors.xml                    # ic_launcher_background = #FFB400 (debug)
@@ -433,3 +439,42 @@ Each screen follows the same pattern to enable JVM previews:
 | Slideshow | `SlideshowContent` | `SlideshowContent.kt` |
 | Settings | `SettingsContent` | `SettingsContent.kt` |
 | Media Selection | `MediaSelectionContent` | `MediaSelectionScreen.kt` |
+
+## Diagnostics & Crash Logging
+
+The app captures logs and crash traces to the filesystem so testers can share
+them without `adb`. All logging flows through [Timber](https://github.com/JakeWharton/Timber);
+existing code uses `Timber.d/w/e(...)` instead of `android.util.Log`.
+
+### Components (`com.dav3.immichframe.logging`)
+
+| Component | Role |
+|---|---|
+| `LogConfig` | Log directory + constants: `app.log` (rolling), `crash_*.txt` |
+| `FileLoggingTree` | Timber `Tree` → appends to `app.log` with timestamps + level; rolls over at ~1 MB (keeps one `.old` backup) |
+| `CrashHandler` | Global `UncaughtExceptionHandler` → writes a full crash report (device info, app version, git SHA, stack trace) to `crash_<timestamp>.txt`, prunes to 5 newest, then delegates to the default handler so the OS still terminates the process |
+| `LogShareHelper` | Builds an `ACTION_SEND_MULTIPLE` chooser intent with `FileProvider` URIs for all log files (app log + crash reports) |
+
+### Initialization
+
+In `ImmichFrameApp.onCreate()` (first thing, so it catches early failures):
+
+- **Debug builds**: plants `Timber.DebugTree()` (→ logcat) + `FileLoggingTree` (→ file)
+- **Release builds**: plants `FileLoggingTree` only (logcat is not reliably captured)
+- `CrashHandler.install()` runs unconditionally — a crash report is always written
+
+### Storage
+
+Logs live in app-private external storage (`getExternalFilesDir(null)/logs/`),
+so they persist across crashes but aren't visible to other apps. The
+FileProvider config (`file_paths.xml`) exposes `logs/` via an
+`<external-files-path>` entry so `ACTION_SEND` can grant temporary read access
+to the user's chosen share target.
+
+### Sharing
+
+The **Share Logs** button in Settings → System section builds an
+`ACTION_SEND_MULTIPLE` intent containing all available log files and launches a
+system chooser. The user selects where to send them (email, Drive, GitHub
+issue attachment, etc.). No automatic network upload occurs — the user is
+always in control. If no log files exist yet, a snackbar message is shown.

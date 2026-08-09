@@ -318,6 +318,10 @@ Options:
 - **Reset All Settings** — clears all settings, credentials, album selection,
   and cached data, returns to setup screen. Tour completion is **preserved**
   (use "Reset All Tours" to clear tour progress).
+- **Share Logs** — opens the system share sheet with all available log files
+  (app log + crash reports) attached via `FileProvider`. Lets testers send
+  diagnostic data via email, Drive, GitHub issue, etc. without `adb`. Shows a
+  snackbar if no log files exist yet.
 
 ### F8: Media Selection
 

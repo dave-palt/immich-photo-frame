@@ -83,6 +83,7 @@ import com.dav3.immichframe.domain.system.needsBootPermission
 import com.dav3.immichframe.domain.system.openBootPermissionSettings
 import com.dav3.immichframe.domain.system.openLauncherSettings
 import com.dav3.immichframe.domain.system.openOverlayPermissionSettings
+import com.dav3.immichframe.logging.LogShareHelper
 import com.dav3.immichframe.ui.onboarding.TourHost
 import com.dav3.immichframe.ui.onboarding.TourScreen
 import com.dav3.immichframe.ui.onboarding.TourSteps
@@ -543,6 +544,33 @@ fun SettingsScreen(
                 ) {
                     Text(
                         stringResource(R.string.reset_all_tours),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                // ---- Share Logs ----
+                val shareCoroutineScope = rememberCoroutineScope()
+                val shareLogsTitle = stringResource(R.string.share_logs)
+                val noLogsMessage = stringResource(R.string.no_logs_available)
+                TextButton(
+                    onClick = {
+                        shareCoroutineScope.launch {
+                            val intent = LogShareHelper.createShareIntent(
+                                context,
+                                shareLogsTitle,
+                            )
+                            if (intent != null) {
+                                context.startActivity(intent)
+                            } else {
+                                snackbarHostState.showSnackbar(noLogsMessage)
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        shareLogsTitle,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
