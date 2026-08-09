@@ -164,6 +164,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+    implementation(libs.timber)
 
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.core.content.FileProvider
 import com.dav3.immichframe.BuildConfig
 import com.dav3.immichframe.data.remote.GitHubApi
@@ -20,6 +19,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,9 +42,6 @@ class UpdateManager
 constructor(
     @ApplicationContext private val context: Context,
 ) {
-    private companion object {
-        const val TAG = "UpdateManager"
-    }
     private val json = Json { ignoreUnknownKeys = true }
 
     private val api: GitHubApi =
@@ -99,10 +96,10 @@ constructor(
      * Check GitHub for a newer release. Downloads APK silently if found.
      */
     suspend fun checkForUpdate(): Boolean = withContext(Dispatchers.IO) {
-        Log.d(TAG, "checkForUpdate: starting (debug=${BuildConfig.DEBUG}, versionName=${BuildConfig.VERSION_NAME}, gitSha=${BuildConfig.GIT_SHA.take(8)})")
+        Timber.d("checkForUpdate: starting (debug=${BuildConfig.DEBUG}, versionName=${BuildConfig.VERSION_NAME}, gitSha=${BuildConfig.GIT_SHA.take(8)})")
 
         if (isInstalledFromPlayStore()) {
-            Log.d(TAG, "checkForUpdate: skipped — installed from Play Store")
+            Timber.d("checkForUpdate: skipped — installed from Play Store")
             return@withContext false
         }
 
@@ -111,21 +108,21 @@ constructor(
         try {
             // Debug builds use the dev channel (pre-releases); release builds use /releases/latest
             val release = if (BuildConfig.DEBUG) {
-                Log.d(TAG, "checkForUpdate: DEBUG build — listing releases for dev-* tag")
+                Timber.d("checkForUpdate: DEBUG build — listing releases for dev-* tag")
                 api.listReleases()
                     .filter { it.tagName.startsWith("dev-") }
                     .sortedByDescending { it.createdAt }
                     .firstOrNull()
-                    .also { Log.d(TAG, "checkForUpdate: latest dev release = ${it?.tagName ?: "none"} (createdAt=${it?.createdAt ?: "n/a"})") }
+                    .also { Timber.d("checkForUpdate: latest dev release = ${it?.tagName ?: "none"} (createdAt=${it?.createdAt ?: "n/a"})") }
                     ?: run {
-                        Log.d(TAG, "checkForUpdate: no dev-* release found")
+                        Timber.d("checkForUpdate: no dev-* release found")
                         _state.value = UpdateState(available = false)
                         return@withContext false
                     }
             } else {
-                Log.d(TAG, "checkForUpdate: RELEASE build — fetching /releases/latest")
+                Timber.d("checkForUpdate: RELEASE build — fetching /releases/latest")
                 api.getLatestRelease().also {
-                    Log.d(TAG, "checkForUpdate: latest release = ${it.tagName}")
+                    Timber.d("checkForUpdate: latest release = ${it.tagName}")
                 }
             }
 
@@ -134,33 +131,33 @@ constructor(
                 // Not a dev-<sha> tag — try semver comparison for release builds
                 // (e.g. tag "v0.2.0" vs installed "0.1.0")
                 if (!isNewerVersion(release.tagName, BuildConfig.VERSION_NAME)) {
-                    Log.d(TAG, "checkForUpdate: tag '${release.tagName}' is not newer than ${BuildConfig.VERSION_NAME} — no update detected")
+                    Timber.d("checkForUpdate: tag '${release.tagName}' is not newer than ${BuildConfig.VERSION_NAME} — no update detected")
                     _state.value = UpdateState(available = false)
                     return@withContext false
                 }
             } else {
                 // Dev channel: compare SHAs directly
                 val currentSha = BuildConfig.GIT_SHA
-                Log.d(TAG, "checkForUpdate: currentSha=${currentSha.take(8)}, latestSha=${latestSha.take(8)}")
+                Timber.d("checkForUpdate: currentSha=${currentSha.take(8)}, latestSha=${latestSha.take(8)}")
 
                 if (latestSha == currentSha) {
-                    Log.d(TAG, "checkForUpdate: already up to date")
+                    Timber.d("checkForUpdate: already up to date")
                     _state.value = UpdateState(available = false)
                     return@withContext false
                 }
             }
 
-            Log.d(TAG, "checkForUpdate: NEW version available! ${release.tagName}")
+            Timber.d("checkForUpdate: NEW version available! ${release.tagName}")
 
             // Find the APK asset
             val apkAsset = release.assets.find { it.name.endsWith(".apk") }
             if (apkAsset == null) {
-                Log.w(TAG, "checkForUpdate: release ${release.tagName} has no .apk asset (assets: ${release.assets.map { it.name }})")
+                Timber.w("checkForUpdate: release ${release.tagName} has no .apk asset (assets: ${release.assets.map { it.name }})")
                 _state.value = UpdateState(available = false)
                 return@withContext false
             }
 
-            Log.d(TAG, "checkForUpdate: found APK asset '${apkAsset.name}' (${apkAsset.size / 1024} KB)")
+            Timber.d("checkForUpdate: found APK asset '${apkAsset.name}' (${apkAsset.size / 1024} KB)")
 
             // Download silently in background
             _state.value = _state.value.copy(
@@ -172,9 +169,9 @@ constructor(
             )
 
             val apkFile = File(updateDir, apkAsset.name)
-            Log.d(TAG, "checkForUpdate: downloading ${apkAsset.browserDownloadUrl} → ${apkFile.absolutePath}")
+            Timber.d("checkForUpdate: downloading ${apkAsset.browserDownloadUrl} → ${apkFile.absolutePath}")
             downloadApk(apkAsset.browserDownloadUrl, apkFile, apkAsset.size)
-            Log.d(TAG, "checkForUpdate: download complete (${apkFile.length() / 1024} KB)")
+            Timber.d("checkForUpdate: download complete (${apkFile.length() / 1024} KB)")
 
             _state.value = _state.value.copy(
                 downloading = false,
@@ -182,7 +179,7 @@ constructor(
             )
             true
         } catch (e: Exception) {
-            Log.e(TAG, "checkForUpdate: failed", e)
+            Timber.e(e, "checkForUpdate: failed")
             _state.value = UpdateState(available = false, error = e.message ?: "Update check failed")
             false
         }
@@ -196,12 +193,12 @@ constructor(
     fun installUpdate() {
         val apkPath = _state.value.downloadedApkPath
         if (apkPath == null) {
-            Log.w(TAG, "installUpdate: no downloaded APK in state")
+            Timber.w("installUpdate: no downloaded APK in state")
             return
         }
 
         if (!canRequestInstalls()) {
-            Log.w(TAG, "installUpdate: install permission not granted — opening settings")
+            Timber.w("installUpdate: install permission not granted — opening settings")
             val intent = Intent(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                 Uri.parse("package:${context.packageName}"),
@@ -212,7 +209,7 @@ constructor(
             return
         }
 
-        Log.d(TAG, "installUpdate: launching installer for ${apkPath.absolutePath}")
+        Timber.d("installUpdate: launching installer for ${apkPath.absolutePath}")
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", apkPath)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/vnd.android.package-archive")
@@ -262,7 +259,7 @@ constructor(
         // exists (even partially), keep it and resume from its current length.
         updateDir.listFiles()?.forEach { f ->
             if (f.name != dest.name) {
-                Log.d(TAG, "downloadApk: deleting old file ${f.name}")
+                Timber.d("downloadApk: deleting old file ${f.name}")
                 f.delete()
             }
         }
@@ -270,10 +267,10 @@ constructor(
         val existingLen = dest.length()
         val resuming = existingLen > 0 && existingLen < expectedSize
         if (resuming) {
-            Log.d(TAG, "downloadApk: resuming from $existingLen / $expectedSize bytes")
+            Timber.d("downloadApk: resuming from $existingLen / $expectedSize bytes")
         }
 
-        Log.d(TAG, "downloadApk: fetching $url${if (resuming) " (Range: $existingLen-)" else ""}")
+        Timber.d("downloadApk: fetching $url${if (resuming) " (Range: $existingLen-)" else ""}")
         val client = OkHttpClient()
         val request = Request.Builder().url(url).apply {
             if (resuming) header("Range", "bytes=$existingLen-")
@@ -283,7 +280,7 @@ constructor(
             // 200 = full content (server ignored Range, start over)
             // 206 = partial content (resume successful)
             if (response.code != 200 && response.code != 206) {
-                Log.e(TAG, "downloadApk: HTTP ${response.code}")
+                Timber.e("downloadApk: HTTP ${response.code}")
                 error("Download failed: ${response.code}")
             }
 

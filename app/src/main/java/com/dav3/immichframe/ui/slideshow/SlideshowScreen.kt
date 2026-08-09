@@ -88,6 +88,7 @@ import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.update.UpdateViewModel
 import com.dav3.immichframe.util.extractBorderColors
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -682,8 +683,6 @@ fun SlideshowScreen(
     }
 }
 
-private const val TAG_VIDEO = "VideoPlayer"
-
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 private fun VideoPlayer(
@@ -702,7 +701,7 @@ private fun VideoPlayer(
 
     DisposableEffect(asset.id) {
         val url = viewModel.videoUrl(asset.id)
-        android.util.Log.d(TAG_VIDEO, "Loading video: assetId=${asset.id} url=$url")
+        Timber.d("Loading video: assetId=${asset.id} url=$url")
         exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(url)))
         exoPlayer.prepare()
         onDispose {
@@ -748,7 +747,7 @@ private fun VideoPlayer(
                     Player.STATE_ENDED -> "ENDED"
                     else -> "UNKNOWN($playbackState)"
                 }
-                android.util.Log.d(TAG_VIDEO, "State changed: $stateName (asset=${asset.id})")
+                Timber.d("State changed: $stateName (asset=${asset.id})")
                 if (playbackState == Player.STATE_ENDED && !isSlideshowPaused && !isVideoPaused && isScreenActive) {
                     viewModel.next()
                 }
@@ -756,8 +755,8 @@ private fun VideoPlayer(
 
             override fun onPlayerErrorChanged(error: androidx.media3.common.PlaybackException?) {
                 if (error != null) {
-                    android.util.Log.e(TAG_VIDEO, "Playback error: ${error.errorCodeName}", error)
-                    android.util.Log.e(TAG_VIDEO, "Cause: ${error.cause?.javaClass?.name}: ${error.cause?.message}")
+                    Timber.e(error, "Playback error: ${error.errorCodeName}")
+                    Timber.e("Cause: ${error.cause?.javaClass?.name}: ${error.cause?.message}")
                     // Skip to next on error so slideshow isn't stuck
                     viewModel.next()
                 }
