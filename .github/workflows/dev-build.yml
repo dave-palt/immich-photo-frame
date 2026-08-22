@@ -75,6 +75,11 @@ jobs:
         # (same key locally and in CI) so the two are interchangeable.
         run: ./gradlew assembleDebug --no-daemon
 
+      - name: Rename APK to app name
+        run: |
+          mv app/build/outputs/apk/debug/app-debug.apk \
+            "app/build/outputs/apk/debug/ImmichMediaFrame-dev-${{ github.sha }}.apk"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:

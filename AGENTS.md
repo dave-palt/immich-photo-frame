@@ -142,6 +142,15 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-22** — Release assets renamed to app name. CI now renames built
+  artifacts before upload so release-page files carry the app name
+  ("Immich Media Frame") instead of Gradle's defaults: prod releases get
+  `ImmichMediaFrame-v{version}.apk` / `ImmichMediaFrame-v{version}.aab`,
+  dev pre-releases get `ImmichMediaFrame-dev-{sha}.apk`. Rename happens in
+  a dedicated workflow step after the build (`mv`); local Gradle output
+  names are unchanged. Safe for self-update: `UpdateManager.kt:153` picks
+  the first release asset ending in `.apk`, not a fixed filename. Updated:
+  ci-cd.md (build job bullets, release asset table).
 - **2026-08-07** — Android 6 (API 23) support. Lowered `minSdk` from 26 → 23,
   reaching ~99% of Android devices (was ~95%). Changes: (1) added
   `desugar_jdk_libs` 2.1.5 (`coreLibraryDesugaring`) so `java.time`
