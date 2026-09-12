@@ -203,17 +203,30 @@ fun SlideshowScreen(
     // the video ends, not the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    // false = image still decoding; true = video or image ready.
-    // Reset to false on every index change so the timer waits for decode.
-    var imageReady by remember { mutableStateOf(false) }
-    LaunchedEffect(state.currentIndex) {
-        // Videos are immediately "ready" — ExoPlayer handles its own timeline.
-        imageReady = state.assets.getOrNull(state.currentIndex)?.type == AssetType.VIDEO
-    }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady, isScreenActive) {
+    // ID of the asset whose image last signalled "loaded" (Coil Success/Error).
+    // Readiness is DERIVED by comparing against the current asset's id instead
+    // of a boolean that gets reset on index change: a boolean reset races with
+    // the synchronous Success callback Coil fires for memory-cached images.
+    // When the reset ran after the callback, the flag stuck false and the
+    // auto-advance timer wedged until the user tapped Next. With the id
+    // comparison, callback ordering is irrelevant and stale callbacks for
+    // other assets are ignored.
+    var loadedAssetId by remember { mutableStateOf<String?>(null) }
+    val currentAsset = state.assets.getOrNull(state.currentIndex)
+    // Videos are immediately "ready" — ExoPlayer handles its own timeline.
+    val imageReady = currentAsset != null &&
+        (currentAsset.type == AssetType.VIDEO || loadedAssetId == currentAsset.id)
+    LaunchedEffect(
+        currentAsset?.id,
+        isPaused,
+        isVideoPaused,
+        s.intervalSeconds,
+        nightActive,
+        isScreenActive,
+        imageReady,
+    ) {
         progress = 0f
-        if (!isPaused && !nightActive && isScreenActive && imageReady && state.assets.isNotEmpty()) {
-            val currentAsset = state.assets[state.currentIndex]
+        if (!isPaused && !nightActive && isScreenActive && imageReady && currentAsset != null) {
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
                 return@LaunchedEffect
@@ -227,6 +240,9 @@ fun SlideshowScreen(
                 progress = elapsed.toFloat() / total
             }
             viewModel.next()
+            // Diagnostics for 24/7 frames: one line per auto-advance. Gaps in
+            // this log = the timer stalled (or night mode/screen-off pause).
+            Timber.d("Auto-advance to index %d/%d", state.currentIndex, state.assets.size)
         }
     }
 
@@ -397,7 +413,7 @@ fun SlideshowScreen(
                                     photoAnimations = s.photoAnimations,
                                     enabledAnims = s.enabledAnimations,
                                     durationMs = s.intervalSeconds * 1000L,
-                                    onImageLoaded = { imageReady = true },
+                                    onImageLoaded = { loadedAssetId = assetId },
                                 )
                             }
                         }

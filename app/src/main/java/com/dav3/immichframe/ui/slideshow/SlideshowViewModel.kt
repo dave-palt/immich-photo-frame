@@ -197,13 +197,19 @@ constructor(
 
     fun setClockPosition(pos: ClockPosition) {
         viewModelScope.launch {
-            settingsRepo.setSlideshowSettings(settings.value.copy(clockPosition = pos))
+            // Read fresh from the repo — the StateFlow may still hold the
+            // seeded default if DataStore hasn't emitted yet, and writing
+            // `settings.value.copy(...)` from that default would clobber the
+            // user's real settings (interval, night mode, ...).
+            val current = settingsRepo.slideshowSettings.first()
+            settingsRepo.setSlideshowSettings(current.copy(clockPosition = pos))
         }
     }
 
     fun setMuted(value: Boolean) {
         viewModelScope.launch {
-            settingsRepo.setSlideshowSettings(settings.value.copy(muted = value))
+            val current = settingsRepo.slideshowSettings.first()
+            settingsRepo.setSlideshowSettings(current.copy(muted = value))
         }
     }
 
