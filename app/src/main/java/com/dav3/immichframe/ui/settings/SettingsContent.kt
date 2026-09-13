@@ -72,6 +72,10 @@ fun SettingsContent(
     onToggleAdaptiveBackground: () -> Unit,
     onToggleFullscreen: () -> Unit,
     onToggleKeepScreenOn: () -> Unit,
+    onTogglePhotoDate: () -> Unit,
+    onToggleLocation: () -> Unit,
+    onToggleDescription: () -> Unit,
+    onToggleTags: () -> Unit,
     onToggleNightMode: () -> Unit,
     onUpdateNightModeStart: (Int) -> Unit,
     onUpdateNightModeEnd: (Int) -> Unit,
@@ -108,6 +112,8 @@ fun SettingsContent(
         PhotoAnimationsSection(s, onTogglePhotoAnimations, onToggleAnimation)
         HorizontalDivider()
         DisplaySection(s, onUpdateFillMode, onToggleAdaptiveBackground, onToggleFullscreen, onToggleKeepScreenOn)
+        HorizontalDivider()
+        PhotoMetadataSection(s, onTogglePhotoDate, onToggleLocation, onToggleDescription, onToggleTags)
         HorizontalDivider()
         NightModeSection(s, onToggleNightMode, onUpdateNightModeBrightness)
         HorizontalDivider()
@@ -236,6 +242,41 @@ private fun DisplaySection(
         title = stringResource(R.string.keep_screen_on),
         checked = s.keepScreenOn,
         onToggle = onToggleKeepScreenOn,
+    )
+}
+
+@Composable
+private fun PhotoMetadataSection(
+    s: SlideshowSettings,
+    onTogglePhotoDate: () -> Unit,
+    onToggleLocation: () -> Unit,
+    onToggleDescription: () -> Unit,
+    onToggleTags: () -> Unit,
+) {
+    SectionHeaderPreview(stringResource(R.string.section_photo_metadata))
+    SwitchItemPreview(
+        title = stringResource(R.string.show_photo_date),
+        subtitle = stringResource(R.string.show_photo_date_desc),
+        checked = s.showPhotoDate,
+        onToggle = onTogglePhotoDate,
+    )
+    SwitchItemPreview(
+        title = stringResource(R.string.show_location),
+        subtitle = stringResource(R.string.show_location_desc),
+        checked = s.showLocation,
+        onToggle = onToggleLocation,
+    )
+    SwitchItemPreview(
+        title = stringResource(R.string.show_description),
+        subtitle = stringResource(R.string.show_description_desc),
+        checked = s.showDescription,
+        onToggle = onToggleDescription,
+    )
+    SwitchItemPreview(
+        title = stringResource(R.string.show_tags),
+        subtitle = stringResource(R.string.show_tags_desc),
+        checked = s.showTags,
+        onToggle = onToggleTags,
     )
 }
 
@@ -689,6 +730,27 @@ private fun SettingsSectionPreview_Display() {
                 onToggleAdaptiveBackground = {},
                 onToggleFullscreen = {},
                 onToggleKeepScreenOn = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = PREVIEW_BG, widthDp = 360, heightDp = 640)
+@Composable
+private fun SettingsSectionPreview_PhotoMetadata() {
+    ImmichFrameTheme {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            PhotoMetadataSection(
+                s = SlideshowSettings(
+                    showPhotoDate = true,
+                    showLocation = true,
+                    showDescription = true,
+                    showTags = true,
+                ),
+                onTogglePhotoDate = {},
+                onToggleLocation = {},
+                onToggleDescription = {},
+                onToggleTags = {},
             )
         }
     }

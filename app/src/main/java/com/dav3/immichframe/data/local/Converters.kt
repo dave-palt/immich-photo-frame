@@ -9,4 +9,14 @@ class Converters {
 
     @TypeConverter
     fun toAssetType(value: String): AssetType = AssetType.valueOf(value)
+
+    @TypeConverter
+    fun fromStringList(value: List<String>): String = value.joinToString(SEPARATOR)
+
+    @TypeConverter
+    fun toStringList(value: String): List<String> = if (value.isEmpty()) emptyList() else value.split(SEPARATOR)
+
+    companion object {
+        private const val SEPARATOR = "||"
+    }
 }
