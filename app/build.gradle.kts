@@ -16,7 +16,7 @@ android {
         minSdk = 23
         targetSdk = 37
         versionCode = (System.currentTimeMillis() / 1000).toInt()
-        versionName = "0.6.0"
+        versionName = "0.7.0"
 
         // Git SHA for self-update version comparison (config-cache safe)
         buildConfigField(
