@@ -142,6 +142,29 @@ Format:
 
 <!-- Append new clarifications below this line. -->
 
+- **2026-08-22** — Release assets renamed to app name. CI now renames built
+  artifacts before upload so release-page files carry the app name
+  ("Immich Media Frame") instead of Gradle's defaults: prod releases get
+  `ImmichMediaFrame-v{version}.apk` / `ImmichMediaFrame-v{version}.aab`,
+  dev pre-releases get `ImmichMediaFrame-dev-{sha}.apk`. Rename happens in
+  a dedicated workflow step after the build (`mv`); local Gradle output
+  names are unchanged. Safe for self-update: `UpdateManager.kt:153` picks
+  the first release asset ending in `.apk`, not a fixed filename. Updated:
+  ci-cd.md (build job bullets, release asset table).
+- **2026-08-07** — Android 6 (API 23) support. Lowered `minSdk` from 26 → 23,
+  reaching ~99% of Android devices (was ~95%). Changes: (1) added
+  `desugar_jdk_libs` 2.1.5 (`coreLibraryDesugaring`) so `java.time`
+  (used in `ImmichRepositoryImpl.kt` for `Instant.parse()`) works on
+  API < 26; (2) two API 26+ calls guarded with `Build.VERSION.SDK_INT`
+  checks — `Bitmap.Config.HARDWARE` in `ImageUtils.kt:35` (pre-26 never
+  returns HARDWARE bitmaps) and `PackageManager.canRequestPackageInstalls()`
+  in `UpdateManager.kt:89` (pre-26 uses the global "Unknown sources"
+  setting, so returns `true`). All AndroidX libs (Compose, Room, WorkManager,
+  Coil, DataStore, Media3, Biometric, EncryptedSharedPreferences) already
+  support API 21+. Biometric degrades gracefully on pre-28 (fingerprint on
+  23–27; the existing `AuthCapability` path handles devices without
+  biometric/credential). Updated: technical-spec (min SDK row, desugar row
+  in tech stack table), README (requirements).
 - **2026-08-04** — Weather location picker (GPS + OSM Nominatim address
   search + manual lat/long). Added three alternative ways to set the
   weather location, all resolving to the same stored lat/long: (1)

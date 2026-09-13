@@ -183,6 +183,10 @@
     <string name="tour_step_counter">Paso %1$d de %2$d</string>
     <string name="reset_all_tours">Restablecer todos los recorridos</string>
     <string name="show_tour">Mostrar tour de nuevo</string>
+    <!-- Diagnostics -->
+    <string name="share_logs">Compartir registros</string>
+    <string name="share_logs_desc">Exporta el registro de la aplicación y los informes de fallos para compartirlos o adjuntarlos a un informe de error.</string>
+    <string name="no_logs_available">Aún no hay archivos de registro disponibles.</string>
     <string name="tour_setup_welcome_title">Bienvenido a Immich Media Frame</string>
     <string name="tour_setup_welcome_body">Conéctate a tu servidor Immich para mostrar tus fotos. Repasemos la configuración.</string>
     <string name="tour_setup_server_title">Dirección del servidor</string>

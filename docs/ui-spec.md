@@ -267,6 +267,7 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 │                              │
 │  Show Tour Again             │ ← replays Settings tour
 │  Reset All Tours             │ ← replays all screens' tours
+│  Share Logs                  │ ← opens share sheet with log/crash files
 │                              │
 └──────────────────────────────┘
 ```
@@ -284,7 +285,9 @@ Accessible from album selection (gear icon) or slideshow controls (gear icon).
 - Back arrow returns to previous screen.
 - **System section** includes a version string in the top bar (`Settings vX.Y.Z`)
   and two tour replay buttons: **"Show Tour Again"** (replays only the Settings
-  tour) and **"Reset All Tours"** (replays tours on all screens).
+  tour) and **"Reset All Tours"** (replays tours on all screens). A **"Share
+  Logs"** button opens the system share sheet with log files and crash reports
+  attached.
 
 ### Onboarding Tour Overlay
 

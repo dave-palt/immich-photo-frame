@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -123,7 +124,7 @@ constructor(
                 // Show cached assets immediately
                 val videoCount = cachedAssets.count { it.type == AssetType.VIDEO }
                 val imageCount = cachedAssets.count { it.type == AssetType.IMAGE }
-                android.util.Log.d("SlideshowLoad", "Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
+                Timber.d("Cache: $imageCount images, $videoCount videos, skipVideos=${s.skipVideos}")
                 val filteredAssets = applyMediaSelection(cachedAssets, toggledIds, newItemsShown)
                     .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
@@ -163,7 +164,7 @@ constructor(
 
                 val filteredAssets = applyMediaSelection(allAssets, toggledIds, newItemsShown)
                     .let { if (s.skipVideos) it.filter { it.type == AssetType.IMAGE } else it }
-                android.util.Log.d("SlideshowLoad", "Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
+                Timber.d("Network: ${allAssets.count { it.type == AssetType.IMAGE }} images, ${allAssets.count { it.type == AssetType.VIDEO }} videos, skipVideos=${s.skipVideos}")
                 val ordered = if (s.shuffle) filteredAssets.shuffled() else filteredAssets
 
                 _uiState.value = when {
@@ -202,7 +203,12 @@ constructor(
 
     fun setClockPosition(pos: ClockPosition) {
         viewModelScope.launch {
-            settingsRepo.setSlideshowSettings(settings.value.copy(clockPosition = pos))
+            // Read fresh from the repo — the StateFlow may still hold the
+            // seeded default if DataStore hasn't emitted yet, and writing
+            // `settings.value.copy(...)` from that default would clobber the
+            // user's real settings (interval, night mode, ...).
+            val current = settingsRepo.slideshowSettings.first()
+            settingsRepo.setSlideshowSettings(current.copy(clockPosition = pos))
         }
     }
 
@@ -227,7 +233,8 @@ constructor(
 
     fun setMuted(value: Boolean) {
         viewModelScope.launch {
-            settingsRepo.setSlideshowSettings(settings.value.copy(muted = value))
+            val current = settingsRepo.slideshowSettings.first()
+            settingsRepo.setSlideshowSettings(current.copy(muted = value))
         }
     }
 

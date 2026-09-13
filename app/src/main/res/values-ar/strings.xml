@@ -183,6 +183,10 @@
     <string name="tour_step_counter">الخطوة %1$d من %2$d</string>
     <string name="reset_all_tours">إعادة تعيين جميع الجولات</string>
     <string name="show_tour">إظهار الجولة مرة أخرى</string>
+    <!-- Diagnostics -->
+    <string name="share_logs">مشاركة السجلات</string>
+    <string name="share_logs_desc">تصدير سجل التطبيق وتقارير الأعطال للمشاركة أو إرفاقها بتقرير خطأ.</string>
+    <string name="no_logs_available">لا توجد ملفات سجل متاحة بعد.</string>
     <string name="tour_setup_welcome_title">مرحباً بك في Immich Media Frame</string>
     <string name="tour_setup_welcome_body">اتصل بخادم Immich لعرض صورك. دعنا نمر بالإعداد.</string>
     <string name="tour_setup_server_title">عنوان الخادم</string>

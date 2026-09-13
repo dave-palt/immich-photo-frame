@@ -45,6 +45,7 @@ Two parallel jobs:
 #### Build job
 - Builds debug APK with `.debug` application ID suffix and `-dev` version name suffix
 - APK signed with the committed `app/debug.keystore` — the same key used by local `assembleDebug` builds, so local and CI dev builds are interchangeable (clean upgrade-over-install in either direction)
+- APK renamed to `ImmichMediaFrame-dev-{sha}.apk` (app name + commit SHA) before upload
 - Artifact: `immichframe-debug` (14-day retention)
 - **On push to develop** (not PR): publishes a GitHub pre-release:
   - Tag: `dev-{full sha}` (explicitly pinned via `--target ${{ github.sha }}`)
@@ -70,6 +71,7 @@ Triggers on push to `main` or manual `workflow_dispatch` (workflow: `.github/wor
   Both targets share one task graph (compile + R8 once), which is faster than
   two sequential invocations and avoids the duplicated setup of split jobs.
 - Uploads both as artifacts (90-day retention)
+- Renames the outputs to `ImmichMediaFrame-v{version}.apk` / `.aab` so release assets carry the app name instead of Gradle's default `app-release.*`
 - Creates a GitHub Release with `softprops/action-gh-release@v3`
 
 #### Version (single source of truth)
@@ -150,8 +152,8 @@ The production build compiles and releases the `keymgr` cross-platform CLI tool 
 
 | Asset | Platform | Purpose |
 |---|---|---|
-| `immichframe-release.apk` | Android | Installable APK |
-| `immichframe-release.aab` | Android/Play Store | App Bundle |
+| `ImmichMediaFrame-v{version}.apk` | Android | Installable APK |
+| `ImmichMediaFrame-v{version}.aab` | Android/Play Store | App Bundle |
 | `keymgr` | macOS, Linux | Compiled standalone Bun binary |
 | `generate-api-key.sh` / `check-api-key.sh` | macOS, Linux | Bash scripts (curl) |
 | `generate-api-key.ps1` / `check-api-key.ps1` | Windows (PowerShell 5.1+) | Native PowerShell scripts (Invoke-RestMethod) |
