@@ -26,6 +26,12 @@ data class CachedAssetEntity(
     @ColumnInfo(name = "last_modified") val lastModified: Long,
     @ColumnInfo(name = "cached_at") val cachedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "original_mime_type") val originalMimeType: String? = null,
+    @ColumnInfo(name = "exif_date_time_original") val exifDateTimeOriginal: String? = null,
+    @ColumnInfo(name = "exif_description") val exifDescription: String? = null,
+    @ColumnInfo(name = "exif_city") val exifCity: String? = null,
+    @ColumnInfo(name = "exif_state") val exifState: String? = null,
+    @ColumnInfo(name = "exif_country") val exifCountry: String? = null,
+    @ColumnInfo(name = "tags") val tags: List<String> = emptyList(),
 ) {
     companion object {
         fun fromDomain(domain: CachedAsset): CachedAssetEntity = CachedAssetEntity(
@@ -39,6 +45,12 @@ data class CachedAssetEntity(
             lastModified = domain.lastModified,
             cachedAt = domain.cachedAt,
             originalMimeType = domain.originalMimeType,
+            exifDateTimeOriginal = domain.exifDateTimeOriginal,
+            exifDescription = domain.exifDescription,
+            exifCity = domain.exifCity,
+            exifState = domain.exifState,
+            exifCountry = domain.exifCountry,
+            tags = domain.tags,
         )
 
         fun toDomain(entity: CachedAssetEntity): CachedAsset = CachedAsset(
@@ -52,6 +64,12 @@ data class CachedAssetEntity(
             lastModified = entity.lastModified,
             cachedAt = entity.cachedAt,
             originalMimeType = entity.originalMimeType,
+            exifDateTimeOriginal = entity.exifDateTimeOriginal,
+            exifDescription = entity.exifDescription,
+            exifCity = entity.exifCity,
+            exifState = entity.exifState,
+            exifCountry = entity.exifCountry,
+            tags = entity.tags,
         )
     }
 }

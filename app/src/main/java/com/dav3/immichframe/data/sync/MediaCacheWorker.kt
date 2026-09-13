@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import timber.log.Timber
 import java.io.File
 
 @HiltWorker
@@ -147,7 +148,7 @@ class MediaCacheWorker @AssistedInject constructor(
             !file.exists() || file.length() == 0L || file.length() != cached.fileSize
         }.map { it.id }
         if (corruptIds.isNotEmpty()) {
-            android.util.Log.w("MediaCacheWorker", "Purging ${corruptIds.size} corrupt cache entries: ${corruptIds.take(3)}")
+            Timber.w("Purging ${corruptIds.size} corrupt cache entries: ${corruptIds.take(3)}")
             mediaCacheRepository.removeAssets(corruptIds)
         }
         // Recompute after purge so the download loop redownloads them.
@@ -290,6 +291,12 @@ class MediaCacheWorker @AssistedInject constructor(
                     lastModified = System.currentTimeMillis(),
                     cachedAt = System.currentTimeMillis(),
                     originalMimeType = asset.originalMimeType,
+                    exifDateTimeOriginal = asset.exif?.dateTimeOriginal,
+                    exifDescription = asset.exif?.description,
+                    exifCity = asset.exif?.city,
+                    exifState = asset.exif?.state,
+                    exifCountry = asset.exif?.country,
+                    tags = asset.tags,
                 ),
             )
         } catch (e: Exception) {

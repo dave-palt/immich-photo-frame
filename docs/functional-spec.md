@@ -251,6 +251,31 @@ Options:
 - **Adaptive Background** — fill letterbox bars with a gradient derived from
   each photo's edge colors (top/bottom for horizontal bars, left/right for
   vertical bars; uses Palette API, default off)
+- **Photo Metadata** section (EXIF-based overlays on the slideshow):
+  - **Photo Date** — show the date the photo was taken, parsed from EXIF
+    `dateTimeOriginal` (default off)
+  - **Location** — show city, state, and country from EXIF GPS data (default off)
+  - **Description** — show the photo description from EXIF metadata (default off)
+  - **Tags** — show tags assigned to the photo in Immich (default off)
+  - Each field renders as an icon+text row in the bottom-right corner of the
+    slideshow. Fields with no data are hidden automatically. The overlay is
+    always visible during playback (not tied to controls visibility).
+- **Weather** section (Open-Meteo, free, no API key):
+  - **Show Weather** toggle (default off). Displays current temperature in
+    the bottom-left corner of the slideshow.
+  - **Use current location** button — requests `ACCESS_COARSE_LOCATION` /
+    `ACCESS_FINE_LOCATION` permission (if not yet granted), then reads the
+    device GPS (one-shot, no background tracking). Reverse-geocoded to a
+    friendly label via OSM Nominatim.
+  - **Address search** — free-text search box powered by OpenStreetMap
+    Nominatim geocoding. Type a city or address → pick from results →
+    lat/long is stored.
+  - **Manual lat/long** — collapsible manual entry as a fallback (find
+    coordinates at openstreetmap.org).
+  - **Temperature Unit** — Celsius or Fahrenheit (°C / °F chips).
+  - **Show Weather Description** — show text like "Partly cloudy" below the
+    temperature (default on).
+  - Weather is fetched on slideshow entry and refreshed every 10 minutes.
 - **Shuffle** — randomize image order (default on)
 - **Skip Videos** — only show photos (default on)
 - **Muted** — silence video audio (default on)
@@ -318,6 +343,10 @@ Options:
 - **Reset All Settings** — clears all settings, credentials, album selection,
   and cached data, returns to setup screen. Tour completion is **preserved**
   (use "Reset All Tours" to clear tour progress).
+- **Share Logs** — opens the system share sheet with all available log files
+  (app log + crash reports) attached via `FileProvider`. Lets testers send
+  diagnostic data via email, Drive, GitHub issue, etc. without `adb`. Shows a
+  snackbar if no log files exist yet.
 
 ### F8: Media Selection
 

@@ -88,6 +88,7 @@ import com.dav3.immichframe.ui.onboarding.tourTarget
 import com.dav3.immichframe.ui.update.UpdateViewModel
 import com.dav3.immichframe.util.extractBorderColors
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -101,6 +102,7 @@ fun SlideshowScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val settings by viewModel.settings.collectAsState(initial = SlideshowSettings())
+    val weather by viewModel.weather.collectAsState()
     val s = settings
 
     val tourState = rememberTourState()
@@ -119,6 +121,17 @@ fun SlideshowScreen(
     val authSubtitleAlbums = stringResource(R.string.biometric_auth_subtitle_albums)
 
     LaunchedEffect(Unit) { viewModel.load() }
+
+    // Weather: fetch on entry, then every 10 minutes
+    LaunchedEffect(s.showWeather, s.weatherLatitude, s.weatherLongitude, s.weatherUnit) {
+        if (s.showWeather) {
+            viewModel.refreshWeather()
+            while (true) {
+                kotlinx.coroutines.delay(10 * 60 * 1000L)
+                viewModel.refreshWeather()
+            }
+        }
+    }
 
     // Album deleted on server — bounce back to album selection so the user
     // can pick again. Only fires once per load() that sets the flag.
@@ -202,17 +215,30 @@ fun SlideshowScreen(
     // the video ends, not the interval timer).
     // Exception: if the video is manually paused, the timer takes over.
     var progress by remember { mutableStateOf(0f) }
-    // false = image still decoding; true = video or image ready.
-    // Reset to false on every index change so the timer waits for decode.
-    var imageReady by remember { mutableStateOf(false) }
-    LaunchedEffect(state.currentIndex) {
-        // Videos are immediately "ready" — ExoPlayer handles its own timeline.
-        imageReady = state.assets.getOrNull(state.currentIndex)?.type == AssetType.VIDEO
-    }
-    LaunchedEffect(state.currentIndex, isPaused, isVideoPaused, s.intervalSeconds, nightActive, imageReady, isScreenActive) {
+    // ID of the asset whose image last signalled "loaded" (Coil Success/Error).
+    // Readiness is DERIVED by comparing against the current asset's id instead
+    // of a boolean that gets reset on index change: a boolean reset races with
+    // the synchronous Success callback Coil fires for memory-cached images.
+    // When the reset ran after the callback, the flag stuck false and the
+    // auto-advance timer wedged until the user tapped Next. With the id
+    // comparison, callback ordering is irrelevant and stale callbacks for
+    // other assets are ignored.
+    var loadedAssetId by remember { mutableStateOf<String?>(null) }
+    val currentAsset = state.assets.getOrNull(state.currentIndex)
+    // Videos are immediately "ready" — ExoPlayer handles its own timeline.
+    val imageReady = currentAsset != null &&
+        (currentAsset.type == AssetType.VIDEO || loadedAssetId == currentAsset.id)
+    LaunchedEffect(
+        currentAsset?.id,
+        isPaused,
+        isVideoPaused,
+        s.intervalSeconds,
+        nightActive,
+        isScreenActive,
+        imageReady,
+    ) {
         progress = 0f
-        if (!isPaused && !nightActive && isScreenActive && imageReady && state.assets.isNotEmpty()) {
-            val currentAsset = state.assets[state.currentIndex]
+        if (!isPaused && !nightActive && isScreenActive && imageReady && currentAsset != null) {
             if (currentAsset.type == AssetType.VIDEO && !isVideoPaused) {
                 // Video playing normally — VideoPlayer calls viewModel.next() on end
                 return@LaunchedEffect
@@ -226,6 +252,9 @@ fun SlideshowScreen(
                 progress = elapsed.toFloat() / total
             }
             viewModel.next()
+            // Diagnostics for 24/7 frames: one line per auto-advance. Gaps in
+            // this log = the timer stalled (or night mode/screen-off pause).
+            Timber.d("Auto-advance to index %d/%d", state.currentIndex, state.assets.size)
         }
     }
 
@@ -396,11 +425,31 @@ fun SlideshowScreen(
                                     photoAnimations = s.photoAnimations,
                                     enabledAnims = s.enabledAnimations,
                                     durationMs = s.intervalSeconds * 1000L,
-                                    onImageLoaded = { imageReady = true },
+                                    onImageLoaded = { loadedAssetId = assetId },
                                 )
                             }
                         }
                     }
+                }
+
+                // Photo metadata overlay (date, location, description, tags)
+                if (!nightActive && !state.isLoading && state.error == null && state.assets.isNotEmpty()) {
+                    val currentAsset = state.assets[state.currentIndex]
+                    PhotoMetadataOverlay(
+                        asset = currentAsset,
+                        settings = s,
+                        modifier = Modifier.align(Alignment.BottomEnd),
+                    )
+                }
+
+                // Weather overlay (Open-Meteo, bottom-left)
+                val weatherData = weather
+                if (!nightActive && s.showWeather && weatherData != null) {
+                    WeatherOverlay(
+                        weather = weatherData,
+                        showDescription = s.showWeatherDescription,
+                        modifier = Modifier.align(Alignment.BottomStart),
+                    )
                 }
 
                 // Draggable clock overlay — positioned from top-left via absolute offset
@@ -682,8 +731,6 @@ fun SlideshowScreen(
     }
 }
 
-private const val TAG_VIDEO = "VideoPlayer"
-
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 private fun VideoPlayer(
@@ -702,7 +749,7 @@ private fun VideoPlayer(
 
     DisposableEffect(asset.id) {
         val url = viewModel.videoUrl(asset.id)
-        android.util.Log.d(TAG_VIDEO, "Loading video: assetId=${asset.id} url=$url")
+        Timber.d("Loading video: assetId=${asset.id} url=$url")
         exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(url)))
         exoPlayer.prepare()
         onDispose {
@@ -748,7 +795,7 @@ private fun VideoPlayer(
                     Player.STATE_ENDED -> "ENDED"
                     else -> "UNKNOWN($playbackState)"
                 }
-                android.util.Log.d(TAG_VIDEO, "State changed: $stateName (asset=${asset.id})")
+                Timber.d("State changed: $stateName (asset=${asset.id})")
                 if (playbackState == Player.STATE_ENDED && !isSlideshowPaused && !isVideoPaused && isScreenActive) {
                     viewModel.next()
                 }
@@ -756,8 +803,8 @@ private fun VideoPlayer(
 
             override fun onPlayerErrorChanged(error: androidx.media3.common.PlaybackException?) {
                 if (error != null) {
-                    android.util.Log.e(TAG_VIDEO, "Playback error: ${error.errorCodeName}", error)
-                    android.util.Log.e(TAG_VIDEO, "Cause: ${error.cause?.javaClass?.name}: ${error.cause?.message}")
+                    Timber.e(error, "Playback error: ${error.errorCodeName}")
+                    Timber.e("Cause: ${error.cause?.javaClass?.name}: ${error.cause?.message}")
                     // Skip to next on error so slideshow isn't stuck
                     viewModel.next()
                 }

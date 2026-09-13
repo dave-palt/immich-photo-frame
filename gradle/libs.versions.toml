@@ -1,31 +1,33 @@
 [versions]
-agp = "9.1.0"
+agp = "9.3.1"
 kotlin = "2.4.10"
-ksp = "2.3.10"
+ksp = "2.3.11"
 hilt = "2.60.1"
 hiltNavCompose = "1.4.0"
 hiltWork = "1.4.0"
 composeBom = "2026.06.01"
-lifecycle = "2.8.7"
+lifecycle = "2.11.0"
 navCompose = "2.8.5"
 retrofit = "3.0.0"
 okhttp = "5.4.0"
-kotlinxSerialization = "1.7.3"
+kotlinxSerialization = "1.11.0"
 retrofitKotlinxSerialization = "1.0.0"
 coil = "3.5.0"
 datastore = "1.1.1"
-securityCrypto = "1.1.0-alpha06"
-coreKtx = "1.15.0"
-activityCompose = "1.9.3"
+securityCrypto = "1.1.0"
+coreKtx = "1.19.0"
+activityCompose = "1.13.0"
 media3 = "1.10.1"
 workManager = "2.9.1"
 room = "2.8.4"
 biometric = "1.1.0"
-browser = "1.8.0"
-spotless = "8.8.0"
+browser = "1.10.0"
+spotless = "8.9.0"
 robolectric = "4.17-beta-2"
 roborazzi = "1.70.0"
 composablePreviewScanner = "0.9.1"
+desugarJdklibs = "2.1.5"
+timber = "5.0.1"
 
 [libraries]
 # AndroidX core
@@ -101,6 +103,12 @@ roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi
 roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
 roborazzi-annotations = { group = "io.github.takahirom.roborazzi", name = "roborazzi-annotations", version.ref = "roborazzi" }
 composable-preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "composablePreviewScanner" }
+
+# Java 8+ API desugaring for API 23+ (java.time support below API 26)
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdklibs" }
+
+# Logging (file + logcat via Timber)
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # JVM unit testing
 junit = { group = "junit", name = "junit", version = "4.13.2" }

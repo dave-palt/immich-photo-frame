@@ -31,7 +31,7 @@ jobs:
         run: bash scripts/build.sh
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v5.7.0
         with:
           distribution: temurin
           java-version: 17
@@ -59,6 +59,14 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: ./gradlew bundleRelease assembleRelease --no-daemon
+
+      - name: Rename artifacts to app name
+        run: |
+          version="${{ steps.version.outputs.name }}"
+          mv app/build/outputs/apk/release/app-release.apk \
+            "app/build/outputs/apk/release/ImmichMediaFrame-v${version}.apk"
+          mv app/build/outputs/bundle/release/app-release.aab \
+            "app/build/outputs/bundle/release/ImmichMediaFrame-v${version}.aab"
 
       - name: Upload AAB
         uses: actions/upload-artifact@v7

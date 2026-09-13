@@ -8,11 +8,15 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.gif.GifDecoder
 import coil3.request.crossfade
+import com.dav3.immichframe.logging.CrashHandler
+import com.dav3.immichframe.logging.FileLoggingTree
+import com.dav3.immichframe.logging.LogConfig
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -36,6 +40,27 @@ class ImmichFrameApp :
 
     override fun onCreate() {
         super.onCreate()
+
+        // --- File logging + crash capture (FIRST, so it catches early failures) ---
+        // Install the uncaught-exception handler before anything else, so a crash
+        // in sync scheduling, image-loader setup, etc. still produces a report.
+        val logDir = getExternalFilesDir(null)
+        if (logDir != null) {
+            CrashHandler.install(logDir)
+            val fileTree = FileLoggingTree(LogConfig.appLogFile(logDir))
+            if (BuildConfig.DEBUG) {
+                // Debug: logcat (via DebugTree) + file
+                Timber.plant(Timber.DebugTree(), fileTree)
+            } else {
+                // Release: file only (logcat is not reliably captured)
+                Timber.plant(fileTree)
+            }
+        } else {
+            // No external storage — fall back to logcat only.
+            Timber.plant(Timber.DebugTree())
+        }
+        Timber.i("ImmichFrame starting — version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}), git=${BuildConfig.GIT_SHA.take(8)}")
+
         // Schedule periodic sync based on user settings (deferred to background)
         appScope.launch {
             syncScheduler.schedulePeriodicSync()
